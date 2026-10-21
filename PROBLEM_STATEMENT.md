@@ -30,7 +30,7 @@ We can solve this by developing a dedicated web-based community ride-sharing pla
 
 ### Platform
 
-- CareRide.com is a web-based portal, not affiliated with The Salvation Army, that any organization can access.
+- Relay Collective.com is a web-based portal, not affiliated with The Salvation Army, that any organization can access.
 - It is a third-party managed platform.
 - It is not another Uber-style service: The Salvation Army can set destinations with specific routes for clients to order a ride.
 

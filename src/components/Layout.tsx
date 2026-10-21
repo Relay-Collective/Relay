@@ -163,7 +163,7 @@ export function Layout() {
         <div className="no-print border-b border-amber-200 bg-sun-50">
           <p className="mx-auto flex max-w-5xl items-center gap-2 px-4 py-3 text-sm font-medium text-amber-900 sm:px-6">
             <Clock className="h-4 w-4 shrink-0" aria-hidden />
-            Your account is waiting for approval from the CareRide team.
+            Your account is waiting for approval from the Relay Collective team.
             {role !== 'DRIVER' && ' You can set things up in the meantime.'}
           </p>
         </div>
@@ -204,7 +204,7 @@ export function Layout() {
       )}
 
       <footer className="no-print mx-auto max-w-5xl px-4 pb-10 text-sm text-slate-500 sm:px-6">
-        {isDemoBackend ? 'Demo data only. ' : ''}CareRide is an independent platform.{' '}
+        {isDemoBackend ? 'Demo data only. ' : ''}Relay Collective is an independent platform.{' '}
         {/* Used before every demo, so it stays visible, but asks first: it wipes everything. Local mock only. */}
         {isDemoBackend && (
           <ConfirmButton

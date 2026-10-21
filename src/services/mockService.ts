@@ -37,7 +37,7 @@ import { backfilledEvents, seed, type Database } from './seed'
 // Older saves can't be mapped onto that, so they start again from the seed.
 // v6: real house addresses and each house's frequent destinations.
 // v7: each completed trip counts as a one-zone Vancouver bus fare.
-// v8: the CareRide Admin signs in as admin@careride.com with its own password.
+// v8: the Relay Collective Admin signs in as admin@careride.com with its own password.
 export const STORAGE_KEY = 'careride-db-v8'
 const OLD_STORAGE_KEYS = ['careride-db-v7', 'careride-db-v6', 'careride-db-v5', 'careride-db-v4', 'careride-db-v3']
 
@@ -263,7 +263,7 @@ function signedInUser(db: Database): User | undefined {
   return db.users.find((u) => u.id === readSession())
 }
 
-// Adds one line to a ride's history. No actor means CareRide made the change on its own.
+// Adds one line to a ride's history. No actor means Relay Collective made the change on its own.
 function logEvent(db: Database, rideId: string, actor: User | undefined, { kind, detail }: RideEventDraft): void {
   db.events.push({ id: newId('event'), rideId, kind, at: now(), actorRole: actor?.role, actorName: actor?.name, detail })
 }
@@ -463,7 +463,7 @@ export const mockService: DataService = {
     transact((db) => {
       const user = findOrThrow(db.users, userId, 'Account')
       if (user.role === 'PLATFORM_ADMIN' && db.users.filter((u) => u.role === 'PLATFORM_ADMIN').length === 1) {
-        throw new Error("This is the only CareRide admin account, so it can't be deleted.")
+        throw new Error("This is the only Relay Collective admin account, so it can't be deleted.")
       }
 
       const driver = db.drivers.find((d) => d.userId === userId)
@@ -505,7 +505,7 @@ export const mockService: DataService = {
         for (const ride of db.rides) {
           if (ride.orgId !== user.orgId || !partnerCloseCancelsRide(ride)) continue
           ride.status = 'CANCELLED'
-          ride.cancelReason = 'The organization closed its CareRide account.'
+          ride.cancelReason = 'The organization closed its Relay Collective account.'
           ride.cancelledAt = now()
           closePendingOffers(db, ride.id)
         }
@@ -821,7 +821,7 @@ export const mockService: DataService = {
 
   listFeedback: ({ driverId, orgId }) =>
     transact((db) => {
-      if (signedInUser(db)?.role !== 'PLATFORM_ADMIN') throw new Error('Only CareRide admins can see feedback.')
+      if (signedInUser(db)?.role !== 'PLATFORM_ADMIN') throw new Error('Only Relay Collective admins can see feedback.')
       return db.feedback.filter((f) => (!driverId || f.driverId === driverId) && (!orgId || f.orgId === orgId))
     }),
 

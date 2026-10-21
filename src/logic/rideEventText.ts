@@ -28,10 +28,10 @@ function list(items: string[]): string {
   return items.length <= 1 ? (items[0] ?? '') : `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`
 }
 
-// No role means CareRide made the change on its own.
+// No role means Relay Collective made the change on its own.
 export function actorLabel(event: Pick<RideEvent, 'actorRole' | 'actorName'>): string {
-  if (!event.actorRole) return 'CareRide'
-  if (event.actorRole === 'PLATFORM_ADMIN') return 'A CareRide admin'
+  if (!event.actorRole) return 'Relay Collective'
+  if (event.actorRole === 'PLATFORM_ADMIN') return 'A Relay Collective admin'
   return event.actorName?.trim() || (event.actorRole === 'DRIVER' ? 'The driver' : 'The front desk')
 }
 

@@ -38,7 +38,7 @@ const ROLES: { value: RegisterRole; title: string; description: string; icon: Re
 export function RoleStep({ draft, update, errors }: StepProps) {
   return (
     <fieldset aria-describedby="role-message">
-      <legend className="sr-only">How will you use CareRide?</legend>
+      <legend className="sr-only">How will you use Relay Collective?</legend>
       <div className="space-y-3" role="radiogroup">
         {ROLES.map((r) => (
           <ChoiceCard
@@ -275,7 +275,7 @@ export function ReviewStep({ draft, goTo }: StepProps) {
       )}
 
       <p className="rounded-xl bg-brand-50 p-4 text-sm text-brand-900">
-        Every new account is reviewed by the CareRide team before rides can start. We'll let you know as soon as you're
+        Every new account is reviewed by the Relay Collective team before rides can start. We'll let you know as soon as you're
         approved.
       </p>
     </div>

@@ -217,7 +217,7 @@ export function RequestRide() {
 
   if (!currentUser || !houses || source === undefined) return null
   const house = houses.find((h) => h.id === currentUser.houseId)
-  if (!house) return <p>This account has no pickup address. Ask the CareRide team to add one.</p>
+  if (!house) return <p>This account has no pickup address. Ask the Relay Collective team to add one.</p>
   if (sourceId && !source) {
     return (
       <p>

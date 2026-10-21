@@ -1,5 +1,5 @@
 {
-  description = "CareRide development environment (Node, JDK 21, Android SDK)";
+  description = "Relay Collective development environment (Node, JDK 21, Android SDK)";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 

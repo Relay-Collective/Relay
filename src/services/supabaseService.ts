@@ -27,7 +27,7 @@ import type {
 import type { DataService, DriverSettings, NewDriver, NewDriverUser, Registration } from './dataService'
 import { getSupabase } from './supabaseClient'
 
-// Real backend. Identity comes from Supabase Auth; the CareRide profile is looked up from it.
+// Real backend. Identity comes from Supabase Auth; the Relay Collective profile is looked up from it.
 // Methods not built yet fail loudly instead of falling back to the local mock (guide Step 10).
 
 // ---------------------------------------------------------------------------
@@ -385,11 +385,11 @@ function signUpMessage(error: AuthError): string {
       return "That email address can't be used. Please check it."
     // Supabase's built-in test mailer only sends to the project team. Needs real email (SMTP) set up for everyone else.
     case 'email_address_not_authorized':
-      return "We can't send a confirmation email to that address yet. Please contact CareRide."
+      return "We can't send a confirmation email to that address yet. Please contact Relay Collective."
     case 'over_email_send_rate_limit':
       return 'Too many sign-up emails were sent recently. Please wait a while and try again.'
     case 'signup_disabled':
-      return "New sign-ups are turned off right now. Please contact CareRide."
+      return "New sign-ups are turned off right now. Please contact Relay Collective."
     default:
       return `We couldn't create your account. ${CONNECTION}`
   }
@@ -400,7 +400,7 @@ function signUpMessage(error: AuthError): string {
 // ---------------------------------------------------------------------------
 
 const ACCOUNT_UNAVAILABLE =
-  "This login doesn't have an active CareRide account. If you think this is a mistake, contact CareRide."
+  "This login doesn't have an active Relay Collective account. If you think this is a mistake, contact Relay Collective."
 
 async function queryProfile(authUserId: string): Promise<ProfileRow | null> {
   const { data, error } = await getSupabase()
@@ -408,11 +408,11 @@ async function queryProfile(authUserId: string): Promise<ProfileRow | null> {
     .select(PROFILE_COLUMNS)
     .eq('auth_user_id', authUserId)
     .maybeSingle<ProfileRow>()
-  if (error) fail(error, "We couldn't load your CareRide account.")
+  if (error) fail(error, "We couldn't load your Relay Collective account.")
   return data
 }
 
-// The CareRide profile for a login. If sign-up was interrupted (or waited for the email link),
+// The Relay Collective profile for a login. If sign-up was interrupted (or waited for the email link),
 // finish it here from the details saved at sign-up. Safe to repeat.
 async function loadProfile(authUser: AuthUser): Promise<User> {
   let row = await queryProfile(authUser.id)
@@ -486,7 +486,7 @@ function siteUrl(): string | undefined {
 
 function resetPasswordUrl(): string {
   const site = siteUrl()
-  if (!site) throw new Error("This app can't send reset links yet. Reset your password on the CareRide website instead.")
+  if (!site) throw new Error("This app can't send reset links yet. Reset your password on the Relay Collective website instead.")
   return `${site}/reset-password`
 }
 
@@ -500,7 +500,7 @@ function passwordMessage(error: AuthError): string {
     case 'over_request_rate_limit':
       return 'Too many reset emails were sent recently. Please wait a while and try again.'
     case 'email_address_not_authorized':
-      return "We can't send email to that address yet. Please contact CareRide."
+      return "We can't send email to that address yet. Please contact Relay Collective."
     default:
       return `That didn't work. ${CONNECTION}`
   }
@@ -565,7 +565,7 @@ export const supabaseService: DataService = {
     }
   },
 
-  // Always looks the same whether or not the email has an account, so nobody can probe who uses CareRide.
+  // Always looks the same whether or not the email has an account, so nobody can probe who uses Relay Collective.
   async requestPasswordReset(email) {
     const { error } = await getSupabase().auth.resetPasswordForEmail(email.trim(), { redirectTo: resetPasswordUrl() })
     if (error && error.code !== 'user_not_found') throw new Error(passwordMessage(error))
@@ -584,7 +584,7 @@ export const supabaseService: DataService = {
     return data.map((row) => toUser(row))
   },
 
-  // Auth reports a taken email at sign-up; a public "is this email registered?" check would leak who uses CareRide.
+  // Auth reports a taken email at sign-up; a public "is this email registered?" check would leak who uses Relay Collective.
   isEmailAvailable: () => Promise.resolve(true),
 
   registerOrganization(org, account, location, destinations = []) {

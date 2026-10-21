@@ -11,11 +11,11 @@ export type SlideId = 'title' | 'problem' | 'impact' | 'approach' | 'live' | 'st
 export const SLIDES: { id: SlideId; label: string; kicker: string; steps?: number; notes: string[] }[] = [
   {
     id: 'title',
-    label: 'CareRide',
+    label: 'Relay Collective',
     kicker: 'HACKVAN 2026',
     notes: [
       'Hook: picture someone at Belkin House with a hospital appointment tomorrow, and no phone to book a ride.',
-      'We’re Adi, Noah and Gilbert. CareRide lets Belkin House staff book that ride for them.',
+      'We’re Adi, Noah and Gilbert. Relay Collective lets Belkin House staff book that ride for them, and a network of volunteer drivers picks it up.',
     ],
   },
   {

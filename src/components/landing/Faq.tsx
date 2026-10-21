@@ -3,8 +3,8 @@ import { Plus } from 'lucide-react'
 // Answers repeat what the rest of the app already promises. Keep them in step with it.
 const QUESTIONS: { q: string; a: string }[] = [
   {
-    q: 'Does CareRide cost anything?',
-    a: 'No. CareRide is a not-for-profit platform built for social good. Rides are free for the people being driven, and joining is free for organizations and drivers.',
+    q: 'Does Relay Collective cost anything?',
+    a: 'No. Relay Collective is a not-for-profit platform built for social good. Rides are free for the people being driven, and joining is free for organizations and drivers.',
   },
   {
     q: 'Does the rider need a phone or an app?',
@@ -23,8 +23,8 @@ const QUESTIONS: { q: string; a: string }[] = [
     a: 'Every driver and organization is reviewed before their first ride.',
   },
   {
-    q: 'Can I use CareRide in an emergency?',
-    a: 'No. CareRide is not an ambulance or emergency service. In a medical emergency, always call 911.',
+    q: 'Can I use Relay Collective in an emergency?',
+    a: 'No. Relay Collective is not an ambulance or emergency service. In a medical emergency, always call 911.',
   },
 ]
 

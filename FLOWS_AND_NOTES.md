@@ -1,4 +1,4 @@
-# CareRide: Flows and Notes
+# Relay Collective: Flows and Notes
 
 Draft. **[open]** = undecided or unclear.
 
@@ -67,7 +67,7 @@ Draft. **[open]** = undecided or unclear.
 - Specify availability and number of spaces
 
 ### Drivers
-- Driver can be unaffiliated, e.g. Frank, an Uber driver who is also a CareRide driver.
+- Driver can be unaffiliated, e.g. Frank, an Uber driver who is also a Relay Collective driver.
 - Start with professional drivers (taxi, ride-share). They are already vetted, so we avoid the liability and hoops.
 - How a user is verified is on us. **[open: how]**
 
@@ -80,7 +80,7 @@ Draft. **[open]** = undecided or unclear.
 - A ride can be solo or have multiple people in the car, especially for scheduled rides.
 - Help clients provide more info. **[open: unclear what this means for the product]**
 - Strong boundary if the client passes up the ride: the client loses the ride.
-- Requests vary. Typical requests that justify a 911 call go to 911; CareRide covers the other cases.
+- Requests vary. Typical requests that justify a 911 call go to 911; Relay Collective covers the other cases.
 - Platform that helps the homeless.
 
 ## 3. What a new org or provider goes through

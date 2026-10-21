@@ -11,7 +11,7 @@ export function getSupabase(): SupabaseClient {
 
   if (!url || !publishableKey) {
     throw new Error(
-      'CareRide Supabase connection settings are missing. Set VITE_SUPABASE_URL and ' +
+      'Relay Collective Supabase connection settings are missing. Set VITE_SUPABASE_URL and ' +
         'VITE_SUPABASE_PUBLISHABLE_KEY in .env.local, then restart the dev server.',
     )
   }

@@ -197,7 +197,7 @@ export interface RideEvent {
   rideId: string
   kind: RideEventKind
   at: string
-  // Who made the change. No role means CareRide did it on its own (e.g. a request ran out of time).
+  // Who made the change. No role means Relay Collective did it on its own (e.g. a request ran out of time).
   actorRole?: UserRole
   actorName?: string // as it was at the time
   detail?: RideEventDetail

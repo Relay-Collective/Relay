@@ -1,17 +1,17 @@
-# CareRide: Step-by-Step Supabase Implementation Guide
+# Relay Collective: Step-by-Step Supabase Implementation Guide
 
 **Audience:** Someone who knows this React project but has never used Supabase.
 
 **Status:** Implementation plan, not an installed integration. The commands and code examples below describe future work. Creating this document does not create a Supabase project, change the backend, or upload data.
 
-**Based on:** The CareRide code reviewed on October 3, 2026. The existing application passed `npm run build` and `npm run lint` during that review. The build reported a bundle-size warning; this is separate from the migration.
+**Based on:** The Relay Collective code reviewed on October 3, 2026. The existing application passed `npm run build` and `npm run lint` during that review. The build reported a bundle-size warning; this is separate from the migration.
 
 **Recommendation:** Keep the React interface and the existing service boundary. Move shared records into Supabase, use Supabase Auth for login, enforce permissions on the backend, and move authoritative ride decisions out of the browser.
 
 ## Contents
 
 - [1. Understand what Supabase will replace](#1-understand-what-supabase-will-replace)
-- [2. Understand the current CareRide architecture](#2-understand-the-current-careride-architecture)
+- [2. Understand the current Relay Collective architecture](#2-understand-the-current-careride-architecture)
 - [3. Create a development Supabase project](#3-create-a-development-supabase-project)
 - [4. Connect the React application](#4-connect-the-react-application)
 - [5. Design the database tables](#5-design-the-database-tables)
@@ -36,15 +36,15 @@
 
 ### The current situation
 
-CareRide currently stores its main database as JSON in `localStorage`. Local storage is a small storage area belonging to a website inside one browser.
+Relay Collective currently stores its main database as JSON in `localStorage`. Local storage is a small storage area belonging to a website inside one browser.
 
-For example, a partner creates a ride on a laptop. A second tab in the same browser can see that ride because the tabs share local storage. A driver opening CareRide on a phone has a different storage area and cannot see the laptop's ride.
+For example, a partner creates a ride on a laptop. A second tab in the same browser can see that ride because the tabs share local storage. A driver opening Relay Collective on a phone has a different storage area and cannot see the laptop's ride.
 
 The current backend also keeps demo passwords in plain text. Its sign-in session is a user ID stored in `sessionStorage`. These arrangements support a demonstration, but they do not provide a trusted shared service.
 
 ### What Supabase provides
 
-| Feature | Beginner explanation | CareRide use |
+| Feature | Beginner explanation | Relay Collective use |
 | --- | --- | --- |
 | PostgreSQL database | A shared database containing connected tables | Organizations, locations, profiles, drivers, destinations, rides, and offers |
 | Auth | A service that handles login accounts and sessions | Email/password sign-in, email verification, recovery, and sign-out |
@@ -58,13 +58,13 @@ These features have different jobs. Uploading a licence means using Storage; ins
 
 ### What Supabase will not automatically do
 
-Supabase does not know CareRide's matching rules, approval process, or permitted status changes. Those rules must be implemented. Realtime does not automatically send SMS messages or booking emails, and a database does not automatically provide offline booking.
+Supabase does not know Relay Collective's matching rules, approval process, or permitted status changes. Those rules must be implemented. Realtime does not automatically send SMS messages or booking emails, and a database does not automatically provide offline booking.
 
 The existing React application can remain hosted on Cloudflare. It will communicate with Supabase over the internet. A separate general-purpose Node server is not required for the recommended starting architecture.
 
 **Completion check:** You can explain why all devices need one shared database and why login, file uploads, and ride decisions are separate responsibilities.
 
-## 2. Understand the current CareRide architecture
+## 2. Understand the current Relay Collective architecture
 
 ### The integration point already exists
 
@@ -131,7 +131,7 @@ Create a shared backend for development without mixing experiments with future o
 ### Actions
 
 1. Create a Supabase account and open the dashboard.
-2. Create or choose a Supabase organization. Here, “organization” means the workspace owning the Supabase project. It is separate from CareRide's partner organizations.
+2. Create or choose a Supabase organization. Here, “organization” means the workspace owning the Supabase project. It is separate from Relay Collective's partner organizations.
 3. Create a project with a clear development name, such as `careride-dev`.
 4. Choose a region suitable for the intended users and the team's data-location requirements. Check the choices currently available in the dashboard rather than assuming a particular region is offered.
 5. Save the database password securely. The database password is for database administration; it is not a frontend API key.
@@ -153,7 +153,7 @@ Keep all development rides and documents fictional. A development reset should a
 
 ### Purpose
 
-Give CareRide one reusable Supabase connection without changing all pages immediately.
+Give Relay Collective one reusable Supabase connection without changing all pages immediately.
 
 ### Actions
 
@@ -171,7 +171,7 @@ Give CareRide one reusable Supabase connection without changing all pages immedi
    VITE_SUPABASE_PUBLISHABLE_KEY=YOUR_PUBLISHABLE_KEY
    ```
 
-   Keep the mock backend selected while the Supabase implementation is incomplete. The `VITE_DATA_BACKEND` variable is a proposed CareRide setting, not a built-in Supabase setting.
+   Keep the mock backend selected while the Supabase implementation is incomplete. The `VITE_DATA_BACKEND` variable is a proposed Relay Collective setting, not a built-in Supabase setting.
 
 3. Add `.env.example` containing placeholder values so teammates know which settings are required. The existing `.gitignore` ignores `*.local`, including `.env.local`.
 4. Create a reusable client module, for example `src/services/supabaseClient.ts`.
@@ -187,7 +187,7 @@ const url = import.meta.env.VITE_SUPABASE_URL
 const publishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
 
 if (!url || !publishableKey) {
-  throw new Error('CareRide Supabase connection settings are missing.')
+  throw new Error('Relay Collective Supabase connection settings are missing.')
 }
 
 export const supabase = createClient(url, publishableKey)
@@ -199,7 +199,7 @@ Vite exposes `VITE_` values in browser code. Use only the publishable key there.
 
 ### Decide session behavior before finalizing the client
 
-CareRide currently gives each tab its own sign-in session. Default persistent browser Auth storage can share a session across tabs. Choose whether to retain tab-local sessions through a supported custom storage configuration or use shared sessions and separate browser profiles for multi-role testing. [Client initialization options](https://supabase.com/docs/reference/javascript/initializing)
+Relay Collective currently gives each tab its own sign-in session. Default persistent browser Auth storage can share a session across tabs. Choose whether to retain tab-local sessions through a supported custom storage configuration or use shared sessions and separate browser profiles for multi-role testing. [Client initialization options](https://supabase.com/docs/reference/javascript/initializing)
 
 **Completion check:** The app initializes a client in Supabase mode, mock mode still works without Supabase settings, and no privileged key is included in frontend files.
 
@@ -232,7 +232,7 @@ The document table is a recommended addition because a filename alone cannot des
 
 ### Keep Auth identity separate from app identity
 
-Supabase manages login identities in its Auth system. CareRide profiles hold application-specific information. [User-management documentation](https://supabase.com/docs/guides/auth/managing-user-data)
+Supabase manages login identities in its Auth system. Relay Collective profiles hold application-specific information. [User-management documentation](https://supabase.com/docs/guides/auth/managing-user-data)
 
 For this project, use an independently generated profile ID and an optional, unique `auth_user_id` link. An organization-added driver can have a profile without an Auth account. A later invitation can attach the Auth account to that same profile.
 
@@ -317,13 +317,13 @@ Generate database TypeScript types after the schema is established. Use them to 
 
 Authentication answers “who are you?” Authorization answers “what may you do?” Both are required.
 
-CareRide's current `RequireAuth` only checks that someone is signed in. Navigation choices are useful for usability, but a person can make an API request without using your buttons.
+Relay Collective's current `RequireAuth` only checks that someone is signed in. Navigation choices are useful for usability, but a person can make an API request without using your buttons.
 
-### CareRide permission plan
+### Relay Collective permission plan
 
 | Actor | Read access | Write access |
 | --- | --- | --- |
-| Signed-out visitor | No private CareRide records; optional deliberately public totals | Auth registration only, followed by controlled onboarding |
+| Signed-out visitor | No private Relay Collective records; optional deliberately public totals | Auth registration only, followed by controlled onboarding |
 | Pending partner | Own onboarding/profile and permitted setup information | Finish own setup; no ride booking until approved |
 | Approved partner | Own organization's destinations/bookings/drivers and limited related trip contact information | Book/change/cancel own rides; manage permitted setup |
 | Pending driver | Own profile and documents | Finish own setup; no offer acceptance |
@@ -362,12 +362,12 @@ The backend must verify that relationship. A browser-supplied `orgId` is only a 
 
 ### Purpose
 
-Replace “a user ID saved in a tab” with a session issued by Supabase Auth, then load the corresponding CareRide profile.
+Replace “a user ID saved in a tab” with a session issued by Supabase Auth, then load the corresponding Relay Collective profile.
 
 ### Actions
 
 1. Implement email/password login using Supabase Auth.
-2. Obtain the authenticated identity and load its linked active CareRide profile.
+2. Obtain the authenticated identity and load its linked active Relay Collective profile.
 3. Make the app wait until both session restoration and profile loading finish before choosing a route.
 4. Handle a valid Auth account with unfinished onboarding explicitly; do not show a permanent loading screen.
 5. Subscribe to Auth state changes so login, logout, and session changes update the app.
@@ -392,15 +392,15 @@ If you retain tab-local storage, implement it through the SDK's supported storag
 
 ### Purpose
 
-Create login accounts and CareRide records reliably, including partial registration and email confirmation.
+Create login accounts and Relay Collective records reliably, including partial registration and email confirmation.
 
 ### Separate three states
 
 1. **Auth account created:** Supabase knows the login identity.
 2. **Email confirmed:** The person has proved access to the mailbox when confirmation is enabled.
-3. **CareRide approved:** A platform administrator has approved the organization or driver.
+3. **Relay Collective approved:** A platform administrator has approved the organization or driver.
 
-A confirmed email does not imply permission to book or drive. A pending CareRide profile should be allowed to finish setup without performing approved-only operations.
+A confirmed email does not imply permission to book or drive. A pending Relay Collective profile should be allowed to finish setup without performing approved-only operations.
 
 ### Recommended partner flow
 
@@ -572,7 +572,7 @@ Set timestamps and the flat fare-savings estimate on the backend. Narrow `NewRid
 
 ### Purpose
 
-Make time-dependent coordination continue when nobody is viewing CareRide.
+Make time-dependent coordination continue when nobody is viewing Relay Collective.
 
 The mock calls `checkDeadlines` during service operations. App polling indirectly drives that work. A shared backend must not depend on page reads to maintain ride state.
 
@@ -761,7 +761,7 @@ If useful local records must be imported, build a deliberate import with ID mapp
 
 ### Purpose
 
-Verify shared behavior, access boundaries, and concurrency before using CareRide operationally. A passing frontend build cannot prove these backend rules.
+Verify shared behavior, access boundaries, and concurrency before using Relay Collective operationally. A passing frontend build cannot prove these backend rules.
 
 ### Prepare fictional test actors
 
@@ -904,7 +904,7 @@ Investigate the exact failed operation. Do not disable RLS or add a secret key t
 | PostgreSQL / Postgres | The database system used by Supabase |
 | Schema | The definition of tables, columns, relationships, and related database objects |
 | Auth user | A login identity managed by Supabase |
-| Profile | CareRide's app identity, including role and organization links |
+| Profile | Relay Collective's app identity, including role and organization links |
 | Session | Authentication state issued after login and managed by the Auth client |
 | Publishable key | A browser-safe API connection key; data access still requires permissions |
 | Secret / service-role key | Privileged server credentials that must not be exposed in frontend code |

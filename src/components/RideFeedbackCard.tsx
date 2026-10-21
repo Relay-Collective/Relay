@@ -12,7 +12,7 @@ const CHOICES: { rating: FeedbackRating; text: string; icon: typeof ThumbsUp; on
   { rating: 'DOWN', text: "It didn't go well", icon: ThumbsDown, on: 'border-red-600 bg-red-50 text-red-800' },
 ]
 
-// After a ride: one tap for thumbs up or down, then an optional note. Only CareRide sees it, not the driver.
+// After a ride: one tap for thumbs up or down, then an optional note. Only Relay Collective sees it, not the driver.
 export function RideFeedbackCard({ ride }: { ride: Ride }) {
   const { refresh } = useApp()
   const mine = useData(() => dataService.listMyFeedback(), ride.id)
@@ -41,7 +41,7 @@ export function RideFeedbackCard({ ride }: { ride: Ride }) {
       <h2 id="feedback-title" className="text-xl font-bold">
         {ride.status === 'NO_SHOW' ? 'How did it go with the driver?' : 'How did this ride go?'}
       </h2>
-      <p className="mt-1 text-slate-600">Only the CareRide team sees this. The driver doesn't.</p>
+      <p className="mt-1 text-slate-600">Only the Relay Collective team sees this. The driver doesn't.</p>
 
       <div className="mt-4 grid gap-3 sm:flex">
         {CHOICES.map(({ rating, text, icon: Icon, on }) => {

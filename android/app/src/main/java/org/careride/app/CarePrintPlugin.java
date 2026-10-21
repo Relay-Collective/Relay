@@ -22,8 +22,8 @@ public class CarePrintPlugin extends Plugin {
             }
             WebView webView = getBridge().getWebView();
             printManager.print(
-                "CareRide ride slip",
-                webView.createPrintDocumentAdapter("CareRide ride slip"),
+                "Relay Collective ride slip",
+                webView.createPrintDocumentAdapter("Relay Collective ride slip"),
                 new PrintAttributes.Builder().build()
             );
             call.resolve();

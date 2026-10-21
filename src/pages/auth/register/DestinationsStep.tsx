@@ -100,7 +100,7 @@ export function DestinationsStep({ draft, update }: StepProps) {
       return
     }
     if (!CITIES.includes(newCity)) {
-      setFormError(`CareRide covers ${CITIES.join(' and ')}. This address is in ${newCity}.`)
+      setFormError(`Relay Collective covers ${CITIES.join(' and ')}. This address is in ${newCity}.`)
       return
     }
     if (draft.destinations.some((d) => d.name.toLowerCase() === name.trim().toLowerCase())) {
@@ -259,7 +259,7 @@ export function DestinationsStep({ draft, update }: StepProps) {
               setNewCity(place.city)
               setPicked(true)
               if (!name.trim() && place.name) setName(place.name.slice(0, MAX_NAME))
-              setFormError(CITIES.includes(place.city) ? undefined : `CareRide covers ${CITIES.join(' and ')}. This address is in ${place.city}.`)
+              setFormError(CITIES.includes(place.city) ? undefined : `Relay Collective covers ${CITIES.join(' and ')}. This address is in ${place.city}.`)
             }}
           />
           <FieldMessage id="dest-form-message" error={formError} />

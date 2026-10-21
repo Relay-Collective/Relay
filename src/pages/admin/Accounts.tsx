@@ -295,7 +295,7 @@ export function Accounts() {
       <div>
         <h1 className={`${pageTitle} mb-2`}>Accounts</h1>
         <p className="text-slate-600">
-          Everyone who can sign in to CareRide. Reset a password when someone is locked out, or delete an account that's no
+          Everyone who can sign in to Relay Collective. Reset a password when someone is locked out, or delete an account that's no
           longer needed.
         </p>
       </div>

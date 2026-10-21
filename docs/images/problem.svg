@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1000" height="240" viewBox="0 0 1000 240" role="img" aria-labelledby="t d">
-  <title id="t">The barrier CareRide removes</title>
-  <desc id="d">Booking a ride usually takes a smartphone, an app and account, and a way to pay. With CareRide, staff book it for them, and the rider needs none of these.</desc>
+  <title id="t">The barrier Relay Collective removes</title>
+  <desc id="d">Booking a ride usually takes a smartphone, an app and account, and a way to pay. With Relay Collective, staff book it for them, and the rider needs none of these.</desc>
   <defs>
     <linearGradient id="ok" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0" stop-color="#0d9488"/>
@@ -10,7 +10,7 @@
       text { font-family: Inter, "Segoe UI", -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif; }
       .title { font-family: Nunito, "Arial Rounded MT Bold", "Segoe UI", -apple-system, Helvetica, Arial, sans-serif; }
 
-      /* 9 s loop: each need is struck out in turn, then the CareRide answer appears. Base styles are the final frame. */
+      /* 9 s loop: each need is struck out in turn, then the Relay Collective answer appears. Base styles are the final frame. */
       .pill { opacity: .45; }
       .p1 { animation: dim1 9s infinite; } .p2 { animation: dim2 9s infinite; } .p3 { animation: dim3 9s infinite; }
       @keyframes dim1 { 0%, 10% { opacity: 1; } 16%, 94% { opacity: .45; } 100% { opacity: 1; } }
@@ -66,6 +66,6 @@
     <rect x="200" y="150" width="600" height="54" rx="27" fill="url(#ok)"/>
     <circle cx="232" cy="177" r="13" fill="#ffffff"/>
     <path d="M226 177 L230.5 181.5 L238 172.5" fill="none" stroke="#0d9488" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-    <text x="520" y="184" text-anchor="middle" font-size="19" font-weight="800" fill="#ffffff">With CareRide, staff book it. The rider needs none of that.</text>
+    <text x="520" y="184" text-anchor="middle" font-size="19" font-weight="800" fill="#ffffff">With Relay Collective, staff book it. The rider needs none of that.</text>
   </g>
 </svg>
