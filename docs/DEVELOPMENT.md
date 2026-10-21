@@ -1,6 +1,6 @@
-# CareRide developer guide
+# Relay Collective developer guide
 
-Everything you need to run, demo, build, and deploy CareRide. For what CareRide is and why it exists, start with the [README](../README.md).
+Everything you need to run, demo, build, and deploy Relay Collective. For what Relay Collective is and why it exists, start with the [README](../README.md).
 
 ## Get started
 
@@ -27,13 +27,13 @@ If you use nvm, run `nvm install` and `nvm use` in the repository before install
 
 ## Try the demo
 
-Open **Sign in** and choose a one-tap demo account, or use one of the credentials below. All seeded demo accounts use the password **`careride`**, except CareRide Admin, which uses **`abcd1234`**.
+Open **Sign in** and choose a one-tap demo account, or use one of the credentials below. All seeded demo accounts use the password **`careride`**, except Relay Collective Admin, which uses **`abcd1234`**.
 
 | Account | Email | Explore |
 | --- | --- | --- |
 | Belkin House | `belkin@careride.demo` | Book, change, and track a client's ride. |
 | Frank | `frank@careride.demo` | Accept requests and complete rides. |
-| CareRide Admin | `admin@careride.com` | Review pending approvals and manage accounts. |
+| Relay Collective Admin | `admin@careride.com` | Review pending approvals and manage accounts. |
 
 Additional partner and driver accounts appear on the sign-in page. Demo records are fictional except for public place names and addresses. Belkin House, Richmond House, and Grace Mansion use their real addresses, and each starts with saved destinations taken from its case workers' answers in [PARTNER_ORG_NOTES.md](../PARTNER_ORG_NOTES.md).
 
@@ -226,7 +226,7 @@ This MVP demonstrates the coordination workflow. The following details matter wh
 | **Impact** | Each completed trip counts as one adult one-zone Vancouver bus fare (**$2.58**), not once per passenger. The dashboards say so. | Keep that meaning unless a pilot asks for a per-passenger total. |
 | **Group and recurring trips** | Passenger counts are supported; combining separate requests and recurring bookings are not available in the UI. | Add group ride suggestions and recurring ride workflows. |
 
-CareRide covers essential, non-emergency transportation. Booking screens direct medical emergencies to **911**.
+Relay Collective covers essential, non-emergency transportation. Booking screens direct medical emergencies to **911**.
 
 ## Contributing
 
@@ -236,7 +236,7 @@ Use fictional data when developing or sharing screenshots. For product changes, 
 
 ## Product context
 
-- [Problem statement](../PROBLEM_STATEMENT.md) — the transportation challenge that inspired CareRide.
+- [Problem statement](../PROBLEM_STATEMENT.md) — the transportation challenge that inspired Relay Collective.
 - [Product description](../PRODUCT_DESCRIPTION.md) — detailed scope, roles, models, and proposed workflows.
 - [Flows and notes](../FLOWS_AND_NOTES.md) — stakeholder journeys and open operational questions.
 - [Product strategy](../PRODUCT_STRATEGY.md) — broader planning and future directions.

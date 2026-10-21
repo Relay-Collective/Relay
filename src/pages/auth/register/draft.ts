@@ -47,7 +47,7 @@ function compact(errors: FieldErrors): FieldErrors {
 }
 
 export function validateRole(d: RegisterDraft): FieldErrors {
-  return compact({ role: d.role ? undefined : 'Choose how you will use CareRide to continue.' })
+  return compact({ role: d.role ? undefined : 'Choose how you will use Relay Collective to continue.' })
 }
 
 export function validateAccount(d: RegisterDraft): FieldErrors {

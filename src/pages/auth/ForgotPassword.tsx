@@ -43,11 +43,11 @@ export function ForgotPassword() {
           <MailCheck className="mx-auto h-12 w-12 text-brand-600" aria-hidden />
           <h1 className="mt-4 text-3xl font-extrabold tracking-tight">Check your email</h1>
           <p className="mt-2 text-lg text-slate-600">
-            If <strong className="break-all">{email.trim()}</strong> has a CareRide account, we've sent it a link to choose a new
+            If <strong className="break-all">{email.trim()}</strong> has a Relay Collective account, we've sent it a link to choose a new
             password.
           </p>
           {isNative && (
-            <p className="mt-4 text-slate-600">The link opens the CareRide website. Choose your new password there, then come back here and sign in.</p>
+            <p className="mt-4 text-slate-600">The link opens the Relay Collective website. Choose your new password there, then come back here and sign in.</p>
           )}
           <p className="mt-4 text-sm text-slate-500">Can't find it? Check your spam folder, or ask your organization's admin.</p>
           <Link to="/signin" className={`${primaryButton} mt-8 w-full`}>

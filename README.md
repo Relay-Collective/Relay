@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/images/hero.svg" alt="CareRide. Care shouldn't depend on a ride. A free ride to the hospital, a housing interview, the clinic, the food bank, and back home." width="100%" />
+  <img src="docs/images/hero.svg" alt="Relay Collective. Care shouldn't depend on a ride. A free ride to the hospital, a housing interview, the clinic, the food bank, and back home." width="100%" />
 </p>
 
 <p align="center">
@@ -18,7 +18,7 @@
 <br />
 
 <p align="center">
-  <img src="docs/images/home.png" alt="The CareRide home page: 'Care shouldn't depend on a ride', with a scheduled ride from Belkin House to St. Paul's Hospital showing the driver confirmed." width="100%" />
+  <img src="docs/images/home.png" alt="The Relay Collective home page: 'Care shouldn't depend on a ride', with a scheduled ride from Belkin House to St. Paul's Hospital showing the driver confirmed." width="100%" />
 </p>
 
 <img src="docs/images/divider.svg" alt="" width="100%" />
@@ -28,16 +28,16 @@
 A hospital visit, a housing interview, or a trip to social services can all hinge on one thing: **getting there.**
 
 <p align="center">
-  <img src="docs/images/problem.svg" alt="Booking a ride usually takes a smartphone, an app and account, and a way to pay. With CareRide, staff book it, and the rider needs none of that." width="100%" />
+  <img src="docs/images/problem.svg" alt="Booking a ride usually takes a smartphone, an app and account, and a way to pay. With Relay Collective, staff book it, and the rider needs none of that." width="100%" />
 </p>
 
 Many people supported by housing and social service organizations have none of these. When the ride falls through, **the appointment is missed, and so is the care.**
 
 The help does exist. There are drivers willing to give their time and organizations with vans. But it is scattered, so front-desk staff spend hours phoning around and still can't tell whether the person arrived.
 
-## 💙 What CareRide does
+## 💙 What Relay Collective does
 
-CareRide is a free, not-for-profit platform that connects **housing and social service staff** with **verified volunteer drivers**. It turns all that phoning around into one shared request that stays visible until the person gets there.
+Relay Collective is a free, not-for-profit network that brings **housing and social service staff**, **community organizations**, and **verified volunteer drivers** together to get people where they need to go. It turns all that phoning around into one shared request, passed along until someone can take it and kept in view until the person gets there.
 
 <p align="center">
   <img src="docs/images/journey.svg" alt="One ride, start to finish: staff request, a driver says yes, the client is picked up at the front desk, and staff see them arrive." width="100%" />
@@ -80,7 +80,7 @@ cd CareRide-Team-1
 npm ci && npm run dev
 ```
 
-The demo needs no API keys or backend because seed data loads automatically. Open **http://localhost:5173**, choose **Sign in**, and pick a one-tap demo account. All demo accounts use the password `careride`, except CareRide Admin (`admin@careride.com`), which uses `abcd1234`.
+The demo needs no API keys or backend because seed data loads automatically. Open **http://localhost:5173**, choose **Sign in**, and pick a one-tap demo account. All demo accounts use the password `careride`, except Relay Collective Admin (`admin@careride.com`), which uses `abcd1234`.
 
 <details>
 <summary><b>Walk a full ride from both sides</b></summary>
@@ -89,7 +89,7 @@ The demo needs no API keys or backend because seed data loads automatically. Ope
 1. In one tab, sign in as **Belkin House** (`belkin@careride.demo`) and request a ride to St. Paul's Hospital.
 2. In a second tab, sign in as **Frank** (`frank@careride.demo`) and accept it.
 3. Move Frank through *I'm on my way → I'm here → Client is in the car → Client dropped off*, and watch Belkin House's timeline update live.
-4. Sign in as **CareRide Admin** (`admin@careride.com`, password `abcd1234`) to review approvals.
+4. Sign in as **Relay Collective Admin** (`admin@careride.com`, password `abcd1234`) to review approvals.
 
 </details>
 
@@ -134,14 +134,15 @@ Built in two days for **HACKVAN 2026**, with each of us pairing with a coding ag
 
 ## 🧭 Where it's headed
 
-CareRide is a working hackathon MVP, inspired by the transportation needs of **Belkin Communities of Hope** in Vancouver. Next steps include production authentication, booking notifications, secure document verification for drivers, and recurring rides. The [developer guide](docs/DEVELOPMENT.md#current-boundaries-and-next-steps) lists what the MVP does and doesn't cover yet.
+Relay Collective is a working hackathon MVP, inspired by the transportation needs of **Belkin Communities of Hope** in Vancouver. Next steps include production authentication, booking notifications, secure document verification for drivers, and recurring rides. The [developer guide](docs/DEVELOPMENT.md#current-boundaries-and-next-steps) lists what the MVP does and doesn't cover yet.
 
-<sub>CareRide is an independent platform. Organizations and place names in the demo do not imply partnership or endorsement.</sub>
+<sub>Relay Collective is an independent platform. Organizations and place names in the demo do not imply partnership or endorsement.</sub>
 
 <img src="docs/images/divider.svg" alt="" width="100%" />
 
 <p align="center">
   <img src="src/assets/logo-mark.png" width="56" alt="" /><br />
   <b>Care shouldn't depend on a ride.</b><br />
+  <i>Many hands, one ride: staff, drivers, and organizations getting people there together.</i><br />
   <sub>Built with 💙 in the FaithTechGlobalLabs community · <a href="LICENSE">MIT License</a></sub>
 </p>

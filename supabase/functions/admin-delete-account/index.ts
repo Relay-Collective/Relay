@@ -1,4 +1,4 @@
-// Removes a CareRide account (guide Step 14).
+// Removes a Relay Collective account (guide Step 14).
 //
 // 1. Calls admin_deactivate_account() AS THE CALLER, so the database checks they are an active platform
 //    admin and does the safe part (switch off, protect the last admin, move the driver's rides) in one

@@ -1,12 +1,12 @@
-# CareRide: Design (Draft)
+# Relay Collective: Design (Draft)
 
-Visual and tone guidelines for the CareRide web app. **Draft v0.2** for team review. v0.2 applies the draft to the code and removes the generic "AI default" look (see §12).
+Visual and tone guidelines for the Relay Collective web app. **Draft v0.2** for team review. v0.2 applies the draft to the code and removes the generic "AI default" look (see §12).
 
 **In three words:** sturdy, plain, kind. **One impression to leave:** "this will get them there."
 
 ## 1. Direction
 
-CareRide is an independent third-party platform. The Salvation Army is our pilot partner, not our owner. The design is **inspired by** Salvation Army branding, not a copy of it.
+Relay Collective is an independent third-party platform. The Salvation Army is our pilot partner, not our owner. The design is **inspired by** Salvation Army branding, not a copy of it.
 
 What we borrow is the *spirit*: **warm, humble, practical, and dependable**. Bold primary colours, plain speech, no frills, built to be used by busy people.
 
@@ -23,7 +23,7 @@ What we do not borrow:
 
 A second source ("0202. Branding", PRD Manual extract) is about brand strategy, not visuals. Three ideas are worth echoing:
 
-1. **A brand is emotion and consistency, not just a logo.** Their image is a "sphere": it looks the same from any angle. Every CareRide screen, email, SMS, and driver message should feel like the same calm, reliable helper.
+1. **A brand is emotion and consistency, not just a logo.** Their image is a "sphere": it looks the same from any angle. Every Relay Collective screen, email, SMS, and driver message should feel like the same calm, reliable helper.
 2. **The promise must be lived, not just stated.** Their "Giving Hope Today" has three parts: *Giving* (nothing kept back), *Hope* (a better outcome is possible), *Today* (relevant right now). We use the same three-part structure with our own promise: **"Rides that show up. Today."**
 
    | Their idea | Our version in the product |
@@ -34,9 +34,9 @@ A second source ("0202. Branding", PRD Manual extract) is about brand strategy, 
 
 3. **Lead with "today".** Their point about staying immediately relevant maps to our product: real-time status, clear times, "now" language.
 
-Not borrowed: the faith-based framing. Their brand is explicitly spiritual and mission-led. CareRide is secular and serves any organization, so we echo the warmth and structure, never the religious message.
+Not borrowed: the faith-based framing. Their brand is explicitly spiritual and mission-led. Relay Collective is secular and serves any organization, so we echo the warmth and structure, never the religious message.
 
-**Rule of thumb:** if someone screenshots a CareRide screen, they should say "that's CareRide", not "that's the Salvation Army".
+**Rule of thumb:** if someone screenshots a Relay Collective screen, they should say "that's Relay Collective", not "that's the Salvation Army".
 
 ## 2. Principles
 
@@ -48,7 +48,7 @@ Not borrowed: the faith-based framing. Their brand is explicitly spiritual and m
 
 ## 3. Colour
 
-We keep the existing CareRide blue/aqua identity (from the heart-road logo) as the **primary**, and add a Salvation Army-inspired **warm red** and **golden yellow** as supporting colours. Blue = trust and structure. Red = action and care. Yellow = attention and welcome.
+We keep the existing Relay Collective blue/aqua identity (from the heart-road logo) as the **primary**, and add a Salvation Army-inspired **warm red** and **golden yellow** as supporting colours. Blue = trust and structure. Red = action and care. Yellow = attention and welcome.
 
 | Role | Token | Hex | Use |
 | --- | --- | --- | --- |
@@ -74,7 +74,7 @@ New tokens are written in OKLCH. The older brand scale stays in hex until it is 
 | Partner organization | `brand` | Brand blue. They are the main users. |
 | Driver | `teal` | Teal |
 | Org admin (driver provider) | `amber` | Sun yellow fill, ink text |
-| CareRide admin | `ink` | Navy |
+| Relay Collective admin | `ink` | Navy |
 
 Violet and indigo are out of the palette. They only appear inside the logo artwork.
 
@@ -171,7 +171,7 @@ It replaces the old rainbow `bg-spectrum` bar. Plain cards (audience cards, stat
 - **Icons:** one set only (e.g. Lucide), 2px stroke, rounded caps. Pair with text.
 - **Illustration:** simple, flat, warm shapes built from the heart-and-road motif. No stock photos of people in distress.
 - **Photography (if used):** drivers and everyday journeys, not clients. Never identifiable clients, in line with our no-client-data rule.
-- **Logo:** use the CareRide heart-road mark. No partner logos in the header. A small, optional "Pilot partner: The Salvation Army" text line in the footer, only with permission.
+- **Logo:** use the Relay Collective heart-road mark. No partner logos in the header. A small, optional "Pilot partner: The Salvation Army" text line in the footer, only with permission.
 
 ## 8. Voice and tone
 
@@ -187,7 +187,7 @@ Plain, kind, and brief. Speak to staff and drivers as capable colleagues.
 - Use "client" or "passenger", as the app does on main. Never "case", "subject", or "the homeless".
 - Use active verbs on buttons: "Book ride", "Accept", "Decline".
 - Calm under pressure: unfilled rides are urgent, not alarming. State the problem, then the next step.
-- No jargon, no exclamation marks, no religious language. CareRide serves any organization.
+- No jargon, no exclamation marks, no religious language. Relay Collective serves any organization.
 
 ## 9. Accessibility checklist
 
@@ -206,7 +206,7 @@ Tokens live in `src/index.css` under `@theme`: `canvas`, `care-red`, `sun-50`, `
 
 Shared class names live in `src/components/ui.ts` (`card`, the button set, `input`, `tones`, `ROLE_TONE`). Change these before touching a screen; most screens inherit from them.
 
-The only gradient left is `text-brand-gradient`, for the "Ride" in the logo wordmark. The old `bg-brand-gradient`, `bg-warm-gradient`, `bg-fresh-gradient` and `bg-spectrum` utilities were removed.
+The only gradient left is `text-brand-gradient`, for the "Collective" in the logo wordmark. The old `bg-brand-gradient`, `bg-warm-gradient`, `bg-fresh-gradient` and `bg-spectrum` utilities were removed.
 
 Motion was left as it was in v0.2 (fade-up entrances, the `pop` overshoot, the floating logo, confetti). The checklist flags the overshoot easing and the infinite float; that is a separate decision.
 

@@ -101,7 +101,7 @@ export function Settings() {
       <div>
         <h1 className={`${pageTitle} mb-2`}>Request settings</h1>
         <p className="text-lg text-slate-600">
-          Choose when CareRide asks you for help. You always decide which rides to take: just decline the ones that don't suit you.
+          Choose when Relay Collective asks you for help. You always decide which rides to take: just decline the ones that don't suit you.
         </p>
       </div>
 

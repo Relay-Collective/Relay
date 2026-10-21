@@ -161,8 +161,8 @@ export function Pitch({ slide, step, onStep }: Props) {
 function Wordmark() {
   return (
     <h1 className="mt-4 font-display text-7xl font-black tracking-tight md:text-8xl">
-      <span className="text-ink">Care</span>
-      <span className="text-brand-gradient">Ride</span>
+      <span className="text-ink">Relay</span>{' '}
+      <span className="text-brand-gradient">Collective</span>
     </h1>
   )
 }

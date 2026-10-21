@@ -41,7 +41,7 @@ export function Destinations() {
     const a = address.trim()
     if (!a) found.address = 'Search for the street address.'
     else if (!picked) found.address = 'Pick a matching address from the list, so drivers can find it.'
-    else if (!CITIES.includes(city)) found.address = `CareRide covers ${CITIES.join(' and ')}. This address is in ${city}.`
+    else if (!CITIES.includes(city)) found.address = `Relay Collective covers ${CITIES.join(' and ')}. This address is in ${city}.`
     else found.address = tooLong(a, MAX_NAME * 2)
     found.notes = tooLong(notes, MAX_NOTE)
     return Object.fromEntries(Object.entries(found).filter(([, v]) => v))

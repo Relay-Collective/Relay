@@ -9,7 +9,7 @@ export const HOME_FOR: Record<UserRole, string> = {
 }
 
 export const ROLE_LABELS: Record<UserRole, string> = {
-  PLATFORM_ADMIN: 'CareRide admin',
+  PLATFORM_ADMIN: 'Relay Collective admin',
   ORG_ADMIN: 'Transport provider',
   PARTNER: 'Partner organization',
   DRIVER: 'Driver',

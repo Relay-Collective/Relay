@@ -17,7 +17,7 @@ export interface Credential {
 export const DEMO_PASSWORD = 'careride'
 export const DEMO_EMAIL_DOMAIN = '@careride.demo'
 
-// The CareRide Admin has its own login, separate from the shared demo password.
+// The Relay Collective Admin has its own login, separate from the shared demo password.
 export const ADMIN_EMAIL = 'admin@careride.com'
 export const ADMIN_PASSWORD = 'abcd1234'
 
@@ -124,7 +124,7 @@ const FREQUENT_PLACES: Record<string, string[]> = {
 }
 
 const demoUsers: User[] = [
-  { id: 'u-admin', name: 'CareRide Admin', email: ADMIN_EMAIL, phone: '604-555-0100', role: 'PLATFORM_ADMIN' },
+  { id: 'u-admin', name: 'Relay Collective Admin', email: ADMIN_EMAIL, phone: '604-555-0100', role: 'PLATFORM_ADMIN' },
   { id: 'u-belkin', name: 'Belkin House', email: 'belkin@careride.demo', phone: '604-555-0120', role: 'PARTNER', orgId: 'org-belkin', houseId: 'house-belkin' },
   { id: 'u-richmond', name: 'Richmond House', email: 'richmond@careride.demo', phone: '604-555-0121', role: 'PARTNER', orgId: 'org-richmond', houseId: 'house-richmond' },
   { id: 'u-grace', name: 'Grace Mansion', email: 'grace@careride.demo', phone: '604-555-0122', role: 'PARTNER', orgId: 'org-grace', houseId: 'house-grace' },

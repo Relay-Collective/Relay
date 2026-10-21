@@ -76,7 +76,7 @@ export function DriverVehicleFields({ value, onChange, errors = {}, lockCapacity
             {value.wheelchairAccessible ? ' · Wheelchair accessible' : ''}
           </span>
           <span className="mt-1 block text-sm text-slate-500">
-            Passenger spaces and wheelchair access stay as they were when CareRide approved you. Contact CareRide to change them.
+            Passenger spaces and wheelchair access stay as they were when Relay Collective approved you. Contact Relay Collective to change them.
           </span>
         </p>
       ) : (

@@ -11,7 +11,7 @@ const liveOrigin = (
 
 const config: CapacitorConfig = {
   appId: 'org.careride.app',
-  appName: 'CareRide',
+  appName: 'Relay Collective',
   webDir: 'dist',
   backgroundColor: '#ffffff',
   plugins: {

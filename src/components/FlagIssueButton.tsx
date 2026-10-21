@@ -11,7 +11,7 @@ interface Props {
   flagged?: RideFeedback // what this driver already said about the ride
 }
 
-// Lets a driver tell CareRide something went wrong on a finished ride. The front desk doesn't see it.
+// Lets a driver tell Relay Collective something went wrong on a finished ride. The front desk doesn't see it.
 export function FlagIssueButton({ ride, flagged }: Props) {
   const { refresh } = useApp()
   const dialog = useRef<HTMLDialogElement>(null)
@@ -46,7 +46,7 @@ export function FlagIssueButton({ ride, flagged }: Props) {
         className="inline-flex min-h-10 items-center gap-1.5 text-sm font-semibold text-slate-600 underline decoration-slate-300 underline-offset-4 hover:text-ink"
       >
         <Flag className="h-4 w-4" aria-hidden />
-        {flagged ? 'Issue sent to CareRide · Edit' : 'Flag an issue'}
+        {flagged ? 'Issue sent to Relay Collective · Edit' : 'Flag an issue'}
       </button>
 
       <dialog
@@ -65,7 +65,7 @@ export function FlagIssueButton({ ride, flagged }: Props) {
             What went wrong?
           </h2>
           <p className="mt-2 text-slate-700">
-            Only the CareRide team sees this, not the front desk. For an emergency, call 911.
+            Only the Relay Collective team sees this, not the front desk. For an emergency, call 911.
           </p>
           <label htmlFor={`flag-note-${ride.id}`} className={`${label} mt-4`}>
             Ride to {ride.destinationName}
@@ -86,7 +86,7 @@ export function FlagIssueButton({ ride, flagged }: Props) {
           )}
           <div className="mt-6 grid gap-3">
             <button type="submit" className={primaryButton} disabled={saving || !note.trim()}>
-              Send to CareRide
+              Send to Relay Collective
             </button>
             <button type="button" className={ghostButton} onClick={() => dialog.current?.close()}>
               Go back

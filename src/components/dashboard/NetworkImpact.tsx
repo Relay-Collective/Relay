@@ -4,7 +4,7 @@ import { useData } from '../../hooks/useData'
 import { faresSavedFor, formatDollars } from '../../logic/estimateFare'
 import { dataService } from '../../services'
 
-// What everyone on CareRide has done together. Small, at the foot of a dashboard.
+// What everyone on Relay Collective has done together. Small, at the foot of a dashboard.
 export function NetworkImpact() {
   const impact = useData(() => dataService.getImpact())
   if (!impact) return null
@@ -20,7 +20,7 @@ export function NetworkImpact() {
     <section aria-labelledby="network-title" className="border-t border-slate-200 pt-5">
       <h2 id="network-title" className="flex items-center gap-2 font-sans text-sm font-bold text-slate-600">
         <HeartHandshake className="h-4 w-4" aria-hidden />
-        Across CareRide
+        Across Relay Collective
       </h2>
       <ul className="mt-3 grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-4">
         {stats.map((s) => (

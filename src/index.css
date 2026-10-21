@@ -5,7 +5,7 @@
    question never restyles. Match the attribute only. */
 @custom-variant open (&[open]);
 
-/* Brand tokens, taken from the CareRide heart-road logo */
+/* Brand tokens, taken from the Relay Collective heart-road logo */
 @theme {
   --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-display: 'Nunito', 'Inter', ui-sans-serif, system-ui, sans-serif;

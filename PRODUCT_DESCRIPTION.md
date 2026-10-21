@@ -1,8 +1,8 @@
-# CareRide: Product Description
+# Relay Collective: Product Description
 
 ## Free rides to essential services, for any organization.
 
-CareRide is a third-party web platform. Housing and social service organizations register their houses and book free rides for their residents. Transport providers and professional drivers (taxi and rideshare) register to give those rides. The client needs no phone, no app, no money, and no account. CareRide stores no client information.
+Relay Collective is a third-party web platform. Housing and social service organizations register their houses and book free rides for their residents. Transport providers and professional drivers (taxi and rideshare) register to give those rides. The client needs no phone, no app, no money, and no account. Relay Collective stores no client information.
 
 | Detail | Value |
 | --- | --- |
@@ -13,13 +13,13 @@ CareRide is a third-party web platform. Housing and social service organizations
 | Pilot | The Salvation Army, starting with Belkin House |
 | Related docs | [PROBLEM_STATEMENT.md](PROBLEM_STATEMENT.md), [PRODUCT_STRATEGY.md](PRODUCT_STRATEGY.md), [FLOWS_AND_NOTES.md](FLOWS_AND_NOTES.md), [JUDGING_CRITERIA.md](JUDGING_CRITERIA.md) |
 
-> CareRide is an independent platform, not owned by the Salvation Army. The Salvation Army is the pilot; this is not an official partnership or endorsement.
+> Relay Collective is an independent platform, not owned by the Salvation Army. The Salvation Army is the pilot; this is not an official partnership or endorsement.
 
 ---
 
 ## 1. The idea in one paragraph
 
-Free rides already exist: transport providers with vans, partner organizations with their own vehicles, professional drivers willing to give their time. The problem is that they are scattered, and staff waste time phoning around. CareRide brings them together. A house books a ride from point A (the house) to point B (a hospital, a clinic, an office). CareRide sends it to suitable drivers one at a time. A driver accepts or declines. If nobody accepts, the house sees it right away, so the client is never forgotten.
+Free rides already exist: transport providers with vans, partner organizations with their own vehicles, professional drivers willing to give their time. The problem is that they are scattered, and staff waste time phoning around. Relay Collective brings them together. A house books a ride from point A (the house) to point B (a hospital, a clinic, an office). Relay Collective sends it to suitable drivers one at a time. A driver accepts or declines. If nobody accepts, the house sees it right away, so the client is never forgotten.
 
 ## 2. Scope
 
@@ -28,11 +28,11 @@ Free rides already exist: transport providers with vans, partner organizations w
 - **Fixed A to B trips in Vancouver.** Point A is a house. Point B is a saved destination, e.g. Belkin House to St. Paul's Hospital. Staff can type an address when needed.
 - **One-way trips.** A return trip is booked the same way, as a separate ride.
 - **No client information.** No names, phone numbers, or history. An optional codename is allowed (still an open question).
-- **Not an emergency service.** Anything that needs 911 goes to 911. CareRide covers the rest.
+- **Not an emergency service.** Anything that needs 911 goes to 911. Relay Collective covers the rest.
 
 ## 3. Why free first
 
-Most organizations on CareRide are nonprofits. Every dollar spent on taxis is a dollar not spent on food or shelter. So CareRide always tries free options first:
+Most organizations on Relay Collective are nonprofits. Every dollar spent on taxis is a dollar not spent on food or shelter. So Relay Collective always tries free options first:
 
 1. **Professional driver giving their time** (free)
 2. **Transport provider or partner organization vehicle** (free)
@@ -43,7 +43,7 @@ Most organizations on CareRide are nonprofits. Every dollar spent on taxis is a 
 
 | Who | What they do | Account? |
 | --- | --- | --- |
-| **CareRide admin** (our team) | Approves new organizations and drivers | Yes |
+| **Relay Collective admin** (our team) | Approves new organizations and drivers | Yes |
 | **Partner organization** (e.g. the Salvation Army) | Registers, adds houses and destinations | One org admin account |
 | **House** (e.g. Belkin House) | Books rides for residents, reminds them, sees when they arrive | **One shared account per house**, not one per case manager |
 | **Transport provider** (e.g. a community van service) | Registers, adds drivers with availability, gets booking notifications, accepts bookings | One org admin account |
@@ -77,10 +77,10 @@ These come from [FLOWS_AND_NOTES.md](FLOWS_AND_NOTES.md).
 **House (staff)**
 1. Checks the trip has a reason and meets the house's travel policy.
 2. Books the ride: destination, time, number of people, travel needs.
-3. CareRide finds a driver. The house sees when one accepts.
+3. Relay Collective finds a driver. The house sees when one accepts.
 4. Reminds the client, and prints a slip if it helps. The driver usually meets the client in the lobby.
 5. Sees when the driver confirms the client arrived.
-6. If needed, books the return trip. CareRide asks the same driver first.
+6. If needed, books the return trip. Relay Collective asks the same driver first.
 
 **Driver**
 1. Gets a request for a ride from a specific house to a destination.
@@ -91,11 +91,11 @@ These come from [FLOWS_AND_NOTES.md](FLOWS_AND_NOTES.md).
 
 ## 6. What a new organization goes through
 
-**Partner organization:** register with basic info → CareRide admin approves → add houses (each gets one shared account) → add destinations (point B) → houses start booking.
+**Partner organization:** register with basic info → Relay Collective admin approves → add houses (each gets one shared account) → add destinations (point B) → houses start booking.
 
-**Transport provider:** register with basic info and where to send booking notifications → CareRide admin approves → add drivers with availability and spaces → receive and accept bookings.
+**Transport provider:** register with basic info and where to send booking notifications → Relay Collective admin approves → add drivers with availability and spaces → receive and accept bookings.
 
-**Independent driver** (e.g. Frank, a rideshare driver who is also a CareRide driver): sign up with vehicle, availability, licence, and proof of professional driving → CareRide admin approves → receive requests.
+**Independent driver** (e.g. Frank, a rideshare driver who is also a Relay Collective driver): sign up with vehicle, availability, licence, and proof of professional driving → Relay Collective admin approves → receive requests.
 
 ## 7. Drivers and verification
 
@@ -105,15 +105,15 @@ These come from [FLOWS_AND_NOTES.md](FLOWS_AND_NOTES.md).
   - **Availability**: days and hours they can drive.
   - **Spaces**: how many passengers fit.
   - **Wheelchair access** and **cities** they serve.
-- Drivers upload a licence and proof they drive professionally. A CareRide admin approves them. Only approved drivers get requests.
+- Drivers upload a licence and proof they drive professionally. A Relay Collective admin approves them. Only approved drivers get requests.
 - **How we verify** drivers and organizations in a real pilot is still open. In the demo, uploads are file names only.
 
 ## 8. Core features (MVP)
 
 ### 8.1 Registration and approval
-- Organizations register as a **partner organization** or a **transport provider**. A CareRide admin approves them.
+- Organizations register as a **partner organization** or a **transport provider**. A Relay Collective admin approves them.
 - Partner organizations add **houses** and **destinations**. They do not register drivers.
-- Drivers sign up themselves in CareRide. Transport providers can still add **their own drivers**.
+- Drivers sign up themselves in Relay Collective. Transport providers can still add **their own drivers**.
 
 ### 8.2 Booking a ride (house account)
 - **Reason for the trip** (medical, social services, housing, legal or ID, other), plus a checkbox confirming it meets the house's travel policy.
@@ -126,10 +126,10 @@ These come from [FLOWS_AND_NOTES.md](FLOWS_AND_NOTES.md).
 - The **"Medical emergency? Call 911"** banner is always visible.
 
 ### 8.3 Return trips
-- From a ride's page, the house taps **Book the return trip**. The trip is reversed (destination → house), and CareRide asks the **same driver first**.
+- From a ride's page, the house taps **Book the return trip**. The trip is reversed (destination → house), and Relay Collective asks the **same driver first**.
 
 ### 8.4 Matching and fallback
-- CareRide sends the request to **one driver at a time**, best match first.
+- Relay Collective sends the request to **one driver at a time**, best match first.
 - A driver is eligible when they are approved, taking requests, serve the house's city, have enough spaces, fit wheelchair needs, and are available at pickup time.
 - Wheelchair-accessible and larger vehicles are asked last unless needed, so they stay free for rides that need them.
 - If a driver declines or doesn't answer in time (5 minutes for essential, 60 for scheduled), it goes to the next driver.
@@ -152,7 +152,7 @@ These come from [FLOWS_AND_NOTES.md](FLOWS_AND_NOTES.md).
 
 ### 8.8 Group rides
 - A ride can carry several people.
-- If two rides from the same house go to the same place around the same time, CareRide can suggest combining them. (The logic is written; it isn't shown on screen yet.)
+- If two rides from the same house go to the same place around the same time, Relay Collective can suggest combining them. (The logic is written; it isn't shown on screen yet.)
 
 ### 8.9 Impact counter
 - Shows rides completed, money saved (vs. an estimated taxi fare), and organizations and drivers on the platform.
@@ -211,7 +211,7 @@ The app is **React + TypeScript**. Screens talk to a **data service**. For the h
 ```mermaid
 flowchart TD
     subgraph Browser["React + TypeScript app"]
-        Admin["CareRide admin screens"]
+        Admin["Relay Collective admin screens"]
         OrgUI["Organization screens"]
         House["House screens"]
         Driver["Driver screens"]
@@ -401,7 +401,7 @@ The full interface is in [src/services/dataService.ts](src/services/dataService.
 | Organizations | `registerOrganization` (also creates the org admin account), `listOrganizations` |
 | Houses | `addHouse` (also creates the house's shared account), `listHouses` |
 | Drivers | `registerDriver`, `listDrivers`, `setAvailability` |
-| CareRide admin | `listPending`, `setOrgStatus`, `setDriverStatus` |
+| Relay Collective admin | `listPending`, `setOrgStatus`, `setDriverStatus` |
 | Destinations | `listDestinations`, `saveDestination` |
 | House rides | `requestRide`, `getRide`, `listRidesForHouse`, `listOffersForRide`, `retryRide`, `cancelRide` |
 | Driver and provider rides | `listMyOffers`, `listOffersForOrg`, `listMyRides`, `listRidesForOrg`, `respondToOffer`, `dropRide`, `markPickedUp`, `markCompleted`, `markNoShow` |
@@ -420,7 +420,7 @@ Rules every backend must enforce:
 | `/register` | New users | Step-by-step sign-up for partner orgs, transport providers, and drivers (`?role=partner\|provider\|driver` skips the first step) |
 | `/signin` | Anyone | Sign in, plus one-tap demo accounts |
 | `/home` | Signed in | Sends each account to its main page |
-| `/admin` | CareRide admin | Approve or reject organizations and drivers |
+| `/admin` | Relay Collective admin | Approve or reject organizations and drivers |
 | `/org` | Org admin | Sends them to the right starting page |
 | `/org/houses` | Partner org admin | Add houses (each gets a shared account) |
 | `/org/destinations` | Partner org admin | Add destinations (point B) |
@@ -448,7 +448,7 @@ Signed-in pages require an account; anyone else is sent to sign in and then back
 
 Demo data is fictional except public place names. Use **Reset demo data** in the footer before starting.
 
-1. **An organization registers.** A new partner organization signs up. The CareRide admin approves it.
+1. **An organization registers.** A new partner organization signs up. The Relay Collective admin approves it.
 2. **A driver registers.** A taxi driver signs up with availability and documents, and the admin approves them.
 3. **Belkin House books a ride.** St. Paul's is a one-tap button because it's the house's most-visited place. Two people are riding. The 911 banner is visible.
 4. **Frank declines.** The request moves on to Maya automatically, and the house sees who was asked.

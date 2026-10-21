@@ -8,7 +8,7 @@ import type { User } from '../types'
 
 const EFFECTS: Record<'DRIVER' | 'PARTNER', string> = {
   DRIVER:
-    "You won't be able to sign in, and CareRide will stop sending you requests. Rides you've already finished stay on record. Requests waiting on you go to the next driver, and upcoming rides you accepted go back out to other drivers.",
+    "You won't be able to sign in, and Relay Collective will stop sending you requests. Rides you've already finished stay on record. Requests waiting on you go to the next driver, and upcoming rides you accepted go back out to other drivers.",
   PARTNER:
     "Staff won't be able to sign in for this organization. Past rides stay on record. Rides that haven't started are cancelled, so drivers aren't sent to a pickup nobody is managing. A ride already on the way finishes as usual.",
 }

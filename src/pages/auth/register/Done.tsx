@@ -12,12 +12,12 @@ const STEP_TILES = ['bg-brand-50 text-brand-700', 'bg-teal-50 text-teal-700', 'b
 
 const NEXT_STEPS: Record<RegisterRole, string[]> = {
   PARTNER: [
-    'The CareRide team reviews your organization.',
+    'The Relay Collective team reviews your organization.',
     'Meanwhile, add the places your clients go from your dashboard.',
     'Once approved, your team can start booking free rides.',
   ],
   DRIVER: [
-    'The CareRide team reviews your account.',
+    'The Relay Collective team reviews your account.',
     'Once approved, we’ll send ride requests during the hours you picked. Change them anytime in Settings.',
     'Accept the ones you can take. Decline the rest, no questions asked.',
   ],
@@ -38,7 +38,7 @@ export function Done({ result, role }: { result: RegisterResult; role: RegisterR
           We sent a link to <strong className="break-all">{result.email}</strong>. Open it to confirm your email, then sign in.
           We'll finish setting up your account then.
         </p>
-        {isNative && <p className="mt-4 text-slate-600">The link opens the CareRide website. After confirming, come back here and sign in.</p>}
+        {isNative && <p className="mt-4 text-slate-600">The link opens the Relay Collective website. After confirming, come back here and sign in.</p>}
         <p className="mt-4 text-sm text-slate-500">Can't find it? Check your spam folder. The link works once.</p>
         <button type="button" className={`${primaryButton} mt-8 w-full`} onClick={() => navigate('/signin', { replace: true })} autoFocus>
           Go to sign in <ArrowRight className="h-5 w-5" aria-hidden />
@@ -56,7 +56,7 @@ export function Done({ result, role }: { result: RegisterResult; role: RegisterR
         <Check className="h-10 w-10 text-white" strokeWidth={3} aria-hidden />
       </div>
       <h1 className="text-3xl font-extrabold tracking-tight">You're all set, {firstName}!</h1>
-      <p className="mt-2 text-lg text-slate-600">Your account is created and you're signed in. It's waiting for review by the CareRide team.</p>
+      <p className="mt-2 text-lg text-slate-600">Your account is created and you're signed in. It's waiting for review by the Relay Collective team.</p>
 
       <ol className="mt-8 space-y-3 text-left">
         {NEXT_STEPS[role].map((text, i) => (

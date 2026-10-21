@@ -26,14 +26,14 @@ import { useApp } from '../../hooks/useApp'
 import { HOME_FOR } from '../../logic/homeFor'
 
 const SECTIONS: PageSection[] = [
-  { id: 'why', label: 'Why CareRide' },
+  { id: 'why', label: 'Why Relay Collective' },
   { id: 'how', label: 'How it works' },
   { id: 'who', label: "Who it's for" },
   { id: 'promise', label: 'Our promise' },
   { id: 'faq', label: 'Questions' },
 ]
 
-// The problem CareRide exists to solve (PRODUCT_DESCRIPTION.md §1, PRODUCT_STRATEGY.md §1). No invented statistics.
+// The problem Relay Collective exists to solve (PRODUCT_DESCRIPTION.md §1, PRODUCT_STRATEGY.md §1). No invented statistics.
 const REASONS: { icon: ReactNode; title: string; text: string; tone: Tone }[] = [
   {
     icon: <HeartPulse className="h-6 w-6" />,
@@ -49,7 +49,7 @@ const REASONS: { icon: ReactNode; title: string; text: string; tone: Tone }[] = 
   },
   {
     icon: <HandHeart className="h-6 w-6" />,
-    title: 'CareRide brings it together',
+    title: 'Relay Collective brings it together',
     text: 'One request reaches every suitable driver, and staff can see what’s happening until the person gets there.',
     tone: 'teal',
   },
@@ -117,7 +117,7 @@ function SectionHeading({ id, title, children }: { id: string; title: string; ch
 
 const HERO_POINTS = ['No phone, app, or money needed', 'Drivers who give their time', 'Free for everyone involved']
 
-// The hero for visitors: what CareRide is, and a clear way in for new and returning people.
+// The hero for visitors: what Relay Collective is, and a clear way in for new and returning people.
 function Introduction() {
   return (
     <div className="text-center lg:text-left">
@@ -125,7 +125,7 @@ function Introduction() {
         Care shouldn’t depend <span className="whitespace-nowrap text-brand-700">on a ride</span>
       </h1>
       <p className="mx-auto mt-6 max-w-xl animate-fade-up text-xl leading-relaxed text-slate-600 [animation-delay:160ms] lg:mx-0">
-        CareRide helps housing and social service staff get the people they support to essential appointments. Verified drivers give their time,
+        Relay Collective brings housing and social service staff together with verified drivers who give their time, so the people they support reach essential appointments,
         and every request stays in view until the person gets there.
       </p>
       <div className="mt-9 flex animate-fade-up flex-col gap-3 [animation-delay:240ms] sm:flex-row sm:flex-wrap sm:items-center sm:justify-center lg:justify-start">
@@ -212,7 +212,7 @@ export function Landing() {
         <section id="why" className="scroll-mt-20 bg-white py-20 sm:py-24" aria-labelledby="why-heading">
           <div className={container}>
             <SectionHeading id="why-heading" title="Getting there shouldn’t be the hard part">
-              CareRide is a not-for-profit platform built for social good. It exists so that people who can’t get there on their own still reach
+              Relay Collective is a not-for-profit platform built for social good. It exists so that people who can’t get there on their own still reach
               the care, housing, and services they need.
             </SectionHeading>
             <ul className="grid gap-6 md:grid-cols-3">
@@ -258,7 +258,7 @@ export function Landing() {
         <section id="who" className="scroll-mt-20 bg-white py-20 sm:py-24" aria-labelledby="who-heading">
           <div className={container}>
             <SectionHeading id="who-heading" title="A network of people who care">
-              CareRide is open to any housing or social service organization and any verified driver. Every new partner means more people reach
+              Relay Collective is open to any housing or social service organization and any verified driver. Every new partner means more people reach
               the care they need.
             </SectionHeading>
             <ul className="grid gap-6 md:grid-cols-2">
@@ -284,7 +284,7 @@ export function Landing() {
               ))}
             </ul>
             <p className="mt-6 text-center text-slate-600 md:text-left">
-              Already part of CareRide?{' '}
+              Already part of Relay Collective?{' '}
               <Link to="/signin" className="rounded font-semibold text-brand-700 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-brand-500">
                 Sign in
               </Link>
@@ -330,7 +330,7 @@ export function Landing() {
               <div>
                 <h2 className="text-3xl font-black tracking-tight text-balance text-white sm:text-4xl">Help more people reach the care they need.</h2>
                 <p className="mt-4 max-w-xl text-lg text-brand-100">
-                  Join CareRide in a few minutes. It’s not-for-profit and free for partner organizations, drivers, and the people they serve.
+                  Join Relay Collective in a few minutes. It’s not-for-profit and free for partner organizations, drivers, and the people they serve.
                 </p>
               </div>
               <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
@@ -357,7 +357,7 @@ export function Landing() {
         <div className={`${container} grid gap-8 py-12 text-sm sm:grid-cols-2 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16`}>
           <div className="space-y-3">
             <Logo size="sm" />
-            <p className="max-w-sm text-slate-500">CareRide is an independent, not-for-profit platform built for social good. Pilot partners are shown for demonstration only.</p>
+            <p className="max-w-sm text-slate-500">Relay Collective is an independent, not-for-profit platform built for social good. Pilot partners are shown for demonstration only.</p>
           </div>
           <div className="grid grid-cols-2 gap-8">
             <nav aria-label="Footer: on this page">

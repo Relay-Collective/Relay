@@ -1,4 +1,4 @@
-// What's new in CareRide, newest first. The first entry is the version the badge shows,
+// What's new in Relay Collective, newest first. The first entry is the version the badge shows,
 // so add a new entry at the top whenever a release goes out.
 
 export interface Release {
@@ -9,11 +9,19 @@ export interface Release {
 
 export const RELEASES: Release[] = [
   {
+    version: '1.2.0',
+    date: '2026-10-21',
+    changes: [
+      'CareRide is now Relay Collective. Same free rides, same drivers, and your account and rides carry over unchanged.',
+      'A new name for what the platform has become: staff, community organizations and volunteer drivers getting people there together.',
+    ],
+  },
+  {
     version: '1.1.0',
     date: '2026-10-18',
     changes: [
-      'Staff can give a finished ride a thumbs up or down, with an optional note. Only CareRide sees it, not the driver.',
-      'Drivers can flag an issue on a past ride. Only CareRide sees it, not the front desk.',
+      'Staff can give a finished ride a thumbs up or down, with an optional note. Only Relay Collective sees it, not the driver.',
+      'Drivers can flag an issue on a past ride. Only Relay Collective sees it, not the front desk.',
       'Each ride has a change history showing who booked, changed, accepted, picked up, dropped off or cancelled it, and when.',
       'Admins see each account’s feedback and its recent rides’ history in the account details.',
     ],

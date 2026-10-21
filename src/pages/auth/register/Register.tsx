@@ -49,7 +49,7 @@ interface StepDef {
 const STEPS: Record<StepId, StepDef> = {
   role: {
     title: 'Get started',
-    heading: () => 'Welcome! How will you use CareRide?',
+    heading: () => 'Welcome! How will you use Relay Collective?',
     subtitle: () => 'Pick the one that fits you best.',
     Component: RoleStep,
     validate: validateRole,

@@ -39,7 +39,7 @@ const AUDIENCES: Record<Audience, { label: string; icon: ReactNode; subtitle: st
 const ROLE_GROUPS: { role: UserRole; title: string; text: string; icon: ReactNode }[] = [
   { role: 'PARTNER', title: 'Partner organizations', text: 'Book rides for clients and track them.', icon: <Building2 className="h-5 w-5" /> },
   { role: 'DRIVER', title: 'Drivers', text: 'Accept ride requests and drive trips.', icon: <Car className="h-5 w-5" /> },
-  { role: 'PLATFORM_ADMIN', title: 'CareRide admin', text: 'Approve organizations and drivers.', icon: <ShieldCheck className="h-5 w-5" /> },
+  { role: 'PLATFORM_ADMIN', title: 'Relay Collective admin', text: 'Approve organizations and drivers.', icon: <ShieldCheck className="h-5 w-5" /> },
 ]
 
 // Remembers who last signed in on this device, so returning staff only type a password.
@@ -228,7 +228,7 @@ export function SignIn() {
       </div>
 
       <p className="mt-8 border-t border-slate-100 pt-6 text-center text-sm text-slate-600">
-        New to CareRide?{' '}
+        New to Relay Collective?{' '}
         <Link to={who.register} className="font-semibold text-brand-700 hover:underline">
           {who.registerLabel}
         </Link>
@@ -293,7 +293,7 @@ export function SignIn() {
       width="wide"
       aside={
         <>
-          <span className="hidden sm:inline">New to CareRide? </span>
+          <span className="hidden sm:inline">New to Relay Collective? </span>
           <Link to="/register" className="font-semibold text-brand-700 hover:underline">
             Create an account
           </Link>

@@ -120,7 +120,7 @@ Most frequent referrals: MSDPR, WorkBC, ICBC, walk-in clinics, urgent care, Anne
 - Location and transit coverage matter most for Richmond House: one infrequent bus, a long walk, and poor night service.
 - Health conditions (mental and physical) make multi-transfer trips hard, and missed appointments follow when there's no staff escort.
 
-## Implications for CareRide
+## Implications for Relay Collective
 
 - The core use case is validated: rides to medical, government, and employment appointments for low-income clients.
 - Safety is a barrier separate from cost, so driver trust and vetting should be visible in the product.
@@ -133,5 +133,5 @@ Most frequent referrals: MSDPR, WorkBC, ICBC, walk-in clinics, urgent care, Anne
 ## Open Questions
 
 - Do clients need an escort or companion for the whole appointment, or just the ride? Richmond House implies the former for some guests.
-- Are Compass-ticket and bus-ticket requests something CareRide should replace, or complement?
+- Are Compass-ticket and bus-ticket requests something Relay Collective should replace, or complement?
 - What drives the "safety" concern: routes, time of day, or neighbourhood? This would shape how rides are matched to drivers.

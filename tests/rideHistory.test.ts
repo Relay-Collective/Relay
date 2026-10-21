@@ -138,10 +138,10 @@ test('history lines read as plain sentences', () => {
     `Belkin House moved the pickup from ${formatDayTime(from)} to ${formatDayTime(to)} and changed the notes and destination.`,
   )
   assert.equal(rideEventText({ ...front, kind: 'EDITED', detail: { fields: [] } }), 'Belkin House updated the ride.')
-  assert.equal(rideEventText({ ...base, kind: 'CANCELLED', detail: { reason: 'No driver accepted in time.', expired: true } }), 'CareRide cancelled the ride. No driver accepted in time.')
+  assert.equal(rideEventText({ ...base, kind: 'CANCELLED', detail: { reason: 'No driver accepted in time.', expired: true } }), 'Relay Collective cancelled the ride. No driver accepted in time.')
   assert.equal(rideEventText({ ...base, kind: 'COMPLETED', actorRole: 'DRIVER', actorName: 'Frank' }), 'Frank dropped off the client.')
   assert.equal(rideEventText({ ...base, kind: 'STEP_UNDONE', actorRole: 'DRIVER', actorName: 'Frank', detail: { undid: 'COMPLETED' } }), 'Frank took back the drop-off.')
-  assert.equal(rideEventText({ ...base, kind: 'SENT_AGAIN', actorRole: 'PLATFORM_ADMIN', actorName: 'CareRide Admin' }), 'A CareRide admin asked drivers again.')
+  assert.equal(rideEventText({ ...base, kind: 'SENT_AGAIN', actorRole: 'PLATFORM_ADMIN', actorName: 'Relay Collective Admin' }), 'A Relay Collective admin asked drivers again.')
 })
 
 test('the demo backend logs who did each step of a ride, in order', async () => {
