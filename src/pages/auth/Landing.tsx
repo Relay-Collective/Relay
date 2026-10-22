@@ -121,12 +121,13 @@ const HERO_POINTS = ['No phone, app, or money needed', 'Drivers who give their t
 function Introduction() {
   return (
     <div className="text-center lg:text-left">
-      <h1 className="animate-fade-up text-5xl font-black leading-[1.05] tracking-tight text-balance [animation-delay:80ms] sm:text-6xl">
-        Care shouldn’t depend <span className="whitespace-nowrap text-brand-700">on a ride</span>
+      <h1 className="animate-fade-up whitespace-nowrap text-2xl font-black leading-[1.1] tracking-tight [animation-delay:80ms] min-[400px]:text-3xl sm:text-5xl lg:text-4xl xl:text-[2.6rem]">
+        <span className="block">Connecting Communities</span>
+        <span className="block text-brand-700">Empowering Change</span>
       </h1>
       <p className="mx-auto mt-6 max-w-xl animate-fade-up text-xl leading-relaxed text-slate-600 [animation-delay:160ms] lg:mx-0">
-        Relay Collective brings housing and social service staff together with verified drivers who give their time, so the people they support reach essential appointments,
-        and every request stays in view until the person gets there.
+        Relay Collective connects nonprofit organizations, volunteers, and communities through one collaborative platform, 
+        making it easier to coordinate resources, deliver essential services, and ensure that help reaches those who need it most.
       </p>
       <div className="mt-9 flex animate-fade-up flex-col gap-3 [animation-delay:240ms] sm:flex-row sm:flex-wrap sm:items-center sm:justify-center lg:justify-start">
         <Link to="/register" className={`${primaryButton} min-h-14 px-7 text-lg`}>
