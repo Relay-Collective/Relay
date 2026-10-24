@@ -46,6 +46,7 @@ import { passengersLabel, riderLabel } from '../../logic/rideText'
 import { MAX_NAME, MAX_NOTE, tooLong } from '../../logic/validate'
 import { dataService } from '../../services'
 import type { House, Ride, RideStatus, RideType, User } from '../../types'
+import { paths } from '../../workspace/paths'
 
 const CUSTOM = 'custom'
 
@@ -222,7 +223,7 @@ export function RequestRide() {
     return (
       <p>
         We couldn't find that ride.{' '}
-        <Link to="/partner" className="font-semibold text-brand-700 underline underline-offset-2">
+        <Link to={paths.transport} className="font-semibold text-brand-700 underline underline-offset-2">
           Back to your rides
         </Link>
       </p>
@@ -487,7 +488,7 @@ function RideForm({ mode, source, house, user }: FormProps) {
         : 'Update anything below. Drivers who were asked will see the new details.',
   }[mode]
   const sendLabel = { new: 'Request ride', again: 'Request ride', return: 'Book return trip', edit: 'Save changes' }[mode]
-  const backTo = source && mode !== 'again' ? ridePath(source.id) : '/partner'
+  const backTo = source && mode !== 'again' ? ridePath(source.id) : paths.transport
 
   const submitButton = (
     <button type="submit" className={`${primaryButton} w-full`} disabled={sending}>
@@ -859,7 +860,7 @@ function RideForm({ mode, source, house, user }: FormProps) {
       </div>
 
       {/* On phones the send button stays in reach at the bottom of the screen. */}
-      <div className="native-bottom-chrome no-print fixed inset-x-0 bottom-0 z-20 border-t border-slate-200/70 bg-white px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3  lg:hidden">
+      <div className="native-bottom-chrome no-print fixed bottom-0 left-[var(--shell-inset,0px)] right-0 z-20 border-t border-slate-200/70 bg-white px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3  lg:hidden">
         <div className="mx-auto max-w-5xl space-y-2">
           {problemNote}
           <div className="flex items-center gap-3">

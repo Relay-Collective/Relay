@@ -1,10 +1,11 @@
 import type { UserRole } from '../types'
+import { paths } from '../workspace/paths'
 
 // The main page each type of account lands on after signing in.
 export const HOME_FOR: Record<UserRole, string> = {
   PLATFORM_ADMIN: '/admin',
   ORG_ADMIN: '/org',
-  PARTNER: '/partner',
+  PARTNER: paths.overview,
   DRIVER: '/driver',
 }
 
@@ -17,5 +18,5 @@ export const ROLE_LABELS: Record<UserRole, string> = {
 
 // Where a ride's detail page lives for the partner organization that booked it.
 export function ridePath(rideId: string): string {
-  return `/partner/ride/${rideId}`
+  return paths.ride(rideId)
 }

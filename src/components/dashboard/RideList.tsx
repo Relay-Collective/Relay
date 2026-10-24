@@ -9,6 +9,7 @@ import { passengersLabel, rideBadgeLabel, riderLabel, SENT_ON_TRANSIT_LABEL } fr
 import type { Ride } from '../../types'
 import { STATUS_ICON, StatusBadge } from '../StatusBadge'
 import { card, input, primaryButton, secondaryButton } from '../ui'
+import { paths } from '../../workspace/paths'
 
 export interface DriverInfo {
   name?: string
@@ -112,7 +113,7 @@ export function RideList({ attention, upcoming, past, driverOf, now, tab = 'upco
                 title="No upcoming rides"
                 text="Book a ride and it shows up here, grouped by day."
                 action={
-                  <Link to="/partner/request" className={primaryButton}>
+                  <Link to={paths.newRide} className={primaryButton}>
                     Request a ride
                   </Link>
                 }
@@ -257,7 +258,7 @@ function RideRow({ ride, driver, now, alert, past }: RowProps) {
 function BookAgain({ rideId }: { rideId: string }) {
   return (
     <Link
-      to={`/partner/request?again=${rideId}`}
+      to={paths.rideAgain(rideId)}
       className="relative z-10 -mx-2 inline-flex min-h-9 items-center gap-1.5 rounded-lg px-2 text-sm font-semibold text-brand-700 transition hover:bg-brand-50 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-brand-500 focus-visible:ring-offset-2 sm:mx-0"
     >
       <RotateCcw className="h-4 w-4" aria-hidden />

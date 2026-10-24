@@ -39,6 +39,7 @@ import { dataService } from '../../services'
 import type { OfferStatus, Ride, RideOffer, RideStatus } from '../../types'
 import { ExternalLink } from '../../native/ExternalLink'
 import { printPage } from '../../native/platform'
+import { paths } from '../../workspace/paths'
 
 const offerText: Record<OfferStatus, string> = {
   PENDING: 'Waiting for answer',
@@ -188,8 +189,8 @@ export function RideDetail() {
     refresh()
   }
 
-  const editPath = `/partner/request?edit=${ride.id}`
-  const againPath = `/partner/request?again=${ride.id}`
+  const editPath = paths.editRide(ride.id)
+  const againPath = paths.rideAgain(ride.id)
   const canEdit = CAN_EDIT.includes(ride.status)
   // Staff are usually at the pickup, so without a pickup address on file Maps starts from where they are
   const transitLink = !isRealAddress(ride.destinationAddress)
@@ -214,7 +215,7 @@ export function RideDetail() {
     <div className="space-y-6">
       <div className="no-print">
         <Link
-          to="/partner"
+          to={paths.transport}
           className="-ml-1 mb-3 inline-flex min-h-9 items-center gap-1.5 rounded-lg px-1 text-sm font-semibold text-slate-500 transition hover:text-ink focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-brand-500 focus-visible:ring-offset-2"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden />
@@ -237,10 +238,10 @@ export function RideDetail() {
                     : "We're asking drivers now. This page updates when someone accepts."}
               </p>
               <div className="mt-4 grid gap-3 sm:flex sm:flex-wrap">
-                <Link to="/partner" className={primaryButton}>
-                  Back to dashboard
+                <Link to={paths.transport} className={primaryButton}>
+                  Back to transportation
                 </Link>
-                <Link to="/partner/request" className={secondaryButton}>
+                <Link to={paths.newRide} className={secondaryButton}>
                   <Plus className="h-5 w-5" aria-hidden />
                   Book another ride
                 </Link>
@@ -532,7 +533,7 @@ export function RideDetail() {
           </Link>
         )}
         {!ride.returnOfRideId && (CAN_BOOK_RETURN.includes(ride.status) || isSentOnTransit(ride)) && (
-          <Link to={`/partner/request?returnOf=${ride.id}`} className={secondaryButton}>
+          <Link to={paths.returnRide(ride.id)} className={secondaryButton}>
             Book the return trip
           </Link>
         )}
