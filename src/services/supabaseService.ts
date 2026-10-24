@@ -24,7 +24,7 @@ import type {
   UserRole,
   VerificationStatus,
 } from '../types'
-import type { DataService, DriverSettings, NewDriver, NewDriverUser, Registration } from './dataService'
+import { ALL_RIDES_LIMIT, type DataService, type DriverSettings, type NewDriver, type NewDriverUser, type Registration } from './dataService'
 import { getSupabase } from './supabaseClient'
 
 // Real backend. Identity comes from Supabase Auth; the Relay Collective profile is looked up from it.
@@ -37,10 +37,10 @@ import { getSupabase } from './supabaseClient'
 // profiles.email is not readable from the browser (see the access-policies migration),
 // so always list columns instead of select('*').
 const PROFILE_COLUMNS = 'id, name, phone, role, org_id, house_id'
-const ORG_COLUMNS = 'id, name, type, contact_name, contact_phone, booking_notifications, status'
+const ORG_COLUMNS = 'id, name, type, contact_name, contact_phone, booking_notifications, status, created_at, reviewed_at, reviewed_by'
 const HOUSE_COLUMNS = 'id, org_id, name, address, city, phone'
 const DRIVER_COLUMNS =
-  'id, profile_id, org_id, background, vehicle, wheelchair_accessible, seats, service_cities, request_hours, status'
+  'id, profile_id, org_id, background, vehicle, wheelchair_accessible, seats, service_cities, request_hours, status, created_at, reviewed_at, reviewed_by'
 const DESTINATION_COLUMNS = 'id, org_id, name, address, city, notes'
 const RIDE_COLUMNS = [
   'id, type, org_id, house_id, requested_by, rider_names, passengers, pickup_address, pickup_instructions',
@@ -71,6 +71,9 @@ interface OrgRow {
   contact_phone: string
   booking_notifications: string | null
   status: VerificationStatus
+  created_at: string
+  reviewed_at: string | null
+  reviewed_by: string | null
 }
 
 interface HouseRow {
@@ -93,6 +96,9 @@ interface DriverRow {
   service_cities: string[]
   request_hours: RequestHours
   status: VerificationStatus
+  created_at: string
+  reviewed_at: string | null
+  reviewed_by: string | null
 }
 
 interface DestinationRow {
@@ -201,6 +207,9 @@ function toOrganization(row: OrgRow): Organization {
     contactPhone: row.contact_phone,
     bookingNotifications: row.booking_notifications ?? undefined,
     status: row.status,
+    createdAt: iso(row.created_at),
+    reviewedAt: iso(row.reviewed_at),
+    reviewedBy: row.reviewed_by ?? undefined,
   }
 }
 
@@ -221,6 +230,9 @@ function toDriver(row: DriverRow): Driver {
     serviceCities: row.service_cities,
     requestHours: row.request_hours,
     status: row.status,
+    createdAt: iso(row.created_at),
+    reviewedAt: iso(row.reviewed_at),
+    reviewedBy: row.reviewed_by ?? undefined,
   }
 }
 
@@ -636,7 +648,7 @@ export const supabaseService: DataService = {
     if (error) fail(error, "We couldn't check which drivers are available.")
     type PoolRow = Pick<DriverRow, 'seats' | 'wheelchair_accessible' | 'service_cities' | 'request_hours'>
     return (data as PoolRow[]).map((row, i) =>
-      toDriver({ ...row, id: `pool-${i}`, profile_id: '', org_id: null, background: 'INDEPENDENT', vehicle: '', status: 'APPROVED' }),
+      toDriver({ ...row, id: `pool-${i}`, profile_id: '', org_id: null, background: 'INDEPENDENT', vehicle: '', status: 'APPROVED', created_at: '', reviewed_at: null, reviewed_by: null }),
     )
   },
 
@@ -858,6 +870,10 @@ export const supabaseService: DataService = {
         .order('pickup_time')
         .returns<RideRow[]>(),
     ),
+
+  // The rides access rule already lets only platform admins read every row; anyone else gets their own.
+  // Capped, newest pickup first, so the oversight list stays quick as the network grows.
+  listAllRides: () => readRides(ridesQuery().order('pickup_time', { ascending: false }).limit(ALL_RIDES_LIMIT).returns<RideRow[]>()),
 
   respondToOffer: (offerId, accept) =>
     rideCall('respond_to_offer', { p_offer_id: offerId, p_accept: accept }, "We couldn't send your answer."),

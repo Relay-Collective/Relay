@@ -1,19 +1,8 @@
-import { Blocks, Building2, CircleHelp, Inbox, LayoutDashboard, type LucideIcon } from 'lucide-react'
+import { Blocks, Building2, CircleHelp, Inbox, LayoutDashboard } from 'lucide-react'
+import type { NavEntry, NavGroup } from '../components/shell/SidebarNav'
 import { LIVE_MODULES } from './modules'
 import { paths } from './paths'
 
-export interface NavEntry {
-  to: string
-  label: string
-  icon: LucideIcon
-  end?: boolean // active only on this exact address, not the pages under it
-  badge?: 'attention' // filled in by the sidebar from live data
-}
-
-export interface NavGroup {
-  label?: string
-  items: NavEntry[]
-}
 
 // The workspace sidebar. Only working destinations belong here: planned modules stay off it.
 export const WORKSPACE_NAV: NavGroup[] = [

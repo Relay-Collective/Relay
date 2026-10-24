@@ -15,6 +15,9 @@ export interface Organization {
   contactPhone: string
   bookingNotifications?: string // phone or email that hears about new bookings
   status: VerificationStatus
+  createdAt?: string // when it registered
+  reviewedAt?: string // when a platform admin last approved or rejected it
+  reviewedBy?: string // User id of that admin
 }
 
 // Point A: where a partner organization's clients live and rides start, e.g. Belkin House.
@@ -68,6 +71,9 @@ export interface Driver {
   licenceFile?: string // demo: file name only
   proofFile?: string // demo: proof of professional driving, file name only
   status: VerificationStatus
+  createdAt?: string // when they signed up (or were added)
+  reviewedAt?: string // when a platform admin last approved or rejected them
+  reviewedBy?: string // User id of that admin
 }
 
 // Point B: a place clients go, e.g. St. Paul's Hospital. Added by the partner org.

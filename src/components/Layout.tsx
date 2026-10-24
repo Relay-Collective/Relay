@@ -27,12 +27,7 @@ const PROVIDER_NAV: NavItem[] = [
   { to: '/org/bookings', label: 'Bookings' },
 ]
 
-const ADMIN_NAV: NavItem[] = [
-  { to: '/admin', label: 'Approvals' },
-  { to: '/admin/accounts', label: 'Accounts' },
-]
-
-// Main links for whoever is signed in. Partner organizations have their own workspace (see WorkspaceShell).
+// Main links for whoever is signed in. Partner organizations and platform admins have their own consoles (WorkspaceShell, AdminShell).
 function useNavLinks(role: UserRole | undefined): NavItem[] {
   const driver = useCurrentDriver()
   const offers = useData(
@@ -48,8 +43,6 @@ function useNavLinks(role: UserRole | undefined): NavItem[] {
       ]
     case 'ORG_ADMIN':
       return PROVIDER_NAV
-    case 'PLATFORM_ADMIN':
-      return ADMIN_NAV
     default:
       return []
   }
@@ -69,7 +62,7 @@ function Badge({ count, active }: { count?: number; active: boolean }) {
   )
 }
 
-// The signed-in app for drivers, transport providers, and admins: header with navigation and account menu.
+// The signed-in app for drivers and transport providers: header with navigation and account menu.
 export function Layout() {
   const { currentUser } = useApp()
   const org = useCurrentOrg()
