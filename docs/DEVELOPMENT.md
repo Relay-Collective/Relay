@@ -13,8 +13,8 @@ Everything you need to run, demo, build, and deploy Relay Collective. For what R
 ### Run locally
 
 ```bash
-git clone https://github.com/FaithTechGlobalLabs/CareRide-Team-1.git
-cd CareRide-Team-1
+git clone https://github.com/Relay-Collective/Relay-Collective.git
+cd Relay-Collective
 npm ci
 npm run dev
 ```

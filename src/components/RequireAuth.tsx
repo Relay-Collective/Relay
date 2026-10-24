@@ -1,6 +1,6 @@
 import { AlertCircle } from 'lucide-react'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
-import logoMark from '../assets/logo-mark.png'
+import logoMark from '../assets/logo-mark.svg'
 import { useApp } from '../hooks/useApp'
 import { HOME_FOR } from '../logic/homeFor'
 import type { UserRole } from '../types'

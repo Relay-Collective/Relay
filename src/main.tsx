@@ -10,6 +10,10 @@ import '@fontsource/inter/latin-700.css'
 import '@fontsource/nunito/latin-700.css'
 import '@fontsource/nunito/latin-800.css'
 import '@fontsource/nunito/latin-900.css'
+// Brand font: the wordmark everywhere, and headings on the public site
+import '@fontsource/plus-jakarta-sans/latin-600.css'
+import '@fontsource/plus-jakarta-sans/latin-700.css'
+import '@fontsource/plus-jakarta-sans/latin-800.css'
 import { notifyOtaReady } from './native/platform'
 import './index.css'
 

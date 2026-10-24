@@ -18,7 +18,7 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import type { ReactNode } from 'react'
-import logoMark from '../../assets/logo-mark.png'
+import logoMark from '../../assets/logo-mark.svg'
 import { tones, type Tone } from '../../components/ui'
 import { LiveScreens } from './LiveScreens'
 import { SLIDES } from './slides'
