@@ -1,7 +1,7 @@
 import { AlertCircle, ArrowRight, Building2, Car, Loader2, Mail, ShieldCheck } from 'lucide-react'
 import { useState, type FormEvent, type ReactNode } from 'react'
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
-import logoMark from '../../assets/logo-mark.png'
+import logoMark from '../../assets/logo-mark.svg'
 import { AuthShell } from '../../components/auth/AuthShell'
 import { CopyButton } from '../../components/CopyButton'
 import { PasswordField } from '../../components/form/PasswordField'

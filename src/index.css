@@ -26,6 +26,20 @@
   --color-aqua-500: #14bdd0;
   --color-violet-brand: #3b2fd6; /* logo only */
 
+  /* Public website (landing page) palette. The signed-in app keeps the tokens above.
+     Teal and cyan fail AA as small text on white: small teal text uses rc-teal-ink, cyan stays graphic. */
+  --font-heading: 'Plus Jakarta Sans', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --color-rc-navy: #101b52;
+  --color-rc-navy-deep: #0b133d;
+  --color-rc-blue: #2251e8;
+  --color-rc-blue-dark: #1a3fc0;
+  --color-rc-teal: #008d82;
+  --color-rc-teal-ink: #00736a;
+  --color-rc-cyan: #18b9cf;
+  --color-rc-canvas: #f6f8fc;
+  --color-rc-mint: #e8f7f3;
+  --color-rc-line: #e3e8f2;
+
   /* Flat app background. One step below white cards, so a card reads by its edge, not a shadow */
   --color-canvas: oklch(0.982 0.005 260);
 
@@ -112,6 +126,58 @@
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-8px); }
   }
+
+  /* Landing network: dashes running along a connection, and a ring breathing out of a node */
+  @keyframes rc-flow {
+    to { stroke-dashoffset: -28; }
+  }
+  @keyframes rc-pulse {
+    0% { opacity: 0.55; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1.9); }
+  }
+  @keyframes rc-spin {
+    to { transform: rotate(360deg); }
+  }
+}
+
+/* Landing page: sections fade up once as they scroll into view (see Reveal.tsx).
+   Reduced motion shows everything in place straight away. */
+.rc-reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+.rc-reveal[data-revealed] {
+  opacity: 1;
+  transform: none;
+}
+.rc-flow {
+  stroke-dasharray: 3 11;
+  animation: rc-flow 1.6s linear infinite;
+}
+.rc-pulse {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: rc-pulse 2.8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+.rc-spin {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: rc-spin 40s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rc-reveal {
+    opacity: 1;
+    transform: none;
+  }
+  .rc-flow,
+  .rc-pulse,
+  .rc-spin {
+    animation: none;
+  }
 }
 
 /* Logo wordmark only. UI chrome uses solid colour. */
@@ -186,14 +252,6 @@ html.native-keyboard-open .native-bottom-chrome {
 }
 
 /* Same open-state styling, written out so it still applies if the open variant is dropped. */
-details.faq[open] {
-  border-color: var(--color-brand-300);
-}
-details.faq[open] .faq-icon {
-  rotate: 45deg;
-  background-color: var(--color-brand-600);
-  color: white;
-}
 details[open] > summary .details-chevron {
   rotate: 180deg;
 }

@@ -1,7 +1,7 @@
 import { KeyRound } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import logoMark from '../../assets/logo-mark.png'
+import logoMark from '../../assets/logo-mark.svg'
 import { AuthShell } from '../../components/auth/AuthShell'
 import { PasswordField } from '../../components/form/PasswordField'
 import { primaryButton } from '../../components/ui'
