@@ -4,6 +4,7 @@ import { useWorkspace } from '../../hooks/useWorkspace'
 import { workspaceTitle } from '../../workspace/navigation'
 import { paths } from '../../workspace/paths'
 import { AccountMenu } from '../AccountMenu'
+import { DRAWER_ID } from '../shell/SidebarShell'
 import { primaryButton } from '../ui'
 import { compactButton, focusRing } from './styles'
 
@@ -22,7 +23,7 @@ export function WorkspaceHeader({ onOpenMenu, menuOpen }: { onOpenMenu: () => vo
           onClick={onOpenMenu}
           aria-label="Open navigation"
           aria-expanded={menuOpen}
-          aria-controls="workspace-drawer"
+          aria-controls={DRAWER_ID}
           className={`-ml-1.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-rc-navy hover:bg-slate-100 md:hidden ${focusRing}`}
         >
           <Menu className="h-6 w-6" aria-hidden />

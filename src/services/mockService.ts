@@ -27,7 +27,7 @@ import {
 } from '../logic/feedback'
 import { rideEventsBetween, type RideEventDraft } from '../logic/rideEvents'
 import type { Driver, House, OfferStatus, Organization, Ride, RideFeedback, RideStatus, User } from '../types'
-import type { DataService, NewAccount, NewDriver, NewDriverUser, RideChanges } from './dataService'
+import { ALL_RIDES_LIMIT, type DataService, type NewAccount, type NewDriver, type NewDriverUser, type RideChanges } from './dataService'
 import { backfilledEvents, seed, type Database } from './seed'
 
 // Hackathon backend: keeps everything in the browser's localStorage.
@@ -323,7 +323,7 @@ function addDriver(
     orgId: driver.orgId,
   }
   if (login) addLogin(db, user.id, login.email, login.password)
-  const created: Driver = { ...driver, id: newId('d'), userId: user.id, status: 'PENDING' }
+  const created: Driver = { ...driver, id: newId('d'), userId: user.id, status: 'PENDING', createdAt: now() }
   db.users.push(user)
   db.drivers.push(created)
   return { driver: created, user }
@@ -382,7 +382,7 @@ export const mockService: DataService = {
 
   registerOrganization: (org, account, location, destinations = []) =>
     transact((db) => {
-      const created: Organization = { ...org, id: newId('org'), status: 'PENDING' }
+      const created: Organization = { ...org, id: newId('org'), status: 'PENDING', createdAt: now() }
       const isPartner = org.type === 'PARTNER_ORG'
       if (isPartner && !location) throw new Error('Add the address where rides start.')
       // A partner organization is one location: its account is shared by the staff there, so it carries the org's name
@@ -525,14 +525,14 @@ export const mockService: DataService = {
   setOrgStatus: (orgId, status) =>
     transact((db) => {
       const org = findOrThrow(db.organizations, orgId, 'Organization')
-      org.status = status
+      Object.assign(org, { status, reviewedAt: now(), reviewedBy: readSession() })
       return org
     }),
 
   setDriverStatus: (driverId, status) =>
     transact((db) => {
       const driver = findOrThrow(db.drivers, driverId, 'Driver')
-      driver.status = status
+      Object.assign(driver, { status, reviewedAt: now(), reviewedBy: readSession() })
       return driver
     }),
 
@@ -656,6 +656,13 @@ export const mockService: DataService = {
     transact((db) => {
       const ids = driverIdsForOrg(db, orgId)
       return db.rides.filter((r) => r.driverId && ids.includes(r.driverId))
+    }),
+
+  // Mirrors the database rule: only a platform admin reads every ride
+  listAllRides: () =>
+    transact((db) => {
+      if (signedInUser(db)?.role !== 'PLATFORM_ADMIN') throw new Error('Only a Relay Collective admin can see every ride.')
+      return [...db.rides].sort((a, b) => b.pickupTime.localeCompare(a.pickupTime)).slice(0, ALL_RIDES_LIMIT)
     }),
 
   respondToOffer: (offerId, accept) =>

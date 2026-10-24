@@ -70,6 +70,9 @@ export interface FeedbackInput {
   note?: string
 }
 
+// The most rides the platform admin's oversight list loads at once
+export const ALL_RIDES_LIMIT = 1000
+
 // The contract every backend must follow (mock now, real backend later).
 // Screens only talk to this interface, never to storage directly.
 export interface DataService {
@@ -147,6 +150,8 @@ export interface DataService {
   listOffersForOrg(orgId: string): Promise<RideOffer[]>
   listMyRides(driverId: string): Promise<Ride[]>
   listRidesForOrg(orgId: string): Promise<Ride[]> // rides taken by the org's drivers
+  // Platform admin only (checked by the backend): every ride, newest pickup first, for oversight
+  listAllRides(): Promise<Ride[]>
   respondToOffer(offerId: string, accept: boolean): Promise<Ride>
   dropRide(rideId: string, driverId: string): Promise<Ride>
   markOnTheWay(rideId: string, eta?: DriverEtaHint): Promise<Ride> // driver set off; ETA is from now, or offset from pickup

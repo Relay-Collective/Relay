@@ -7,8 +7,22 @@ import { useApp } from './hooks/useApp'
 import { HOME_FOR } from './logic/homeFor'
 import { NativeBridge } from './native/NativeBridge'
 import { isNative } from './native/platform'
-import { Accounts } from './pages/admin/Accounts'
+import { adminPaths } from './admin/paths'
+import { AdminShell } from './components/admin/AdminShell'
+import { Activity } from './pages/admin/Activity'
+import { AdminOverview } from './pages/admin/AdminOverview'
+import { AdminSearch } from './pages/admin/AdminSearch'
+import { AdminServices } from './pages/admin/AdminServices'
+import { AdminSettings } from './pages/admin/AdminSettings'
 import { Approvals } from './pages/admin/Approvals'
+import { Issues } from './pages/admin/Issues'
+import { OrganizationDetail } from './pages/admin/OrganizationDetail'
+import { Organizations } from './pages/admin/Organizations'
+import { Review } from './pages/admin/Review'
+import { RideOversight } from './pages/admin/RideOversight'
+import { Transportation } from './pages/admin/Transportation'
+import { UserDetail } from './pages/admin/UserDetail'
+import { Users } from './pages/admin/Users'
 import { ForgotPassword } from './pages/auth/ForgotPassword'
 import { Landing } from './pages/auth/Landing'
 import { Register } from './pages/auth/register/Register'
@@ -58,6 +72,12 @@ function MovedRide() {
   return <Navigate to={paths.ride(id)} replace />
 }
 
+// Only the two kinds of application have review pages
+function ReviewRoute() {
+  const { kind } = useParams()
+  return kind === 'organizations' || kind === 'drivers' ? <Review /> : <Navigate to={adminPaths.approvals} replace />
+}
+
 export default function App() {
   // The demo is a full-screen walkthrough, so the badge stays out of it.
   const { pathname } = useLocation()
@@ -98,11 +118,29 @@ export default function App() {
             <Route path="/partner/*" element={<MovedTo to={paths.overview} />} />
           </Route>
 
-          <Route element={<Layout />}>
-            <Route element={<RequireRole roles={['PLATFORM_ADMIN']} />}>
-              <Route path="/admin" element={<Approvals />} />
-              <Route path="/admin/accounts" element={<Accounts />} />
+          {/* Platform admins: the console for the whole Relay Collective network */}
+          <Route element={<RequireRole roles={['PLATFORM_ADMIN']} />}>
+            <Route element={<AdminShell />}>
+              <Route path={adminPaths.overview} element={<AdminOverview />} />
+              <Route path={adminPaths.organizations} element={<Organizations />} />
+              <Route path={`${adminPaths.organizations}/:id`} element={<OrganizationDetail />} />
+              <Route path={adminPaths.users} element={<Users />} />
+              <Route path={`${adminPaths.users}/:id`} element={<UserDetail />} />
+              <Route path={adminPaths.approvals} element={<Approvals />} />
+              <Route path={`${adminPaths.approvals}/:kind/:id`} element={<ReviewRoute />} />
+              <Route path={adminPaths.services} element={<AdminServices />} />
+              <Route path={adminPaths.transportation} element={<Transportation />} />
+              <Route path={`${adminPaths.transportation}/rides/:id`} element={<RideOversight />} />
+              <Route path={adminPaths.activity} element={<Activity />} />
+              <Route path={adminPaths.issues} element={<Issues />} />
+              <Route path={adminPaths.settings} element={<AdminSettings />} />
+              <Route path={adminPaths.search} element={<AdminSearch />} />
             </Route>
+            <Route path="/admin/accounts" element={<MovedTo to={adminPaths.users} />} />
+            <Route path="/admin/*" element={<MovedTo to={adminPaths.overview} />} />
+          </Route>
+
+          <Route element={<Layout />}>
             {/* Transport providers: hidden from sign-up for now, but existing ones still work */}
             <Route element={<RequireRole roles={['ORG_ADMIN']} />}>
               <Route path="/org" element={<OrgHome />} />
