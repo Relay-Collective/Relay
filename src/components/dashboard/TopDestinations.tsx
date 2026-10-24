@@ -2,6 +2,7 @@ import { RotateCcw } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import type { PlaceCount } from '../../logic/rideInsights'
 import { card } from '../ui'
+import { paths } from '../../workspace/paths'
 
 // Where clients go most, as a ranked list with one-tap rebooking.
 // Bars are one hue on a lighter track of the same hue, so length is the only thing to read.
@@ -14,7 +15,7 @@ export function TopDestinations({ places }: { places: PlaceCount[] }) {
         <h2 id="places-title" className="text-lg font-extrabold">
           Frequent places
         </h2>
-        <Link to="/partner/destinations" className="text-sm font-semibold text-brand-700 hover:underline">
+        <Link to={paths.destinations} className="text-sm font-semibold text-brand-700 hover:underline">
           Manage
         </Link>
       </div>
@@ -44,7 +45,7 @@ export function TopDestinations({ places }: { places: PlaceCount[] }) {
                       {p.count} {p.count === 1 ? 'ride' : 'rides'}
                     </span>
                     <Link
-                      to={`/partner/request?again=${p.lastRideId}`}
+                      to={paths.rideAgain(p.lastRideId)}
                       className="-my-2 inline-flex min-h-9 shrink-0 items-center gap-1 rounded-lg px-2 text-sm font-semibold text-brand-700 transition hover:bg-brand-50 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-brand-500 focus-visible:ring-offset-2"
                       aria-label={`Book ${p.name} again`}
                     >

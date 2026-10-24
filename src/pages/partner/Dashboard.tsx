@@ -2,16 +2,19 @@ import { AlertTriangle, CalendarCheck, CalendarDays, CalendarPlus, ChevronRight,
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ActivityChart } from '../../components/dashboard/ActivityChart'
-import { DashboardHeader } from '../../components/dashboard/DashboardHeader'
 import { NetworkImpact } from '../../components/dashboard/NetworkImpact'
 import { NextPickup } from '../../components/dashboard/NextPickup'
-import { RideList, type DriverInfo, type RideTab } from '../../components/dashboard/RideList'
+import { RideList, type RideTab } from '../../components/dashboard/RideList'
 import { StatTile } from '../../components/dashboard/StatTile'
 import { TopDestinations } from '../../components/dashboard/TopDestinations'
+import { PageHeader } from '../../components/workspace/PageHeader'
+import { SectionError } from '../../components/workspace/states'
+import { panel } from '../../components/workspace/styles'
 import { card, primaryButton, tones, type Tone } from '../../components/ui'
 import { useApp } from '../../hooks/useApp'
 import { useData } from '../../hooks/useData'
 import { useNow } from '../../hooks/useNow'
+import { useWorkspace } from '../../hooks/useWorkspace'
 import { FARE_SAVED_NOTE, formatDollars } from '../../logic/estimateFare'
 import { ridePath } from '../../logic/homeFor'
 import {
@@ -26,7 +29,7 @@ import {
   topDestinations,
 } from '../../logic/rideInsights'
 import { dataService } from '../../services'
-import type { Ride } from '../../types'
+import { paths } from '../../workspace/paths'
 
 // The chart shows two weeks back and one week ahead
 const DAYS_BACK = 14
@@ -47,16 +50,15 @@ function scrollToRides() {
 
 const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`
 
-// A partner organization's home: what needs doing, what's next, and how rides are going, all in one place.
+// The transportation module's home: what needs doing, what's next, and how rides are going, all in one place.
 export function Dashboard() {
-  const { currentUser, users } = useApp()
+  const { currentUser } = useApp()
   const now = useNow()
-  const houseId = currentUser?.houseId ?? ''
   const orgId = currentUser?.orgId
-  const rides = useData(() => dataService.listRidesForHouse(houseId), houseId)
-  const drivers = useData(() => dataService.listDrivers()) ?? []
+  // Rides, location and drivers are already loaded by the workspace shell
+  const { rides: loadedRides, house, driverOf } = useWorkspace()
+  const rides = loadedRides.data
   const destinations = useData(() => dataService.listDestinations(orgId), orgId) ?? []
-  const house = useData(() => dataService.listHouses(orgId), orgId)?.find((h) => h.id === houseId)
   const [tab, setTab] = useState<RideTab>()
 
   if (!currentUser) return null
@@ -71,11 +73,6 @@ export function Dashboard() {
   const past = all.filter(isFinished).sort((a, b) => finishedAt(b).localeCompare(finishedAt(a)))
   const stats = partnerStats(all, now)
   const next = upcoming[0]
-
-  const driverOf = (r: Ride): DriverInfo | undefined => {
-    const d = drivers.find((x) => x.id === r.driverId)
-    return d && { name: users.find((u) => u.id === d.userId)?.name, vehicle: d.vehicle }
-  }
 
   const openTab = (t: RideTab) => {
     setTab(t)
@@ -102,7 +99,7 @@ export function Dashboard() {
         </button>
       )
     ) : rides === undefined ? (
-      'Loading your rides…'
+      loadedRides.error ? "We couldn't load your rides." : 'Loading your rides…'
     ) : next ? (
       <>
         {stats.today > 0 ? `${plural(stats.today, 'ride', 'rides')} today. ` : ''}
@@ -118,7 +115,7 @@ export function Dashboard() {
 
   const shortcuts: Shortcut[] = [
     {
-      to: '/partner/destinations',
+      to: paths.destinations,
       title: 'Destinations',
       detail: plural(destinations.length, 'saved place', 'saved places'),
       icon: MapPin,
@@ -128,24 +125,30 @@ export function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <DashboardHeader
-        name={currentUser.name}
-        summary={summary}
-        detail={
-          house && (
-            <span className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-sm text-slate-600">
-              <MapPin className="h-4 w-4 shrink-0 text-coral-500" aria-hidden />
-              <span className="truncate">Pickups from {house.address}</span>
-            </span>
-          )
-        }
-        actions={
-          <Link to="/partner/request" className={`${primaryButton} min-h-14 px-6 text-lg`}>
-            <CalendarPlus className="h-5 w-5" aria-hidden />
-            Request a ride
-          </Link>
-        }
-      />
+      <div>
+        <PageHeader
+          title="Transportation overview"
+          description={summary}
+          actions={
+            <Link to={paths.newRide} className={primaryButton}>
+              <CalendarPlus className="h-5 w-5" aria-hidden />
+              Request a ride
+            </Link>
+          }
+        />
+        {house && (
+          <span className="-mt-3 inline-flex max-w-full items-center gap-1.5 rounded-full bg-white px-3 py-1 text-sm text-slate-600 ring-1 ring-slate-200">
+            <MapPin className="h-4 w-4 shrink-0 text-rc-teal-ink" aria-hidden />
+            <span className="truncate">Pickups from {house.address}</span>
+          </span>
+        )}
+      </div>
+
+      {loadedRides.error && !rides && (
+        <div className={panel}>
+          <SectionError message="We couldn't load your organization's rides. Please try again." />
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {attention.length > 0 ? (

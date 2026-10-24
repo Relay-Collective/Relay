@@ -9,6 +9,7 @@ import { DEFAULT_PICKUP_INSTRUCTIONS } from '../../constants'
 import { dataService } from '../../services'
 import { STORAGE_KEY, resetDemoData } from '../../services/mockService'
 import type { NewRide } from '../../services/dataService'
+import { paths } from '../../workspace/paths'
 
 const PARTNER = 'u-belkin'
 const DRIVER = 'u-olive' // Maya, the driver shown
@@ -239,12 +240,12 @@ async function build(): Promise<LiveDemo> {
   }
 }
 
-export const staffPath = (demo: LiveDemo, step: LiveStep) => (step.staff === 'request' ? '/partner/request' : ridePath(demo.rideId))
+export const staffPath = (demo: LiveDemo, step: LiveStep) => (step.staff === 'request' ? paths.newRide : ridePath(demo.rideId))
 
 // Where a step starts from: where the step before left off. The first starts on the staff dashboard, before the form is opened.
 export function startOf(demo: LiveDemo, index: number): { moment: Moment; staffPath: string } {
   const before = LIVE_STEPS[index - 1]
-  return before ? { moment: before.moment, staffPath: staffPath(demo, before) } : { moment: 'start', staffPath: '/partner' }
+  return before ? { moment: before.moment, staffPath: staffPath(demo, before) } : { moment: 'start', staffPath: paths.transport }
 }
 
 // The booking form opens blank, to be filled in on screen, or already filled in

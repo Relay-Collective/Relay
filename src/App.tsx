@@ -1,7 +1,8 @@
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation, useParams } from 'react-router-dom'
 import { Layout } from './components/Layout'
 import { RequireAuth, RequireRole } from './components/RequireAuth'
 import { VersionBadge } from './components/VersionBadge'
+import { WorkspaceShell } from './components/workspace/WorkspaceShell'
 import { useApp } from './hooks/useApp'
 import { HOME_FOR } from './logic/homeFor'
 import { NativeBridge } from './native/NativeBridge'
@@ -23,6 +24,13 @@ import { OrgHome } from './pages/org/OrgHome'
 import { Dashboard } from './pages/partner/Dashboard'
 import { RequestRide } from './pages/partner/RequestRide'
 import { RideDetail } from './pages/partner/RideDetail'
+import { Help } from './pages/workspace/Help'
+import { OrganizationProfile } from './pages/workspace/Organization'
+import { Overview } from './pages/workspace/Overview'
+import { Requests } from './pages/workspace/Requests'
+import { Services } from './pages/workspace/Services'
+import { TransportLayout } from './pages/workspace/TransportLayout'
+import { paths } from './workspace/paths'
 
 // "/home" always lands on the right main page for whoever is signed in.
 function RoleHome() {
@@ -37,6 +45,17 @@ function NativeEntry() {
   const { ready, currentUser } = useApp()
   if (!ready) return null
   return <Navigate to={currentUser ? '/home' : '/signin'} replace />
+}
+
+// Partner pages used to live under /partner. Old links and bookmarks still land on the same page.
+function MovedTo({ to }: { to: string }) {
+  const { search } = useLocation()
+  return <Navigate to={`${to}${search}`} replace />
+}
+
+function MovedRide() {
+  const { id = '' } = useParams()
+  return <Navigate to={paths.ride(id)} replace />
 }
 
 export default function App() {
@@ -57,6 +76,28 @@ export default function App() {
 
         <Route element={<RequireAuth />}>
           <Route path="/home" element={<RoleHome />} />
+          {/* Partner organizations: the organization workspace, with transportation as its first service */}
+          <Route element={<RequireRole roles={['PARTNER']} />}>
+            <Route element={<WorkspaceShell />}>
+              <Route path={paths.overview} element={<Overview />} />
+              <Route path={paths.requests} element={<Requests />} />
+              <Route path={paths.services} element={<Services />} />
+              <Route path={paths.organization} element={<OrganizationProfile />} />
+              <Route path={paths.help} element={<Help />} />
+              <Route path={paths.transport} element={<TransportLayout />}>
+                <Route index element={<Dashboard />} />
+                <Route path="new" element={<RequestRide />} />
+                <Route path="rides/:id" element={<RideDetail />} />
+                <Route path="destinations" element={<Destinations />} />
+              </Route>
+            </Route>
+            <Route path="/partner" element={<MovedTo to={paths.transport} />} />
+            <Route path="/partner/request" element={<MovedTo to={paths.newRide} />} />
+            <Route path="/partner/ride/:id" element={<MovedRide />} />
+            <Route path="/partner/destinations" element={<MovedTo to={paths.destinations} />} />
+            <Route path="/partner/*" element={<MovedTo to={paths.overview} />} />
+          </Route>
+
           <Route element={<Layout />}>
             <Route element={<RequireRole roles={['PLATFORM_ADMIN']} />}>
               <Route path="/admin" element={<Approvals />} />
@@ -67,14 +108,6 @@ export default function App() {
               <Route path="/org" element={<OrgHome />} />
               <Route path="/org/drivers" element={<Drivers />} />
               <Route path="/org/bookings" element={<Bookings />} />
-            </Route>
-            <Route element={<RequireRole roles={['PARTNER']} />}>
-              <Route path="/partner" element={<Dashboard />} />
-              <Route path="/partner/request" element={<RequestRide />} />
-              <Route path="/partner/ride/:id" element={<RideDetail />} />
-              <Route path="/partner/destinations" element={<Destinations />} />
-              <Route path="/partner/drivers" element={<Navigate to="/partner" replace />} />
-              <Route path="/partner/bookings" element={<Navigate to="/partner" replace />} />
             </Route>
             <Route element={<RequireRole roles={['DRIVER']} />}>
               <Route path="/driver" element={<DriverHome />} />

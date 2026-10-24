@@ -9,6 +9,7 @@ import type { Ride } from '../../types'
 import { RideProgress } from '../RideProgress'
 import { StatusBadge } from '../StatusBadge'
 import { card, primaryButton } from '../ui'
+import { paths } from '../../workspace/paths'
 
 interface Props {
   ride?: Ride
@@ -29,7 +30,7 @@ export function NextPickup({ ride, driverName, vehicle, now }: Props) {
           Nothing booked right now
         </h2>
         <p className="mt-1 text-sm text-slate-500">When you book a ride, the next pickup shows up here with a live countdown.</p>
-        <Link to="/partner/request" className={`${primaryButton} mt-5 w-full`}>
+        <Link to={paths.newRide} className={`${primaryButton} mt-5 w-full`}>
           Request a ride
         </Link>
       </section>

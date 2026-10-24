@@ -140,6 +140,17 @@
   }
 }
 
+/* The organization workspace speaks the public site's language: Plus Jakarta Sans headings and the
+   landing palette. Remapping the app tokens here restyles the transportation pages inside it too,
+   without forking their components. Every pairing still passes AA (Relay Blue on white is 6.2:1). */
+.workspace {
+  --font-display: var(--font-heading);
+  --color-ink: var(--color-rc-navy);
+  --color-brand-600: var(--color-rc-blue);
+  --color-brand-700: var(--color-rc-blue-dark);
+  --color-canvas: var(--color-rc-canvas);
+}
+
 /* Landing page: sections fade up once as they scroll into view (see Reveal.tsx).
    Reduced motion shows everything in place straight away. */
 .rc-reveal {

@@ -9,6 +9,7 @@ import { riderLabel } from '../logic/rideText'
 import { dataService } from '../services'
 import type { Ride } from '../types'
 import { markSeen, readSeen } from './seenNotices'
+import { rideIdFromPath } from '../workspace/paths'
 
 // Only recent answers pop up; older ones are on the rides list.
 const RECENT_MS = 12 * 3_600_000
@@ -24,7 +25,7 @@ export function RideAcceptedNotice() {
   const { pathname } = useLocation()
   const userId = currentUser?.id ?? ''
   // The ride page already says who accepted. A notice there sits on the slip staff are about to print.
-  const viewing = pathname.startsWith('/partner/ride/') ? pathname.split('/')[3] : undefined
+  const viewing = rideIdFromPath(pathname)
   const houseId = currentUser?.role === 'PARTNER' ? currentUser.houseId : undefined
   const [seen, setSeen] = useState(() => readSeen(userId, 'accepted'))
 
