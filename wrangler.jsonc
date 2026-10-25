@@ -1,5 +1,5 @@
 {
-	"name": "careride-team-1",
+	"name": "relay-collective",
 	"compatibility_date": "2026-10-03",
 	"main": "./worker/index.ts",
 	// Dashboard deploy command: npm run deploy
