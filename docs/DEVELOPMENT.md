@@ -52,7 +52,7 @@ Tabs on the same browser origin share ride data while keeping their own sign-in 
 
 ### Pitch deck
 
-The HACKVAN pitch lives at **[/demo](https://careride-team-1.careride.workers.dev/demo)** (locally, `http://localhost:5173/demo`). It follows the event's [pitch guidelines](../PITCH_GUIDELINES.md), and its "See it in action" slide plays one ride through the real app, with the staff and driver screens side by side.
+The HACKVAN pitch lives at **[/demo](https://relay-collective.relay-collective.workers.dev/demo)** (locally, `http://localhost:5173/demo`). It follows the event's [pitch guidelines](../PITCH_GUIDELINES.md), and its "See it in action" slide plays one ride through the real app, with the staff and driver screens side by side.
 
 - **→ / Space / Page Down** next, **← / Page Up** back, so presentation clickers work. **N** shows speaker notes, **F** goes full screen.
 - Each forward click on the live slide shows a tap on one screen, then the other screen catching up. Going back jumps straight to that step.
@@ -154,7 +154,7 @@ The same Vite build is packaged as an Android app with Capacitor. A default buil
 VITE_DATA_BACKEND=supabase
 VITE_SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_YOUR_KEY
-VITE_PUBLIC_SITE_URL=https://careride-team-1.careride.workers.dev
+VITE_PUBLIC_SITE_URL=https://relay-collective.relay-collective.workers.dev
 ```
 
 `VITE_PUBLIC_SITE_URL` is the website that confirmation and reset-password emails open. The app's own address (`https://localhost`) can't be opened from an email, so people confirm or reset on the website, then sign in in the app. Add that address with `/**` under Supabase **Authentication → URL Configuration → Redirect URLs**. Sign-ins stay on the phone until the person signs out.
