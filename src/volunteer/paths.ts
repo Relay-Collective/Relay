@@ -1,0 +1,18 @@
+// Every address in the volunteer workspace, in one place.
+// Transportation is the first service a volunteer can take part in, so its pages live under its own prefix.
+const ROOT = '/volunteer'
+const TRANSPORT = `${ROOT}/transportation`
+
+export const volunteerPaths = {
+  overview: ROOT,
+  opportunities: `${ROOT}/opportunities`,
+  commitments: `${ROOT}/commitments`,
+  transport: TRANSPORT,
+  rides: `${TRANSPORT}/rides`,
+  ride: (rideId: string) => `${TRANSPORT}/rides/${encodeURIComponent(rideId)}`,
+  availability: `${ROOT}/availability`,
+  profile: `${ROOT}/profile`,
+  verification: `${ROOT}/profile/verification`,
+  settings: `${ROOT}/settings`,
+  help: `${ROOT}/help`,
+} as const

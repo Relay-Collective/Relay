@@ -39,8 +39,6 @@ import { OrganizationOnboarding } from './pages/onboarding/organization/Organiza
 import { PendingApproval } from './pages/onboarding/PendingApproval'
 import { ProviderOnboarding } from './pages/onboarding/ProviderOnboarding'
 import { Demo } from './pages/demo/Demo'
-import { DriverHome } from './pages/driver/DriverHome'
-import { Settings } from './pages/driver/Settings'
 import { Bookings } from './pages/org/Bookings'
 import { Destinations } from './pages/org/Destinations'
 import { Drivers } from './pages/org/Drivers'
@@ -55,6 +53,19 @@ import { Requests } from './pages/workspace/Requests'
 import { Services } from './pages/workspace/Services'
 import { TransportLayout } from './pages/workspace/TransportLayout'
 import { paths } from './workspace/paths'
+import { VolunteerShell } from './components/volunteer/VolunteerShell'
+import { Availability } from './pages/volunteer/Availability'
+import { Commitments } from './pages/volunteer/Commitments'
+import { Help as VolunteerHelp } from './pages/volunteer/Help'
+import { MyRides } from './pages/volunteer/MyRides'
+import { Opportunities } from './pages/volunteer/Opportunities'
+import { Overview as VolunteerOverview } from './pages/volunteer/Overview'
+import { Profile } from './pages/volunteer/Profile'
+import { RideDetail as VolunteerRideDetail } from './pages/volunteer/RideDetail'
+import { Settings as VolunteerSettings } from './pages/volunteer/Settings'
+import { Transportation as VolunteerTransportation } from './pages/volunteer/Transportation'
+import { Verification } from './pages/volunteer/Verification'
+import { volunteerPaths } from './volunteer/paths'
 
 // "/home" always lands on the right main page for whoever is signed in, from what the backend says:
 // their role, and for organization staff whether the organization is approved yet.
@@ -175,11 +186,29 @@ export default function App() {
                 <Route path="/org/drivers" element={<Drivers />} />
                 <Route path="/org/bookings" element={<Bookings />} />
               </Route>
-              <Route element={<RequireRole roles={['DRIVER']} />}>
-                <Route path="/driver" element={<DriverHome />} />
-                <Route path="/driver/my-rides" element={<Navigate to="/driver" replace />} />
-                <Route path="/driver/settings" element={<Settings />} />
+            </Route>
+
+            {/* Drivers: the volunteer workspace, with transportation as its first service */}
+            <Route element={<RequireRole roles={['DRIVER']} />}>
+              <Route element={<VolunteerShell />}>
+                <Route path={volunteerPaths.overview} element={<VolunteerOverview />} />
+                <Route path={volunteerPaths.opportunities} element={<Opportunities />} />
+                <Route path={volunteerPaths.commitments} element={<Commitments />} />
+                <Route path={volunteerPaths.transport} element={<VolunteerTransportation />} />
+                <Route path={volunteerPaths.rides} element={<MyRides />} />
+                <Route path={`${volunteerPaths.rides}/:id`} element={<VolunteerRideDetail />} />
+                <Route path={volunteerPaths.availability} element={<Availability />} />
+                <Route path={volunteerPaths.profile} element={<Profile />} />
+                <Route path={volunteerPaths.verification} element={<Verification />} />
+                <Route path={volunteerPaths.settings} element={<VolunteerSettings />} />
+                <Route path={volunteerPaths.help} element={<VolunteerHelp />} />
               </Route>
+              {/* Driver pages used to live under /driver. Old links and bookmarks still land on the same page. */}
+              <Route path="/driver" element={<MovedTo to={volunteerPaths.transport} />} />
+              <Route path="/driver/my-rides" element={<MovedTo to={volunteerPaths.rides} />} />
+              <Route path="/driver/settings" element={<MovedTo to={volunteerPaths.availability} />} />
+              <Route path="/driver/*" element={<MovedTo to={volunteerPaths.overview} />} />
+              <Route path={`${volunteerPaths.overview}/*`} element={<MovedTo to={volunteerPaths.overview} />} />
             </Route>
           </Route>
         </Route>

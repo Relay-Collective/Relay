@@ -153,6 +153,14 @@
   --color-canvas: var(--color-rc-canvas);
 }
 
+/* A phone tab bar (SidebarShell's bottomBar) is 4rem tall. Things floating outside the shell, like the
+   version chip, sit above it. */
+@media (max-width: 767px) {
+  html:has([data-bottom-bar]) {
+    --app-bottom-bar: 4rem;
+  }
+}
+
 /* Landing page: sections fade up once as they scroll into view (see Reveal.tsx).
    Reduced motion shows everything in place straight away. */
 .rc-reveal {

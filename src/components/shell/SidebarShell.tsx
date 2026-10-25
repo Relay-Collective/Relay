@@ -17,6 +17,7 @@ interface Props {
   header: (props: { onOpenMenu: () => void; menuOpen: boolean }) => ReactNode
   banner?: ReactNode // e.g. a "waiting for approval" strip under the header
   footer?: ReactNode
+  bottomBar?: ReactNode // phones only: a tab bar fixed to the bottom of the screen
   maxWidth?: string
   children: ReactNode
 }
@@ -41,7 +42,7 @@ function writeCollapsed(key: string, value: boolean) {
 // The frame of a signed-in console. Desktop: a sidebar that can collapse to icons.
 // Tablet: the icon rail. Phone: a drawer from the menu button.
 // Styled in the public site's language (see .workspace in index.css).
-export function SidebarShell({ storageKey, sidebar, header, banner, footer, maxWidth = 'max-w-6xl', children }: Props) {
+export function SidebarShell({ storageKey, sidebar, header, banner, footer, bottomBar, maxWidth = 'max-w-6xl', children }: Props) {
   const [collapsed, setCollapsed] = useState(() => readCollapsed(storageKey))
   const [drawerOpen, setDrawerOpen] = useState(false)
   const closeDrawer = useCallback(() => setDrawerOpen(false), [])
@@ -56,8 +57,11 @@ export function SidebarShell({ storageKey, sidebar, header, banner, footer, maxW
   // Bars fixed to the bottom of a page (e.g. the booking form's send button) start after the sidebar
   const inset = collapsed ? 'md:[--shell-inset:4.5rem]' : 'md:[--shell-inset:4.5rem] lg:[--shell-inset:16rem]'
 
+  // With a phone tab bar, bars fixed to the bottom of a page sit above it (--shell-bottom)
+  const bottom = bottomBar ? 'max-md:[--shell-bottom:calc(4rem+var(--safe-bottom))] max-md:pb-[calc(4rem+var(--safe-bottom))]' : ''
+
   return (
-    <div className={`workspace min-h-screen bg-canvas ${inset}`}>
+    <div className={`workspace min-h-screen bg-canvas ${inset} ${bottom}`}>
       <a
         href="#app-main"
         className={`sr-only z-50 rounded-full bg-white px-4 py-2 font-semibold text-rc-navy focus:not-sr-only focus:fixed focus:left-4 focus:top-4 ${focusRing}`}
@@ -84,6 +88,10 @@ export function SidebarShell({ storageKey, sidebar, header, banner, footer, maxW
         </main>
         {footer && <div className={`mx-auto w-full ${maxWidth} px-4 pb-10 sm:px-6 lg:px-8`}>{footer}</div>}
       </div>
+
+      {bottomBar && (
+        <div data-bottom-bar className="native-bottom-chrome no-print fixed inset-x-0 bottom-0 z-20 border-t border-slate-200 bg-white pb-[var(--safe-bottom)] md:hidden">{bottomBar}</div>
+      )}
     </div>
   )
 }

@@ -1,9 +1,7 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { useApp } from '../hooks/useApp'
-import { useCurrentDriver, useCurrentOrg } from '../hooks/useCurrent'
-import { useData } from '../hooks/useData'
+import { useCurrentOrg } from '../hooks/useCurrent'
 import { HOME_FOR } from '../logic/homeFor'
-import { dataService } from '../services'
 import type { UserRole } from '../types'
 import { AccountMenu } from './AccountMenu'
 import { Logo } from './Logo'
@@ -27,25 +25,10 @@ const PROVIDER_NAV: NavItem[] = [
   { to: '/org/bookings', label: 'Bookings' },
 ]
 
-// Main links for whoever is signed in. Partner organizations and platform admins have their own consoles (WorkspaceShell, AdminShell).
+// Main links for transport providers. Partner organizations, drivers, and platform admins have their own consoles
+// (WorkspaceShell, VolunteerShell, AdminShell).
 function useNavLinks(role: UserRole | undefined): NavItem[] {
-  const driver = useCurrentDriver()
-  const offers = useData(
-    () => (role === 'DRIVER' && driver?.status === 'APPROVED' ? dataService.listMyOffers(driver.id) : Promise.resolve([])),
-    driver?.id,
-  )
-
-  switch (role) {
-    case 'DRIVER':
-      return [
-        { to: '/driver', label: 'Rides', badge: offers?.length },
-        { to: '/driver/settings', label: 'Settings' },
-      ]
-    case 'ORG_ADMIN':
-      return PROVIDER_NAV
-    default:
-      return []
-  }
+  return role === 'ORG_ADMIN' ? PROVIDER_NAV : []
 }
 
 function Badge({ count, active }: { count?: number; active: boolean }) {
@@ -62,17 +45,16 @@ function Badge({ count, active }: { count?: number; active: boolean }) {
   )
 }
 
-// The signed-in app for drivers and transport providers: header with navigation and account menu.
+// The signed-in app for transport providers: header with navigation and account menu.
 export function Layout() {
   const { currentUser } = useApp()
   const org = useCurrentOrg()
-  const driver = useCurrentDriver()
   const role = currentUser?.role
   const links = useNavLinks(role)
 
   const activeNav = ACTIVE_NAV[role ? ROLE_TONE[role] : 'brand']
 
-  const pending = (role === 'DRIVER' ? driver?.status : org?.status) === 'PENDING'
+  const pending = org?.status === 'PENDING'
 
   return (
     <div className="min-h-screen">
@@ -128,7 +110,7 @@ export function Layout() {
 
       {pending && (
         <div className="no-print border-b border-amber-200 bg-sun-50">
-          <PendingApprovalNotice isDriver={role === 'DRIVER'} className="mx-auto max-w-5xl px-4 py-3 sm:px-6" />
+          <PendingApprovalNotice isDriver={false} className="mx-auto max-w-5xl px-4 py-3 sm:px-6" />
         </div>
       )}
 
