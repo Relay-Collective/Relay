@@ -9,8 +9,8 @@
 </p>
 
 <p align="center">
-  <a href="https://careride-team-1.careride.workers.dev/"><img alt="Visit the website" src="https://img.shields.io/badge/Visit_the_website-2251E8?style=for-the-badge&logo=googlechrome&logoColor=white" /></a>
-  <a href="https://careride-team-1.careride.workers.dev/demo"><img alt="Walk through the transportation app" src="https://img.shields.io/badge/Transportation_app_tour-101B52?style=for-the-badge&logo=googleslides&logoColor=white" /></a>
+  <a href="https://relay-collective.relay-collective.workers.dev/"><img alt="Visit the website" src="https://img.shields.io/badge/Visit_the_website-2251E8?style=for-the-badge&logo=googlechrome&logoColor=white" /></a>
+  <a href="https://relay-collective.relay-collective.workers.dev/demo"><img alt="Walk through the transportation app" src="https://img.shields.io/badge/Transportation_app_tour-101B52?style=for-the-badge&logo=googleslides&logoColor=white" /></a>
   <a href="docs/DEVELOPMENT.md#run-locally"><img alt="Run it locally" src="https://img.shields.io/badge/Run_it_locally-008D82?style=for-the-badge&logo=npm&logoColor=white" /></a>
 </p>
 

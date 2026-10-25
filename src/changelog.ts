@@ -9,6 +9,22 @@ export interface Release {
 
 export const RELEASES: Release[] = [
   {
+    version: '1.3.0',
+    date: '2026-10-25',
+    changes: [
+      'A new Relay Collective look: a new logo, and a public site that shows transportation as the first of several services, with the others marked as planned.',
+      'Signing up now creates a personal account first. From there you can register an organization, join one by invitation, or sign up as a volunteer driver.',
+      'Organizations apply in five steps, and your progress is saved on this device until you submit. You can check where your application stands at any time.',
+      'Organization staff can invite teammates from Organization > Team. Each invitation works once, for one email address, for 7 days.',
+      'Partner organizations have a new workspace with an overview, every request in one searchable list, and an organization profile. Transportation lives inside it.',
+      'Drivers have a new volunteer workspace with their trips, rides, availability, profile and verification status. On phones it has a tab bar along the bottom.',
+      'Driver impact now counts completed rides and passengers carried, in place of the bus-fare estimate.',
+      'Changing your password now asks for your current one first.',
+      'When a staff member closes their account, their organization’s rides are only cancelled if they were its last active member.',
+      'Admins have a new console covering organizations, users, approvals, transportation, issues and activity, with search. Approval decisions are confirmed first and can’t overwrite another admin’s decision.',
+    ],
+  },
+  {
     version: '1.2.0',
     date: '2026-10-21',
     changes: [
