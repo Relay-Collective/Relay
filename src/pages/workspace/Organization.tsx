@@ -1,13 +1,13 @@
-import { ArrowRight, BadgeCheck, CircleX, Clock, Info, KeyRound, MapPin } from 'lucide-react'
+import { ArrowRight, BadgeCheck, CircleX, Clock, Info, MapPin } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { PageHeader } from '../../components/workspace/PageHeader'
 import { AvailabilityPill } from '../../components/workspace/ServiceModuleCard'
 import { Skeleton } from '../../components/workspace/states'
+import { TeamInvitations } from '../../components/workspace/TeamInvitations'
 import { panel, panelHead, panelLink, panelTitle } from '../../components/workspace/styles'
 import { useApp } from '../../hooks/useApp'
 import { useWorkspace } from '../../hooks/useWorkspace'
-import { ROLE_LABELS } from '../../logic/homeFor'
 import type { VerificationStatus } from '../../types'
 import { LIVE_MODULES } from '../../workspace/modules'
 import { paths } from '../../workspace/paths'
@@ -18,7 +18,7 @@ const VERIFICATION: Record<VerificationStatus, { text: string; icon: typeof Badg
   REJECTED: { text: 'Not approved', icon: CircleX, className: 'bg-red-50 text-red-800' },
 }
 
-// Who the organization is, where its rides start, and who can use the workspace.
+// Who the organization is, where its rides start, and who is on its team.
 // Read-only: these details are set when the organization registers, and nothing here edits them yet.
 export function OrganizationProfile() {
   const { currentUser } = useApp()
@@ -80,28 +80,6 @@ export function OrganizationProfile() {
           )}
         </section>
 
-        <section aria-labelledby="access-title" className={panel}>
-          <div className={panelHead}>
-            <h2 id="access-title" className={`${panelTitle} flex items-center gap-2`}>
-              <KeyRound className="h-4 w-4 text-rc-blue" aria-hidden /> Team access
-            </h2>
-          </div>
-          <div className="px-5 py-4">
-            <p className="text-sm text-slate-700">Your organization uses one shared staff account.</p>
-            <dl className="mt-3 rounded-lg bg-rc-canvas p-3 text-sm">
-              <dt className="sr-only">Account</dt>
-              <dd className="font-semibold text-rc-navy">{currentUser.name}</dd>
-              {currentUser.email && <dd className="text-slate-600">{currentUser.email}</dd>}
-              <dd className="mt-1 text-xs font-medium text-slate-500">{ROLE_LABELS[currentUser.role]} account</dd>
-            </dl>
-            <p className="mt-3 flex items-start gap-2 text-sm text-slate-600">
-              <Info className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" aria-hidden />
-              Anyone with this sign-in can request and manage your organization's rides, so share it only with staff who need it. Individual staff accounts and
-              roles aren't available yet.
-            </p>
-          </div>
-        </section>
-
         <section aria-labelledby="org-services-title" className={panel}>
           <div className={panelHead}>
             <h2 id="org-services-title" className={panelTitle}>
@@ -123,6 +101,8 @@ export function OrganizationProfile() {
             ))}
           </ul>
         </section>
+
+        <TeamInvitations org={org} />
       </div>
 
       <p className="flex items-start gap-2 text-sm text-slate-500">

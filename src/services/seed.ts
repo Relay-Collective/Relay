@@ -1,7 +1,20 @@
 import { ALL_DAY, hoursOn } from '../logic/requestHours'
 import { knownPlace } from '../logic/places'
 import { backfillRideEvents } from '../logic/rideEvents'
-import type { Destination, Driver, House, Organization, Ride, RideEvent, RideFeedback, RideOffer, User } from '../types'
+import type {
+  Destination,
+  Driver,
+  House,
+  Identity,
+  Invitation,
+  Organization,
+  OrganizationApplication,
+  Ride,
+  RideEvent,
+  RideFeedback,
+  RideOffer,
+  User,
+} from '../types'
 
 // Demo data. Everything here is fictional except public place names and addresses.
 // House addresses are from https://belkintsa.ca/services/overview.
@@ -36,6 +49,10 @@ export interface Database {
   offers: RideOffer[]
   events: RideEvent[] // each ride's change history, oldest first
   feedback: RideFeedback[]
+  // Signed up, but no role yet (onboarding not finished). Their login is in credentials under the same id.
+  identities: Identity[]
+  applications: OrganizationApplication[]
+  invitations: (Invitation & { token: string })[] // demo only: the real backend keeps a hash, never the token
 }
 
 // History for rides that don't have any yet (the seed, or demo data saved before the log existed),
@@ -135,7 +152,7 @@ const demoUsers: User[] = [
   { id: 'u-jordan', name: 'Jordan', email: 'jordan@careride.demo', phone: '604-555-0106', role: 'DRIVER' },
 ]
 
-const seedBase: Omit<Database, 'events' | 'feedback'> = {
+const seedBase: Omit<Database, 'events' | 'feedback' | 'identities' | 'applications' | 'invitations'> = {
   credentials: demoUsers.map((u) => ({ email: u.email!, userId: u.id, password: demoPasswordFor(u.email!) })),
   users: demoUsers,
   organizations: [
@@ -238,4 +255,7 @@ export const seed: Database = {
       at: '2026-09-28T18:00:00.000Z',
     },
   ],
+  identities: [],
+  applications: [],
+  invitations: [],
 }

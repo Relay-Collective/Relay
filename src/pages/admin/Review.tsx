@@ -11,6 +11,9 @@ import { EmptyState, SectionError, SkeletonRows } from '../../components/workspa
 import { panel, panelHead, panelTitle } from '../../components/workspace/styles'
 import { BACKGROUND_LABELS } from '../../constants'
 import { useAdmin } from '../../hooks/useAdmin'
+import { useData } from '../../hooks/useData'
+import { ORG_KINDS, PLATFORM_INTERESTS, SERVICE_CATEGORIES, labelOf } from '../../onboarding/options'
+import { dataService } from '../../services'
 import { approvalQueue } from '../../logic/adminSummary'
 import { describeRequestHours } from '../../logic/requestHours'
 import type { ReviewOutcome } from '../../hooks/useReview'
@@ -21,6 +24,8 @@ export function Review() {
   const { orgs, drivers, accounts, houses, personName, orgName } = useAdmin()
   const [outcome, setOutcome] = useState<ReviewOutcome>()
   const isOrg = kind === 'organizations'
+  // What the organization told us when it applied. Organizations from before onboarding have none.
+  const application = useData(() => (isOrg ? dataService.getOrganizationApplication(id) : Promise.resolve(undefined)), `${kind}:${id}`)
   const ready = orgs.data && drivers.data
 
   const org = isOrg ? orgs.data?.find((o) => o.id === id) : undefined
@@ -114,6 +119,17 @@ export function Review() {
                 ['Contact phone', org.contactPhone],
                 ['Hears about bookings', org.bookingNotifications],
                 ['Pickup location', location ? `${location.address}, ${location.city}` : org.type === 'PARTNER_ORG' ? undefined : 'Not needed for a provider'],
+                ...(application
+                  ? ([
+                      ['Organization kind', labelOf(ORG_KINDS, application.kind)],
+                      ['Website', application.website],
+                      ['Contact email', application.contactEmail],
+                      ['Contact role', application.contactRole],
+                      ['Description', application.description],
+                      ['Services', application.serviceCategories.map((c) => labelOf(SERVICE_CATEGORIES, c)).join(', ')],
+                      ['Interested in', application.platformInterests.map((p) => labelOf(PLATFORM_INTERESTS, p)).join(', ') || undefined],
+                    ] as [string, string | undefined][])
+                  : []),
               ]}
             />
           ) : (

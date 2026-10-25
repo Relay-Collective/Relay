@@ -6,7 +6,8 @@ export function returnPath(value: unknown): string | undefined {
     value.startsWith('/signin') ||
     value.startsWith('/register') ||
     value.startsWith('/forgot-password') ||
-    value.startsWith('/reset-password')
+    value.startsWith('/reset-password') ||
+    value.startsWith('/welcome')
   ) {
     return undefined
   }

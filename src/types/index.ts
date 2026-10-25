@@ -230,3 +230,66 @@ export interface Impact {
   organizations: number
   verifiedDrivers: number
 }
+
+// ---- Identity and onboarding
+
+// Who is signed in, before (or without) a Relay Collective role. Sign-up creates only this;
+// a profile (User) comes from onboarding: registering an organization, driving, or an invitation.
+export interface Identity {
+  id: string
+  email: string
+  name: string // as typed at sign-up; only used to prefill forms
+}
+
+// How an organization describes itself. Descriptive only: none of these grant access to anything.
+export type OrgKind = 'NONPROFIT' | 'COMMUNITY_GROUP' | 'FAITH_BASED' | 'PUBLIC_AGENCY' | 'OTHER'
+export type ServiceCategory = 'HOUSING' | 'FOOD' | 'HEALTH' | 'TRANSPORTATION' | 'OUTREACH' | 'EMPLOYMENT' | 'OTHER'
+export type PlatformInterest = 'TRANSPORTATION' | 'VOLUNTEERS' | 'RESOURCES' | 'REFERRALS' | 'REPORTING'
+
+// What an organization told Relay Collective when it applied. Seen by its members and platform admins.
+export interface OrganizationApplication {
+  orgId: string
+  kind: OrgKind
+  website?: string
+  description: string
+  contactEmail: string
+  contactRole: string
+  serviceCategories: ServiceCategory[]
+  platformInterests: PlatformInterest[]
+  submittedBy: string // User id
+  submittedAt: string
+}
+
+// A staff member invites a colleague into their organization. Single use, tied to one email.
+export interface Invitation {
+  id: string
+  orgId: string
+  email: string
+  role: 'PARTNER'
+  invitedBy: string // User id
+  createdAt: string
+  expiresAt: string
+  acceptedAt?: string
+  revokedAt?: string
+}
+
+// What someone holding an invitation link may see. Details only when it's theirs to accept.
+export type InvitationState =
+  | 'VALID'
+  | 'INVALID'
+  | 'EXPIRED'
+  | 'REVOKED'
+  | 'USED'
+  | 'WRONG_ACCOUNT' // sent to a different email
+  | 'HAS_ACCOUNT' // this login already has a Relay Collective role (one organization per account)
+  | 'UNAVAILABLE' // the organization isn't approved right now
+
+export interface InvitationPreview {
+  state: InvitationState
+  orgName?: string
+  role?: 'PARTNER'
+  invitedBy?: string
+  email?: string
+  expiresAt?: string
+  emailHint?: string // WRONG_ACCOUNT only, e.g. "j•••@example.org"
+}

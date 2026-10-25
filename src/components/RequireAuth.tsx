@@ -2,14 +2,17 @@ import { AlertCircle } from 'lucide-react'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import logoMark from '../assets/logo-mark.svg'
 import { useApp } from '../hooks/useApp'
+import { useCurrentOrg } from '../hooks/useCurrent'
 import { HOME_FOR } from '../logic/homeFor'
+import { onboardingPaths } from '../onboarding/routing'
 import type { UserRole } from '../types'
 import { primaryButton, secondaryButton } from './ui'
 
 // Signed-in pages only. Everyone else goes to sign-in and comes back here afterwards.
 // Sign-in is outside this gate, so sending people there does not loop.
+// Being signed in is enough here (onboarding lives behind this gate); RequireAccount also needs a role.
 export function RequireAuth() {
-  const { ready, currentUser, sessionError, retrySession, signOut } = useApp()
+  const { ready, identity, sessionError, retrySession, signOut } = useApp()
   const location = useLocation()
 
   if (!ready) {
@@ -39,10 +42,25 @@ export function RequireAuth() {
       </div>
     )
   }
-  if (!currentUser) {
+  if (!identity) {
     const from = `${location.pathname}${location.search}`
     return <Navigate to="/signin" replace state={{ from }} />
   }
+  return <Outlet />
+}
+
+// Pages for people with a Relay Collective role. A new identity finishes onboarding first.
+export function RequireAccount() {
+  const { currentUser } = useApp()
+  if (!currentUser) return <Navigate to={onboardingPaths.start} replace />
+  return <Outlet />
+}
+
+// The organization workspace, unless the application was turned down: that person sees its status instead.
+// A pending organization can still prepare its workspace; the backend refuses bookings until approval.
+export function RequireOrgNotRejected() {
+  const org = useCurrentOrg()
+  if (org?.status === 'REJECTED') return <Navigate to={onboardingPaths.application} replace />
   return <Outlet />
 }
 

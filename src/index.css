@@ -142,8 +142,10 @@
 
 /* The organization workspace speaks the public site's language: Plus Jakarta Sans headings and the
    landing palette. Remapping the app tokens here restyles the transportation pages inside it too,
-   without forking their components. Every pairing still passes AA (Relay Blue on white is 6.2:1). */
-.workspace {
+   without forking their components. Every pairing still passes AA (Relay Blue on white is 6.2:1).
+   Sign-in and onboarding (.rc-brand) use the same remap, so the first screens match the workspace. */
+.workspace,
+.rc-brand {
   --font-display: var(--font-heading);
   --color-ink: var(--color-rc-navy);
   --color-brand-600: var(--color-rc-blue);
