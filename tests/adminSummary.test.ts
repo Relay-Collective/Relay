@@ -169,7 +169,7 @@ test('only a platform admin can list every ride, and reviews record who decided 
 
   const target = (await mockService.listOrganizations())[0]
   const reviewed = await mockService.setOrgStatus(target.id, 'APPROVED')
-  assert.equal(reviewed.reviewedBy, admin.id)
+  assert.equal(reviewed.reviewedBy, admin.user?.id)
   assert.ok(reviewed.reviewedAt)
   await mockService.signOut()
 })

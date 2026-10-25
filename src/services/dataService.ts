@@ -4,8 +4,12 @@ import type {
   Driver,
   FeedbackRating,
   House,
+  Identity,
   Impact,
+  Invitation,
+  InvitationPreview,
   Organization,
+  OrganizationApplication,
   Ride,
   RideEvent,
   RideFeedback,
@@ -19,9 +23,31 @@ export interface NewAccount {
   name: string
   email: string
   password: string
+  next?: string // where the confirmation link continues to, e.g. an invitation; a path on this site
 }
 // Outcome of self sign-up. With email confirmation on, the account exists but nobody is signed in yet.
 export type Registration = { status: 'SIGNED_IN'; user: User } | { status: 'CONFIRM_EMAIL'; email: string }
+// Outcome of creating an identity (sign-up without a role). Onboarding gives it a role afterwards.
+export type SignUpResult = { status: 'SIGNED_IN'; identity: Identity } | { status: 'CONFIRM_EMAIL'; email: string }
+// Who is signed in. user is the Relay Collective profile, read from the backend; it's missing until onboarding finishes.
+export interface Session {
+  identity: Identity
+  user?: User
+}
+// What a partner organization sends when it applies. The backend creates the org, its location, and the applicant's profile.
+export interface NewOrganizationApplication
+  extends Pick<OrganizationApplication, 'kind' | 'website' | 'description' | 'contactEmail' | 'contactRole' | 'serviceCategories' | 'platformInterests'> {
+  orgName: string
+  contactName: string
+  contactPhone: string
+  address: string
+  city: string
+}
+// A new invitation. The token is shown once, to build the link; the backend keeps only its hash.
+export interface CreatedInvitation {
+  invitation: Invitation
+  token: string
+}
 // What an admin's password reset produced. The demo sets a password to share; the real backend emails a reset link.
 export type PasswordReset = { kind: 'NEW_PASSWORD'; email: string; password: string } | { kind: 'EMAIL_SENT'; email: string }
 export type NewDriverUser = Pick<User, 'name' | 'phone'>
@@ -70,6 +96,9 @@ export interface FeedbackInput {
   note?: string
 }
 
+// Sign-in refused because the email hasn't been confirmed yet. The sign-in page offers a new link.
+export class UnconfirmedEmailError extends Error {}
+
 // The most rides the platform admin's oversight list loads at once
 export const ALL_RIDES_LIMIT = 1000
 
@@ -77,8 +106,9 @@ export const ALL_RIDES_LIMIT = 1000
 // Screens only talk to this interface, never to storage directly.
 export interface DataService {
   // Session. The backend decides who is signed in; screens never set it directly.
-  restoreSession(): Promise<User | undefined> // the signed-in account, if any; throws if it can't be checked
-  signIn(email: string, password: string): Promise<User> // starts a session; throws if they don't match
+  // The signed-in identity and its profile, if any; throws if it can't be checked (or the account was closed)
+  restoreSession(): Promise<Session | undefined>
+  signIn(email: string, password: string): Promise<Session> // starts a session; throws if they don't match
   signOut(): Promise<void>
   // Calls back when the session changes outside this screen (another tab, expiry, demo reset). Returns unsubscribe.
   onSessionChange(listener: () => void): () => void
@@ -88,6 +118,26 @@ export interface DataService {
   requestPasswordReset(email: string): Promise<void>
   // Sets a new password for the signed-in person, e.g. after opening a reset link
   updatePassword(newPassword: string): Promise<void>
+  // Creates an identity only (no role). Says nothing about whether the email was already registered
+  // when email confirmation is on, so sign-up can't be used to probe who has an account.
+  signUp(account: NewAccount): Promise<SignUpResult>
+  // Sends the confirmation email again. Same answer whether or not the email has an account.
+  resendVerification(email: string): Promise<void>
+
+  // Onboarding, for a signed-in identity without a role. Each returns the new profile.
+  // Safe to repeat: a retry returns the profile the first call made instead of creating another.
+  submitOrganizationApplication(application: NewOrganizationApplication): Promise<User>
+  registerDriverProfile(user: NewDriverUser, driver: NewDriver): Promise<User>
+  // The application behind an organization: its members and platform admins only
+  getOrganizationApplication(orgId: string): Promise<OrganizationApplication | undefined>
+
+  // Invitations. Staff of an approved partner organization invite colleagues by email; the backend
+  // picks the organization and role, checks every rule again on acceptance, and allows one use.
+  createInvitation(email: string): Promise<CreatedInvitation>
+  listInvitations(): Promise<Invitation[]> // the signed-in member's organization's
+  revokeInvitation(invitationId: string): Promise<void>
+  previewInvitation(token: string): Promise<InvitationPreview> // signed-in only
+  acceptInvitation(token: string): Promise<User>
 
   // Accounts
   listUsers(): Promise<User[]>

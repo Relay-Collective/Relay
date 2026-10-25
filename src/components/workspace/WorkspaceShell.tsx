@@ -1,4 +1,5 @@
 import { Outlet } from 'react-router-dom'
+import { onboardingPaths } from '../../onboarding/routing'
 import { WorkspaceProvider } from '../../context/WorkspaceProvider'
 import { useWorkspace } from '../../hooks/useWorkspace'
 import { SidebarShell } from '../shell/SidebarShell'
@@ -25,7 +26,7 @@ function ShellFrame() {
       banner={
         org?.status === 'PENDING' && (
           <div className="no-print border-b border-amber-200 bg-sun-50">
-            <PendingApprovalNotice isDriver={false} className="px-4 py-3 sm:px-6 lg:px-8" />
+            <PendingApprovalNotice isDriver={false} statusLink={onboardingPaths.application} className="px-4 py-3 sm:px-6 lg:px-8" />
           </div>
         )
       }

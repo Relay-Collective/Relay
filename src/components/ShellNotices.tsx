@@ -1,4 +1,5 @@
-import { AlertTriangle, Clock, RefreshCw } from 'lucide-react'
+import { AlertTriangle, ArrowRight, Clock, RefreshCw } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { useApp } from '../hooks/useApp'
 import { isDemoBackend } from '../services'
 import { resetDemoData } from '../services/mockService'
@@ -11,12 +12,17 @@ import { dangerButton, secondaryButton } from './ui'
 // Shared by every signed-in layout, so drivers, providers, admins, and the organization workspace
 // all hear about the same things in the same way.
 
-export function PendingApprovalNotice({ isDriver, className = '' }: { isDriver: boolean; className?: string }) {
+export function PendingApprovalNotice({ isDriver, statusLink, className = '' }: { isDriver: boolean; statusLink?: string; className?: string }) {
   return (
     <p className={`flex items-center gap-2 text-sm font-medium text-amber-900 ${className}`}>
       <Clock className="h-4 w-4 shrink-0" aria-hidden />
       Your account is waiting for approval from the Relay Collective team.
       {!isDriver && ' You can set things up in the meantime.'}
+      {statusLink && (
+        <Link to={statusLink} className="ml-1 inline-flex items-center gap-1 font-semibold underline-offset-2 hover:underline">
+          Application status <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+        </Link>
+      )}
     </p>
   )
 }

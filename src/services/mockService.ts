@@ -26,8 +26,17 @@ import {
   canGiveFeedback,
 } from '../logic/feedback'
 import { rideEventsBetween, type RideEventDraft } from '../logic/rideEvents'
-import type { Driver, House, OfferStatus, Organization, Ride, RideFeedback, RideStatus, User } from '../types'
-import { ALL_RIDES_LIMIT, type DataService, type NewAccount, type NewDriver, type NewDriverUser, type RideChanges } from './dataService'
+import { EMAIL } from '../logic/validate'
+import type { Driver, House, Identity, Invitation, InvitationState, OfferStatus, Organization, Ride, RideFeedback, RideStatus, User } from '../types'
+import {
+  ALL_RIDES_LIMIT,
+  type DataService,
+  type NewAccount,
+  type NewDriver,
+  type NewDriverUser,
+  type RideChanges,
+  type Session,
+} from './dataService'
 import { backfilledEvents, seed, type Database } from './seed'
 
 // Hackathon backend: keeps everything in the browser's localStorage.
@@ -59,6 +68,9 @@ function load(): Database {
 function upgrade(db: Database): Database {
   db.events ??= backfilledEvents(db)
   db.feedback ??= []
+  db.identities ??= []
+  db.applications ??= []
+  db.invitations ??= []
   return db
 }
 
@@ -263,6 +275,47 @@ function signedInUser(db: Database): User | undefined {
   return db.users.find((u) => u.id === readSession())
 }
 
+// The signed-in identity and its profile. An identity id becomes the profile id when onboarding finishes.
+function sessionFor(db: Database, id: string): Session | undefined {
+  const user = db.users.find((u) => u.id === id)
+  if (user) return { identity: { id: user.id, email: user.email ?? '', name: user.name }, user }
+  const identity = db.identities.find((i) => i.id === id)
+  return identity && { identity }
+}
+
+// The signed-in identity that hasn't got a role yet. Onboarding turns it into a profile.
+function identityToOnboard(db: Database): Identity {
+  const id = readSession()
+  if (!id) throw new Error('Please sign in first.')
+  const identity = db.identities.find((i) => i.id === id)
+  if (!identity) throw new Error('This account already has a Relay Collective role.')
+  return identity
+}
+
+function finishOnboarding(db: Database, identity: Identity, user: User): User {
+  db.identities = db.identities.filter((i) => i.id !== identity.id)
+  db.users.push(user)
+  return user
+}
+
+function withoutToken({ token, ...invitation }: Invitation & { token: string }): Invitation {
+  void token
+  return invitation
+}
+
+const INVITATION_DAYS = 7
+const MAX_OPEN_INVITATIONS = 25
+
+function invitationState(db: Database, inv: Invitation, identity: Identity | undefined): InvitationState {
+  if (inv.revokedAt) return 'REVOKED'
+  if (inv.acceptedAt) return 'USED'
+  if (new Date(inv.expiresAt).getTime() <= Date.now()) return 'EXPIRED'
+  if (!identity || inv.email !== normalizeEmail(identity.email)) return 'WRONG_ACCOUNT'
+  if (db.users.some((u) => u.id === identity.id)) return 'HAS_ACCOUNT'
+  if (db.organizations.find((o) => o.id === inv.orgId)?.status !== 'APPROVED') return 'UNAVAILABLE'
+  return 'VALID'
+}
+
 // Adds one line to a ride's history. No actor means Relay Collective made the change on its own.
 function logEvent(db: Database, rideId: string, actor: User | undefined, { kind, detail }: RideEventDraft): void {
   db.events.push({ id: newId('event'), rideId, kind, at: now(), actorRole: actor?.role, actorName: actor?.name, detail })
@@ -336,19 +389,19 @@ function driverIdsForOrg(db: Database, orgId: string): string[] {
 export const mockService: DataService = {
   restoreSession: () =>
     transact((db) => {
-      const userId = readSession()
-      const user = db.users.find((u) => u.id === userId)
-      if (userId && !user) writeSession('') // account was removed or the demo was reset
-      return user
+      const id = readSession()
+      const session = id ? sessionFor(db, id) : undefined
+      if (id && !session) writeSession('') // account was removed or the demo was reset
+      return session
     }),
 
   signIn: (email, password) =>
     transact((db) => {
       const login = db.credentials.find((c) => c.email === normalizeEmail(email))
-      const user = login && login.password === password && db.users.find((u) => u.id === login.userId)
-      if (!user) throw new Error("That email and password don't match. Please try again.")
-      writeSession(user.id)
-      return user
+      const session = login && login.password === password ? sessionFor(db, login.userId) : undefined
+      if (!session) throw new Error("That email and password don't match. Please try again.")
+      writeSession(session.identity.id)
+      return session
     }),
 
   signOut: () => {
@@ -373,6 +426,189 @@ export const mockService: DataService = {
       const login = db.credentials.find((c) => c.userId === readSession())
       if (!login) throw new Error('Please sign in first.')
       login.password = newPassword
+    }),
+
+  signUp: (account) =>
+    transact((db) => {
+      const email = normalizeEmail(account.email)
+      if (!EMAIL.test(email)) throw new Error('Enter a valid email address.')
+      if (account.password.length < MIN_PASSWORD_LENGTH) throw new Error(`Use at least ${MIN_PASSWORD_LENGTH} characters.`)
+      if (db.credentials.some((c) => c.email === email)) {
+        throw new Error("We couldn't create an account with that email. If you've signed up before, sign in instead.")
+      }
+      // The demo can't send email, so new identities are signed in straight away
+      const identity: Identity = { id: newId('u'), email, name: account.name.trim() }
+      db.identities.push(identity)
+      addLogin(db, identity.id, email, account.password)
+      writeSession(identity.id)
+      return { status: 'SIGNED_IN' as const, identity }
+    }),
+
+  resendVerification: () => Promise.resolve(),
+
+  submitOrganizationApplication: (app) =>
+    transact((db) => {
+      const id = readSession()
+      const existing = db.users.find((u) => u.id === id)
+      // A retry after the first call went through returns the same account, never a second organization
+      if (existing?.role === 'PARTNER' && db.applications.some((a) => a.submittedBy === existing.id)) return existing
+      const identity = identityToOnboard(db)
+      if (!app.serviceCategories.length) throw new Error('Choose at least one kind of work your organization does.')
+      const org: Organization = {
+        id: newId('org'),
+        name: app.orgName.trim(),
+        type: 'PARTNER_ORG',
+        contactName: app.contactName.trim(),
+        contactPhone: app.contactPhone.trim(),
+        status: 'PENDING',
+        createdAt: now(),
+      }
+      const house: House = { id: newId('house'), orgId: org.id, name: org.name, address: app.address.trim(), city: app.city, phone: org.contactPhone }
+      db.organizations.push(org)
+      db.houses.push(house)
+      db.applications.push({
+        orgId: org.id,
+        kind: app.kind,
+        website: app.website?.trim() || undefined,
+        description: app.description.trim(),
+        contactEmail: normalizeEmail(app.contactEmail),
+        contactRole: app.contactRole.trim(),
+        serviceCategories: [...new Set(app.serviceCategories)],
+        platformInterests: [...new Set(app.platformInterests)],
+        submittedBy: identity.id,
+        submittedAt: now(),
+      })
+      return finishOnboarding(db, identity, {
+        id: identity.id,
+        name: identity.name,
+        email: identity.email,
+        phone: org.contactPhone,
+        role: 'PARTNER',
+        orgId: org.id,
+        houseId: house.id,
+      })
+    }),
+
+  registerDriverProfile: (newUser, driver) =>
+    transact((db) => {
+      const existing = db.users.find((u) => u.id === readSession())
+      if (existing?.role === 'DRIVER') return existing
+      const identity = identityToOnboard(db)
+      const user: User = { ...newUser, id: identity.id, email: identity.email, role: 'DRIVER' }
+      db.drivers.push({ ...driver, orgId: undefined, id: newId('d'), userId: user.id, status: 'PENDING', createdAt: now() })
+      return finishOnboarding(db, identity, user)
+    }),
+
+  getOrganizationApplication: (orgId) =>
+    transact((db) => {
+      const user = signedInUser(db)
+      if (user?.role !== 'PLATFORM_ADMIN' && user?.orgId !== orgId) return undefined
+      return db.applications.find((a) => a.orgId === orgId)
+    }),
+
+  createInvitation: (email) =>
+    transact((db) => {
+      const user = signedInUser(db)
+      const org = db.organizations.find((o) => o.id === user?.orgId)
+      if (!user || user.role !== 'PARTNER' || !org) throw new Error('Only staff of a partner organization can invite colleagues.')
+      if (org.status !== 'APPROVED') throw new Error('You can invite colleagues once your organization is approved.')
+      const normalized = normalizeEmail(email)
+      if (!EMAIL.test(normalized)) throw new Error('Enter a valid email address.')
+      const open = (i: Invitation) => i.orgId === org.id && !i.acceptedAt && !i.revokedAt
+      for (const i of db.invitations) if (open(i) && i.email === normalized) i.revokedAt = now()
+      if (db.invitations.filter((i) => open(i) && new Date(i.expiresAt).getTime() > Date.now()).length >= MAX_OPEN_INVITATIONS) {
+        throw new Error(`Your organization has ${MAX_OPEN_INVITATIONS} open invitations. Revoke some before sending more.`)
+      }
+      const bytes = crypto.getRandomValues(new Uint8Array(32))
+      const token = Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')
+      const invitation: Invitation = {
+        id: newId('invite'),
+        orgId: org.id,
+        email: normalized,
+        role: 'PARTNER',
+        invitedBy: user.id,
+        createdAt: now(),
+        expiresAt: new Date(Date.now() + INVITATION_DAYS * 86_400_000).toISOString(),
+      }
+      db.invitations.push({ ...invitation, token })
+      return { invitation, token }
+    }),
+
+  listInvitations: () =>
+    transact((db) => {
+      const user = signedInUser(db)
+      const mine = (i: Invitation) => user?.role === 'PLATFORM_ADMIN' || (user?.role === 'PARTNER' && i.orgId === user.orgId)
+      // The token never leaves the backend after creation
+      return db.invitations
+        .filter(mine)
+        .map(withoutToken)
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    }),
+
+  revokeInvitation: (invitationId) =>
+    transact((db) => {
+      const user = signedInUser(db)
+      const inv = db.invitations.find((i) => i.id === invitationId)
+      const allowed = inv && (user?.role === 'PLATFORM_ADMIN' || (user?.role === 'PARTNER' && inv.orgId === user.orgId))
+      if (!inv || !allowed || inv.acceptedAt || inv.revokedAt) {
+        throw new Error("That invitation can't be withdrawn. It may already be used or withdrawn.")
+      }
+      inv.revokedAt = now()
+    }),
+
+  previewInvitation: (token) =>
+    transact((db) => {
+      const id = readSession()
+      if (!id) throw new Error('Please sign in first.')
+      const inv = db.invitations.find((i) => i.token === token)
+      if (!inv) return { state: 'INVALID' as const }
+      const identity = sessionFor(db, id)?.identity
+      const state = invitationState(db, inv, identity)
+      if (state === 'WRONG_ACCOUNT') {
+        const [local, domain] = inv.email.split('@')
+        return { state, emailHint: `${local[0]}•••@${domain}` }
+      }
+      if (state !== 'VALID' && state !== 'HAS_ACCOUNT') return { state }
+      return {
+        state,
+        orgName: db.organizations.find((o) => o.id === inv.orgId)?.name,
+        role: inv.role,
+        invitedBy: db.users.find((u) => u.id === inv.invitedBy)?.name,
+        email: inv.email,
+        expiresAt: inv.expiresAt,
+      }
+    }),
+
+  acceptInvitation: (token) =>
+    transact((db) => {
+      const id = readSession()
+      if (!id) throw new Error('Please sign in first.')
+      const inv = db.invitations.find((i) => i.token === token)
+      if (!inv) throw new Error("This invitation link isn't valid.")
+      const identity = sessionFor(db, id)?.identity
+      const messages: Partial<Record<InvitationState, string>> = {
+        REVOKED: 'This invitation was withdrawn. Ask your organization for a new one.',
+        USED: 'This invitation has already been used.',
+        EXPIRED: 'This invitation has expired. Ask your organization for a new one.',
+        WRONG_ACCOUNT: 'This invitation was sent to a different email address.',
+        HAS_ACCOUNT: 'This account already belongs to Relay Collective, and an account can join one organization.',
+        UNAVAILABLE: "This organization isn't accepting new members right now.",
+      }
+      const state = invitationState(db, inv, identity)
+      if (state !== 'VALID') throw new Error(messages[state])
+      const house = db.houses.find((h) => h.orgId === inv.orgId)
+      if (!house) throw new Error("This organization isn't set up for staff yet. Contact Relay Collective.")
+      const onboarding = identityToOnboard(db)
+      inv.acceptedAt = now()
+      return finishOnboarding(db, onboarding, {
+        id: onboarding.id,
+        name: onboarding.name,
+        email: onboarding.email,
+        phone: '',
+        role: inv.role,
+        orgId: inv.orgId,
+        houseId: house.id,
+      })
     }),
 
   listUsers: () => transact((db) => db.users),
@@ -501,7 +737,10 @@ export const mockService: DataService = {
       if (user.role === 'DRIVER') {
         const driver = db.drivers.find((d) => d.userId === userId)
         if (driver) releaseDriverWork(db, driver.id)
-      } else {
+      } else if (
+        // Colleagues who can still sign in keep managing the organization's rides
+        !db.users.some((u) => u.id !== userId && u.orgId === user.orgId && u.role === 'PARTNER' && db.credentials.some((c) => c.userId === u.id))
+      ) {
         for (const ride of db.rides) {
           if (ride.orgId !== user.orgId || !partnerCloseCancelsRide(ride)) continue
           ride.status = 'CANCELLED'

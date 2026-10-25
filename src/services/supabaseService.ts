@@ -8,7 +8,11 @@ import type {
   DriverBackground,
   FeedbackRating,
   House,
+  Identity,
+  Invitation,
+  InvitationPreview,
   OfferStatus,
+  OrganizationApplication,
   Organization,
   OrgType,
   RequestHours,
@@ -24,7 +28,16 @@ import type {
   UserRole,
   VerificationStatus,
 } from '../types'
-import { ALL_RIDES_LIMIT, type DataService, type DriverSettings, type NewDriver, type NewDriverUser, type Registration } from './dataService'
+import {
+  ALL_RIDES_LIMIT,
+  type DataService,
+  type DriverSettings,
+  type NewDriver,
+  type NewDriverUser,
+  type Registration,
+  type Session,
+  UnconfirmedEmailError,
+} from './dataService'
 import { getSupabase } from './supabaseClient'
 
 // Real backend. Identity comes from Supabase Auth; the Relay Collective profile is looked up from it.
@@ -53,6 +66,10 @@ const OFFER_COLUMNS = 'id, ride_id, driver_id, status, sent_at, expires_at, resp
 // Who made each change is kept as a name and role, so the browser never needs the actor's profile.
 const EVENT_COLUMNS = 'id, ride_id, kind, actor_role, actor_name, detail, created_at'
 const FEEDBACK_COLUMNS = 'id, ride_id, author_role, org_id, driver_id, rating, note, updated_at'
+const APPLICATION_COLUMNS =
+  'org_id, kind, website, description, contact_email, contact_role, service_categories, platform_interests, submitted_by, submitted_at'
+// token_hash is not readable from the browser
+const INVITATION_COLUMNS = 'id, org_id, email, role, invited_by, created_at, expires_at, accepted_at, revoked_at'
 
 interface ProfileRow {
   id: string
@@ -177,6 +194,31 @@ interface FeedbackRow {
   rating: FeedbackRating | null
   note: string | null
   updated_at: string
+}
+
+interface ApplicationRow {
+  org_id: string
+  kind: OrganizationApplication['kind']
+  website: string | null
+  description: string
+  contact_email: string
+  contact_role: string
+  service_categories: OrganizationApplication['serviceCategories']
+  platform_interests: OrganizationApplication['platformInterests']
+  submitted_by: string
+  submitted_at: string
+}
+
+interface InvitationRow {
+  id: string
+  org_id: string
+  email: string
+  role: 'PARTNER'
+  invited_by: string
+  created_at: string
+  expires_at: string
+  accepted_at: string | null
+  revoked_at: string | null
 }
 
 // Postgres returns "2026-10-03 12:00:00+00"-style times; the app compares ISO strings like the mock's.
@@ -323,6 +365,35 @@ function toFeedback(row: FeedbackRow): RideFeedback {
   }
 }
 
+function toApplication(row: ApplicationRow): OrganizationApplication {
+  return {
+    orgId: row.org_id,
+    kind: row.kind,
+    website: row.website ?? undefined,
+    description: row.description,
+    contactEmail: row.contact_email,
+    contactRole: row.contact_role,
+    serviceCategories: row.service_categories,
+    platformInterests: row.platform_interests,
+    submittedBy: row.submitted_by,
+    submittedAt: iso(row.submitted_at),
+  }
+}
+
+function toInvitation(row: InvitationRow): Invitation {
+  return {
+    id: row.id,
+    orgId: row.org_id,
+    email: row.email,
+    role: row.role,
+    invitedBy: row.invited_by,
+    createdAt: iso(row.created_at),
+    expiresAt: iso(row.expires_at),
+    acceptedAt: iso(row.accepted_at),
+    revokedAt: iso(row.revoked_at),
+  }
+}
+
 async function readFeedback(query: PromiseLike<{ data: FeedbackRow[] | null; error: PostgrestError | null }>): Promise<RideFeedback[]> {
   const { data, error } = await query
   if (error) fail(error, "We couldn't load feedback.")
@@ -424,40 +495,63 @@ async function queryProfile(authUserId: string): Promise<ProfileRow | null> {
   return data
 }
 
-// The Relay Collective profile for a login. If sign-up was interrupted (or waited for the email link),
-// finish it here from the details saved at sign-up. Safe to repeat.
-async function loadProfile(authUser: AuthUser): Promise<User> {
+function toIdentity(authUser: AuthUser): Identity {
+  const email = authUser.email ?? ''
+  const name = typeof authUser.user_metadata?.full_name === 'string' ? authUser.user_metadata.full_name.trim() : ''
+  return { id: authUser.id, email, name: name || email.split('@')[0] }
+}
+
+// The session for a login: its identity, plus its Relay Collective profile once onboarding has made one.
+// A sign-up from before identity-first onboarding carries its form in metadata: finish it here. Safe to repeat.
+async function loadSession(authUser: AuthUser): Promise<Session> {
+  const identity = toIdentity(authUser)
   let row = await queryProfile(authUser.id)
   if (!row && authUser.user_metadata?.careride_onboarding) {
     const { error } = await getSupabase().rpc('complete_onboarding')
     if (error) fail(error, "We couldn't finish setting up your account.")
     row = await queryProfile(authUser.id)
   }
-  if (!row) {
-    // No profile and nothing to build one from, or a deactivated account. Don't leave a half-signed-in session.
-    await getSupabase().auth.signOut({ scope: 'local' })
-    throw new Error(ACCOUNT_UNAVAILABLE)
-  }
-  return toUser(row, authUser.email)
+  if (row) return { identity, user: toUser(row, authUser.email) }
+
+  // Access rules hide a closed account's profile the same way as a missing one: ask which it is.
+  const { data: state, error } = await getSupabase().rpc('my_account_state')
+  if (error) fail(error, "We couldn't load your Relay Collective account.")
+  if (state === 'NONE') return { identity } // a new identity: onboarding comes next
+  // Closed (or otherwise unusable). Don't leave a half-signed-in session.
+  await getSupabase().auth.signOut({ scope: 'local' })
+  throw new Error(ACCOUNT_UNAVAILABLE)
 }
 
-// Create the login with the form details attached. complete_onboarding() turns them into records.
-async function signUp(email: string, password: string, details: Record<string, unknown>): Promise<Registration> {
-  // Without a site address (an app build missing it), Supabase falls back to its Site URL setting
+async function requireUser(authUser: AuthUser | null | undefined): Promise<User> {
+  if (!authUser) throw new Error('Please sign in first.')
+  const { user } = await loadSession(authUser)
+  if (!user) throw new Error("We couldn't load your new account. Please refresh the page.")
+  return user
+}
+
+async function currentAuthUser(): Promise<AuthUser | null> {
+  const { data } = await getSupabase().auth.getSession()
+  return data.session?.user ?? null
+}
+
+// Where the confirmation link lands. /welcome finishes signing in and sends people on (see AuthLanding).
+function confirmRedirect(next?: string): string | undefined {
   const site = siteUrl()
+  if (!site) return undefined
+  return next ? `${site}/welcome?next=${encodeURIComponent(next)}` : `${site}/welcome`
+}
+
+// Legacy one-step sign-up: the login with the whole form attached. complete_onboarding() turns it into records.
+async function signUp(email: string, password: string, details: Record<string, unknown>): Promise<Registration> {
   const { data, error } = await getSupabase().auth.signUp({
     email: email.trim(),
     password,
-    options: {
-      data: { careride_onboarding: details },
-      emailRedirectTo: site ? `${site}/signin` : undefined,
-    },
+    options: { data: { careride_onboarding: details }, emailRedirectTo: confirmRedirect() },
   })
   if (error) throw new Error(signUpMessage(error))
-  // With email confirmation on, Auth hides whether an email is taken by returning a user with no identities.
   if (data.user && data.user.identities?.length === 0) throw new Error(EMAIL_TAKEN)
   if (!data.session || !data.user) return { status: 'CONFIRM_EMAIL', email: email.trim() }
-  return { status: 'SIGNED_IN', user: await loadProfile(data.user) }
+  return { status: 'SIGNED_IN', user: await requireUser(data.user) }
 }
 
 // Every ride change goes through a database function that locks the ride and returns its new state.
@@ -526,13 +620,16 @@ export const supabaseService: DataService = {
   async restoreSession() {
     const { data, error } = await getSupabase().auth.getSession()
     if (error) throw new Error(`We couldn't check your sign-in. ${CONNECTION}`)
-    return data.session ? loadProfile(data.session.user) : undefined
+    return data.session ? loadSession(data.session.user) : undefined
   },
 
   async signIn(email, password) {
     const { data, error } = await getSupabase().auth.signInWithPassword({ email: email.trim(), password })
-    if (error) throw new Error(signInMessage(error))
-    return loadProfile(data.user)
+    if (error) {
+      if (error.code === 'email_not_confirmed') throw new UnconfirmedEmailError(signInMessage(error))
+      throw new Error(signInMessage(error))
+    }
+    return loadSession(data.user)
   },
 
   async signOut() {
@@ -587,6 +684,115 @@ export const supabaseService: DataService = {
     if (newPassword.length < MIN_PASSWORD_LENGTH) throw new Error(`Use at least ${MIN_PASSWORD_LENGTH} characters.`)
     const { error } = await getSupabase().auth.updateUser({ password: newPassword })
     if (error) throw new Error(passwordMessage(error))
+  },
+
+  async signUp(account) {
+    const email = account.email.trim()
+    const { data, error } = await getSupabase().auth.signUp({
+      email,
+      password: account.password,
+      options: { data: { full_name: account.name.trim() }, emailRedirectTo: confirmRedirect(account.next) },
+    })
+    if (error) {
+      // Only reachable with email confirmation off, where Auth can't hide a taken email. Stay neutral anyway.
+      if (error.code === 'user_already_exists' || error.code === 'email_exists') {
+        throw new Error("We couldn't create an account with that email. If you've signed up before, sign in or reset your password.")
+      }
+      throw new Error(signUpMessage(error))
+    }
+    // With confirmation on, Auth answers a taken email with a user that has no identities and sends nothing.
+    // Treat it like any other sign-up ("check your email"), so the form can't tell anyone who has an account.
+    if (!data.session || !data.user || data.user.identities?.length === 0) return { status: 'CONFIRM_EMAIL', email }
+    return { status: 'SIGNED_IN', identity: toIdentity(data.user) }
+  },
+
+  async resendVerification(email) {
+    const { error } = await getSupabase().auth.resend({ type: 'signup', email: email.trim(), options: { emailRedirectTo: confirmRedirect() } })
+    if (error && error.code !== 'user_not_found') throw new Error(passwordMessage(error))
+  },
+
+  async submitOrganizationApplication(app) {
+    const { error } = await getSupabase().rpc('submit_organization_application', {
+      p_details: {
+        orgName: app.orgName,
+        kind: app.kind,
+        website: app.website ?? null,
+        description: app.description,
+        address: app.address,
+        city: app.city,
+        contactName: app.contactName,
+        contactEmail: app.contactEmail,
+        contactPhone: app.contactPhone,
+        contactRole: app.contactRole,
+        serviceCategories: app.serviceCategories,
+        platformInterests: app.platformInterests,
+      },
+    })
+    if (error) {
+      if (error.code === '23514') throw new Error('Please check your organization details and try again.')
+      fail(error, "We couldn't submit your application.")
+    }
+    return requireUser(await currentAuthUser())
+  },
+
+  async registerDriverProfile(user, driver) {
+    const { error } = await getSupabase().rpc('register_driver_profile', { p_details: driverDetails(user, driver) })
+    if (error) {
+      if (error.code === '23514') throw new Error('Please check your details and try again.')
+      fail(error, "We couldn't create your driver account.")
+    }
+    return requireUser(await currentAuthUser())
+  },
+
+  async getOrganizationApplication(orgId) {
+    const { data, error } = await getSupabase()
+      .from('organization_applications')
+      .select(APPLICATION_COLUMNS)
+      .eq('org_id', orgId)
+      .maybeSingle<ApplicationRow>()
+    if (error) fail(error, "We couldn't load the application.")
+    return data ? toApplication(data) : undefined
+  },
+
+  async createInvitation(email) {
+    const { data, error } = await getSupabase().rpc('create_invitation', { p_email: email.trim() })
+    if (error) fail(error, "We couldn't create the invitation.")
+    const created = data as { id: string; token: string }
+    const { data: row, error: readError } = await getSupabase()
+      .from('organization_invitations')
+      .select(INVITATION_COLUMNS)
+      .eq('id', created.id)
+      .single<InvitationRow>()
+    if (readError) fail(readError, 'The invitation was created, but we couldn’t load it.')
+    return { invitation: toInvitation(row), token: created.token }
+  },
+
+  async listInvitations() {
+    const { data, error } = await getSupabase()
+      .from('organization_invitations')
+      .select(INVITATION_COLUMNS)
+      .order('created_at', { ascending: false })
+      .returns<InvitationRow[]>()
+    if (error) fail(error, "We couldn't load invitations.")
+    return data.map(toInvitation)
+  },
+
+  async revokeInvitation(invitationId) {
+    const { error } = await getSupabase().rpc('revoke_invitation', { p_invitation_id: invitationId })
+    if (error) fail(error, "We couldn't withdraw the invitation.")
+  },
+
+  async previewInvitation(token) {
+    const { data, error } = await getSupabase().rpc('get_invitation', { p_token: token })
+    if (error) fail(error, "We couldn't check this invitation.")
+    const preview = data as InvitationPreview
+    return { ...preview, expiresAt: preview.expiresAt ? iso(preview.expiresAt) : undefined }
+  },
+
+  async acceptInvitation(token) {
+    const { error } = await getSupabase().rpc('accept_invitation', { p_token: token })
+    if (error) fail(error, "We couldn't accept the invitation.")
+    return requireUser(await currentAuthUser())
   },
 
   // Only the profiles this caller may see (access rules decide). Emails are never included.
