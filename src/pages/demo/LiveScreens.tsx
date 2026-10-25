@@ -1,3 +1,4 @@
+import { volunteerPaths } from '../../volunteer/paths'
 import { CarFront, Home, TriangleAlert } from 'lucide-react'
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { DEMO_REFRESH } from '../../context/demoFrame'
@@ -259,7 +260,7 @@ export function LiveScreens({ index, onChange }: Props) {
               <div className="overflow-hidden rounded-[2rem] border-[6px] border-ink bg-white shadow-xl">
                 <Screen
                   ref={phone}
-                  src={frameSrc('/driver', 'driver')}
+                  src={frameSrc(volunteerPaths.transport, 'driver')}
                   size={PHONE}
                   scale={phoneScale}
                   title="Driver’s phone"

@@ -38,7 +38,7 @@ export function VersionBadge() {
         type="button"
         onClick={open}
         aria-label={`Version ${CURRENT_VERSION}. See what's new${unseen ? ' (new updates)' : ''}`}
-        className="no-print fixed bottom-[calc(1rem+var(--safe-bottom))] right-4 z-10 inline-flex min-h-11 items-center gap-2 rounded-full bg-brand-600 py-2 pl-3.5 pr-4 text-sm font-semibold text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+        className="no-print fixed bottom-[calc(1rem+var(--safe-bottom)+var(--app-bottom-bar,0px))] right-4 z-10 inline-flex min-h-11 items-center gap-2 rounded-full bg-brand-600 py-2 pl-3.5 pr-4 text-sm font-semibold text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-brand-500 focus-visible:ring-offset-2"
       >
         <span className="relative">
           <Sparkles className="h-4 w-4" aria-hidden />

@@ -1,4 +1,5 @@
 import type { UserRole } from '../types'
+import { volunteerPaths } from '../volunteer/paths'
 import { paths } from '../workspace/paths'
 
 // The main page each type of account lands on after signing in.
@@ -6,7 +7,7 @@ export const HOME_FOR: Record<UserRole, string> = {
   PLATFORM_ADMIN: '/admin',
   ORG_ADMIN: '/org',
   PARTNER: paths.overview,
-  DRIVER: '/driver',
+  DRIVER: volunteerPaths.overview,
 }
 
 export const ROLE_LABELS: Record<UserRole, string> = {
