@@ -1,4 +1,4 @@
-import { Blocks, Building2, CircleHelp, Inbox, LayoutDashboard, MessagesSquare } from 'lucide-react'
+import { Blocks, Building2, CircleHelp, Inbox, LayoutDashboard, MessagesSquare, UsersRound } from 'lucide-react'
 import type { NavEntry, NavGroup } from '../components/shell/SidebarNav'
 import { LIVE_MODULES } from './modules'
 import { paths } from './paths'
@@ -19,7 +19,10 @@ export const WORKSPACE_NAV: NavGroup[] = [
   },
   {
     label: 'Organization',
-    items: [{ to: paths.organization, label: 'Organization profile', icon: Building2 }],
+    items: [
+      { to: paths.organization, label: 'Organization profile', icon: Building2 },
+      { to: paths.team, label: 'Team', icon: UsersRound, badge: 'joinRequests' },
+    ],
   },
 ]
 
@@ -34,6 +37,7 @@ const TITLES: [prefix: string, title: string][] = [
   [paths.requests, 'Requests'],
   [paths.services, 'Services'],
   [paths.organization, 'Organization profile'],
+  [paths.team, 'Team'],
   [paths.help, 'Help and support'],
   [paths.feedback, 'My feedback'],
   [paths.overview, 'Overview'],

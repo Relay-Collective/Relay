@@ -1,10 +1,11 @@
-import { ArrowRight, BadgeCheck, CircleX, Clock, Info, MapPin } from 'lucide-react'
+import { ArrowRight, BadgeCheck, CircleX, Clock, Info, MapPin, UsersRound } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { PageHeader } from '../../components/workspace/PageHeader'
 import { AvailabilityPill } from '../../components/workspace/ServiceModuleCard'
 import { Skeleton } from '../../components/workspace/states'
-import { TeamInvitations } from '../../components/workspace/TeamInvitations'
+import { OrganizationVisibilitySettings } from '../../components/membership/OrganizationVisibilitySettings'
+import { RoleBadge } from '../../components/membership/MemberRoleSelector'
 import { panel, panelHead, panelLink, panelTitle } from '../../components/workspace/styles'
 import { useApp } from '../../hooks/useApp'
 import { useWorkspace } from '../../hooks/useWorkspace'
@@ -18,11 +19,11 @@ const VERIFICATION: Record<VerificationStatus, { text: string; icon: typeof Badg
   REJECTED: { text: 'Not approved', icon: CircleX, className: 'bg-red-50 text-red-800' },
 }
 
-// Who the organization is, where its rides start, and who is on its team.
-// Read-only: these details are set when the organization registers, and nothing here edits them yet.
+// Who the organization is, where its rides start, who can find it, and a way to its team.
+// The registered details are read-only: they're set when the organization registers.
 export function OrganizationProfile() {
   const { currentUser } = useApp()
-  const { org, house } = useWorkspace()
+  const { org, house, orgRole, isAdmin, pendingJoinRequests } = useWorkspace()
   if (!currentUser) return null
 
   const verification = org && VERIFICATION[org.status]
@@ -102,12 +103,35 @@ export function OrganizationProfile() {
           </ul>
         </section>
 
-        <TeamInvitations org={org} />
+        <OrganizationVisibilitySettings org={org} isAdmin={isAdmin} />
+
+        <section aria-labelledby="team-link-title" className={`${panel} lg:col-span-2`}>
+          <div className={panelHead}>
+            <h2 id="team-link-title" className={`${panelTitle} flex items-center gap-2`}>
+              <UsersRound className="h-4 w-4 text-rc-blue" aria-hidden /> Team
+            </h2>
+            <Link to={paths.team} className={panelLink}>
+              {isAdmin ? 'Manage team' : 'View team'} <ArrowRight className="h-4 w-4" aria-hidden />
+            </Link>
+          </div>
+          <div className="flex flex-wrap items-center gap-3 px-5 py-4 text-sm text-slate-600">
+            {orgRole && (
+              <span className="inline-flex items-center gap-2">
+                Your role: <RoleBadge role={orgRole} />
+              </span>
+            )}
+            {isAdmin && !!pendingJoinRequests && (
+              <Link to={paths.teamTab('requests')} className="font-semibold text-rc-blue hover:underline">
+                {pendingJoinRequests} {pendingJoinRequests === 1 ? 'request' : 'requests'} to join waiting for review
+              </Link>
+            )}
+          </div>
+        </section>
       </div>
 
       <p className="flex items-start gap-2 text-sm text-slate-500">
         <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
-        Editing these details isn't available in the workspace yet. If something here is out of date, let the Relay Collective team know.
+        Editing your registered details isn't available in the workspace yet. If something here is out of date, let the Relay Collective team know.
       </p>
     </div>
   )

@@ -1,14 +1,14 @@
-import { Building2, Car, Check, Link2, ShieldCheck, Users } from 'lucide-react'
+import { Building2, Car, Check, ShieldCheck, Users } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
-import { softPanel } from '../../components/auth/styles'
 import { OnboardingLayout } from '../../components/onboarding/OnboardingLayout'
 import { OnboardingStep } from '../../components/onboarding/OnboardingStep'
-import { TextField } from '../../components/form/TextField'
 import { FieldMessage } from '../../components/form/FieldMessage'
 import { useApp } from '../../hooks/useApp'
-import { focusFirstError } from '../../onboarding/focus'
+import { useLoadable } from '../../hooks/useLoadable'
 import { onboardingPaths } from '../../onboarding/routing'
+import { dataService } from '../../services'
+import { FullPageLoader } from '../auth/FullPageLoader'
 
 type Path = 'organization' | 'join' | 'provider'
 
@@ -24,7 +24,7 @@ const PATHS: { value: Path; title: string; description: string; detail: string; 
     value: 'join',
     title: 'Join an existing organization',
     description: 'You work or volunteer with an organization that already uses Relay Collective.',
-    detail: 'You need an invitation from a colleague at that organization.',
+    detail: 'Search for your organization and request access, or use an invitation link.',
     icon: <Users className="h-6 w-6" />,
   },
   {
@@ -36,23 +36,19 @@ const PATHS: { value: Path; title: string; description: string; detail: string; 
   },
 ]
 
-// Invitation links look like https://…/invite/<token>; people may paste the whole link or just the code.
-function tokenFrom(value: string): string | undefined {
-  const v = value.trim()
-  const match = v.match(/\/invite\/([A-Za-z0-9]+)/)
-  return match?.[1] ?? (/^[A-Za-z0-9]{20,128}$/.test(v) ? v : undefined)
-}
-
 // "How would you like to get started?" A choice of path, not of permissions: every path ends in
 // a review by Relay Collective or an invitation the backend checks.
 export function GetStarted() {
   const { identity, currentUser } = useApp()
   const navigate = useNavigate()
   const [path, setPath] = useState<Path>()
-  const [link, setLink] = useState('')
   const [error, setError] = useState<string>()
+  // Someone waiting on a request to join goes back to where it stands
+  const requests = useLoadable(() => (currentUser ? Promise.resolve([]) : dataService.listMyJoinRequests()), identity?.id)
 
   if (currentUser) return <Navigate to="/home" replace />
+  if (!requests.data && !requests.error) return <FullPageLoader />
+  if (requests.data?.some((r) => r.status === 'pending')) return <Navigate to={onboardingPaths.joinStatus} replace />
 
   function next() {
     if (!path) {
@@ -61,13 +57,7 @@ export function GetStarted() {
     }
     if (path === 'organization') return navigate(onboardingPaths.organization)
     if (path === 'provider') return navigate(onboardingPaths.provider)
-    const token = tokenFrom(link)
-    if (!token) {
-      setError(link.trim() ? 'That doesn’t look like an invitation link. Copy the whole link from your invitation.' : 'Paste the invitation link you received.')
-      focusFirstError()
-      return
-    }
-    navigate(onboardingPaths.invite(token))
+    navigate(onboardingPaths.join)
   }
 
   const firstName = identity?.name.split(' ')[0]
@@ -99,7 +89,7 @@ export function GetStarted() {
         title="How would you like to get started?"
         description="Choose the one that fits you best. You can go back before you submit anything."
         onSubmit={next}
-        submitLabel={path === 'join' ? 'Open invitation' : 'Continue'}
+        submitLabel="Continue"
       >
         <fieldset aria-describedby="path-message">
           <legend className="sr-only">How would you like to get started?</legend>
@@ -145,36 +135,8 @@ export function GetStarted() {
               )
             })}
           </div>
-          {path !== 'join' && <FieldMessage id="path-message" error={error} />}
+          <FieldMessage id="path-message" error={error} />
         </fieldset>
-
-        {path === 'join' && (
-          <div className={`${softPanel} mt-6 animate-fade-up`}>
-            <p className="flex items-center gap-2 font-semibold text-rc-navy">
-              <Link2 className="h-4 w-4 text-rc-teal-ink" aria-hidden /> Have an invitation link?
-            </p>
-            <p className="mt-1 text-sm text-slate-600">
-              Colleagues invite you from their organization's workspace. Open the link they sent, or paste it here. It must be sent to{' '}
-              <strong className="text-rc-navy">{identity?.email}</strong>.
-            </p>
-            <TextField
-              id="invite-link"
-              label="Invitation link"
-              className="mt-4"
-              inputMode="url"
-              autoComplete="off"
-              spellCheck={false}
-              placeholder="https://…/invite/…"
-              value={link}
-              error={error}
-              onChange={(e) => {
-                setLink(e.target.value)
-                setError(undefined)
-              }}
-            />
-            <p className="mt-3 text-sm text-slate-500">No invitation yet? Ask someone at your organization to invite you from Organization → Team.</p>
-          </div>
-        )}
 
         <p className="mt-8 flex items-start gap-2 text-sm text-slate-500">
           <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />

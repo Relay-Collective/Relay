@@ -38,6 +38,8 @@ import { SignIn } from './pages/auth/SignIn'
 import { SignUp } from './pages/auth/SignUp'
 import { GetStarted } from './pages/onboarding/GetStarted'
 import { InviteAcceptance } from './pages/onboarding/InviteAcceptance'
+import { JoinOrganization } from './pages/onboarding/JoinOrganization'
+import { JoinRequestStatus } from './pages/onboarding/JoinRequestStatus'
 import { OrganizationOnboarding } from './pages/onboarding/organization/OrganizationOnboarding'
 import { PendingApproval } from './pages/onboarding/PendingApproval'
 import { ProviderOnboarding } from './pages/onboarding/ProviderOnboarding'
@@ -56,6 +58,7 @@ import { OrganizationProfile } from './pages/workspace/Organization'
 import { Overview } from './pages/workspace/Overview'
 import { Requests } from './pages/workspace/Requests'
 import { Services } from './pages/workspace/Services'
+import { Team } from './pages/workspace/Team'
 import { TransportLayout } from './pages/workspace/TransportLayout'
 import { paths } from './workspace/paths'
 import { VolunteerShell } from './components/volunteer/VolunteerShell'
@@ -135,6 +138,9 @@ export default function App() {
           <Route path={onboardingPaths.start} element={<GetStarted />} />
           <Route path={onboardingPaths.organization} element={<OrganizationOnboarding />} />
           <Route path={onboardingPaths.provider} element={<ProviderOnboarding />} />
+          <Route path={onboardingPaths.join} element={<JoinOrganization />} />
+          {/* Also reached once approved: the backend's answer decides when the workspace opens */}
+          <Route path={onboardingPaths.joinStatus} element={<JoinRequestStatus />} />
 
           <Route element={<RequireAccount />}>
             <Route path="/home" element={<RoleHome />} />
@@ -147,6 +153,7 @@ export default function App() {
                   <Route path={paths.requests} element={<Requests />} />
                   <Route path={paths.services} element={<Services />} />
                   <Route path={paths.organization} element={<OrganizationProfile />} />
+                  <Route path={paths.team} element={<Team />} />
                   <Route path={paths.help} element={<Help />} />
                   <Route path={paths.feedback} element={<MyFeedback />} />
                   <Route path={`${paths.feedback}/:id`} element={<MyFeedbackDetail />} />

@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom'
 import { onboardingPaths } from '../../onboarding/routing'
 import { WorkspaceProvider } from '../../context/WorkspaceProvider'
+import { JoinRequestNotice, MembershipApprovedNotice } from '../membership/MembershipNotices'
 import { useWorkspace } from '../../hooks/useWorkspace'
 import { SidebarShell } from '../shell/SidebarShell'
 import { AppFooter, LoadErrorBanner, PendingApprovalNotice, RideNotices } from '../ShellNotices'
@@ -34,6 +35,8 @@ function ShellFrame() {
     >
       <RideNotices />
       <LoadErrorBanner />
+      <MembershipApprovedNotice />
+      <JoinRequestNotice />
       <Outlet />
     </SidebarShell>
   )
