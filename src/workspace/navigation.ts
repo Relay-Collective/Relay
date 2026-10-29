@@ -1,4 +1,4 @@
-import { Blocks, Building2, CircleHelp, Inbox, LayoutDashboard } from 'lucide-react'
+import { Blocks, Building2, CircleHelp, Inbox, LayoutDashboard, MessagesSquare } from 'lucide-react'
 import type { NavEntry, NavGroup } from '../components/shell/SidebarNav'
 import { LIVE_MODULES } from './modules'
 import { paths } from './paths'
@@ -24,6 +24,7 @@ export const WORKSPACE_NAV: NavGroup[] = [
 ]
 
 export const HELP_NAV: NavEntry = { to: paths.help, label: 'Help and support', icon: CircleHelp }
+export const MY_FEEDBACK_NAV: NavEntry = { to: paths.feedback, label: 'My feedback', icon: MessagesSquare, badge: 'feedback' }
 
 // The page name shown in the workspace header, from the most specific matching address
 const TITLES: [prefix: string, title: string][] = [
@@ -34,6 +35,7 @@ const TITLES: [prefix: string, title: string][] = [
   [paths.services, 'Services'],
   [paths.organization, 'Organization profile'],
   [paths.help, 'Help and support'],
+  [paths.feedback, 'My feedback'],
   [paths.overview, 'Overview'],
 ]
 

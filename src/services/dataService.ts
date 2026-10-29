@@ -1,7 +1,14 @@
 import type { DriverEtaHint } from '../logic/driverEta'
 import type {
+  AdminFeedbackDetail,
+  AdminFeedbackRow,
   Destination,
   Driver,
+  FeedbackAttachment,
+  FeedbackPerson,
+  FeedbackSummary,
+  FeedbackVisibility,
+  FeedbackWorkspace,
   FeedbackRating,
   House,
   Identity,
@@ -10,6 +17,11 @@ import type {
   InvitationPreview,
   Organization,
   OrganizationApplication,
+  ProductFeedback,
+  ProductFeedbackPriority,
+  ProductFeedbackStatus,
+  ProductFeedbackThread,
+  ProductFeedbackType,
   Ride,
   RideEvent,
   RideFeedback,
@@ -95,6 +107,43 @@ export interface FeedbackInput {
   rating?: FeedbackRating
   note?: string
 }
+
+// Feedback & Suggestions. The backend picks the submitter and organization from the session, and the
+// workspace from their role; sourcePage is a sanitized route (see sanitizeRoute in src/feedback/rules.ts).
+export interface NewProductFeedback {
+  feedbackType: ProductFeedbackType
+  title: string
+  description: string
+  sourcePage?: string
+  sourceWorkspace: FeedbackWorkspace
+  relatedRelease?: string // only kept on feedback about an update
+}
+
+// The admin inbox's filters. All optional; priority 'none' means not prioritized yet. Dates are YYYY-MM-DD.
+export interface FeedbackQuery {
+  search?: string // title, description, or a reference like FB-1042
+  type?: ProductFeedbackType
+  status?: ProductFeedbackStatus
+  priority?: ProductFeedbackPriority | 'none'
+  workspace?: FeedbackWorkspace
+  organizationId?: string
+  release?: string
+  from?: string
+  to?: string
+  limit: number
+  offset: number
+}
+
+export interface FeedbackPage {
+  total: number
+  rows: AdminFeedbackRow[]
+}
+
+// One triage change. expected is what the admin's screen showed, so another admin's newer decision is never overwritten.
+export type TriageChange =
+  | { field: 'status'; expected: ProductFeedbackStatus; value: ProductFeedbackStatus }
+  | { field: 'priority'; expected?: ProductFeedbackPriority; value?: ProductFeedbackPriority }
+  | { field: 'assignedTo'; expected?: string; value?: string } // profile ids
 
 // Sign-in refused because the email hasn't been confirmed yet. The sign-in page offers a new link.
 export class UnconfirmedEmailError extends Error {}
@@ -219,6 +268,27 @@ export interface DataService {
   giveFeedback(rideId: string, feedback: FeedbackInput): Promise<RideFeedback>
   listMyFeedback(): Promise<RideFeedback[]> // what the signed-in person gave
   listFeedback(filter: { driverId?: string; orgId?: string }): Promise<RideFeedback[]> // platform admin only
+
+  // Feedback & Suggestions, from anyone signed in with a role. Send the same clientRequestId when retrying
+  // one form, so an answer lost on the network can't create a second submission.
+  submitProductFeedback(feedback: NewProductFeedback, clientRequestId: string): Promise<ProductFeedback>
+  // Adds the one screenshot to the signed-in person's own feedback, within a day of sending it.
+  // Safe to retry after a failure. The file should already be checked (see src/feedback/screenshot.ts).
+  attachFeedbackScreenshot(feedbackId: string, file: Blob, fileName: string): Promise<FeedbackAttachment>
+  listMyProductFeedback(): Promise<ProductFeedback[]> // newest first
+  // The signed-in person's own feedback, its public replies and status changes. Never internal notes.
+  getMyProductFeedback(feedbackId: string): Promise<ProductFeedbackThread | undefined>
+  // A short-lived link to show a screenshot, for its submitter or a platform admin
+  getFeedbackScreenshotUrl(attachment: FeedbackAttachment): Promise<string>
+
+  // Feedback management: platform admins only (checked by the backend)
+  getFeedbackSummary(): Promise<FeedbackSummary>
+  listProductFeedback(query: FeedbackQuery): Promise<FeedbackPage> // filtered, searched and paged by the backend
+  getProductFeedback(feedbackId: string): Promise<AdminFeedbackDetail | undefined>
+  listFeedbackAssignees(): Promise<FeedbackPerson[]> // active platform admins
+  updateFeedbackTriage(feedbackId: string, change: TriageChange): Promise<void>
+  // public: a reply the submitter sees. internal: a note only admins see.
+  addFeedbackMessage(feedbackId: string, message: string, visibility: FeedbackVisibility): Promise<void>
 
   // Impact
   getImpact(): Promise<Impact>

@@ -1,6 +1,7 @@
 import { ALL_DAY, hoursOn } from '../logic/requestHours'
 import { knownPlace } from '../logic/places'
 import { backfillRideEvents } from '../logic/rideEvents'
+import { emptyFeedbackStore, type ProductFeedbackStore } from './mockFeedback'
 import type {
   Destination,
   Driver,
@@ -53,6 +54,7 @@ export interface Database {
   identities: Identity[]
   applications: OrganizationApplication[]
   invitations: (Invitation & { token: string })[] // demo only: the real backend keeps a hash, never the token
+  productFeedback: ProductFeedbackStore // Feedback & Suggestions; screenshots themselves live in demoFiles
 }
 
 // History for rides that don't have any yet (the seed, or demo data saved before the log existed),
@@ -152,7 +154,7 @@ const demoUsers: User[] = [
   { id: 'u-jordan', name: 'Jordan', email: 'jordan@careride.demo', phone: '604-555-0106', role: 'DRIVER' },
 ]
 
-const seedBase: Omit<Database, 'events' | 'feedback' | 'identities' | 'applications' | 'invitations'> = {
+const seedBase: Omit<Database, 'events' | 'feedback' | 'identities' | 'applications' | 'invitations' | 'productFeedback'> = {
   credentials: demoUsers.map((u) => ({ email: u.email!, userId: u.id, password: demoPasswordFor(u.email!) })),
   users: demoUsers,
   organizations: [
@@ -258,4 +260,6 @@ export const seed: Database = {
   identities: [],
   applications: [],
   invitations: [],
+  // Starts empty: the admin console shows real submissions only
+  productFeedback: emptyFeedbackStore(),
 }

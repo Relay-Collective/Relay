@@ -37,6 +37,8 @@ import {
   type RideChanges,
   type Session,
 } from './dataService'
+import { getDemoFile, putDemoFile } from './demoFiles'
+import * as feedbackStore from './mockFeedback'
 import { backfilledEvents, seed, type Database } from './seed'
 
 // Hackathon backend: keeps everything in the browser's localStorage.
@@ -71,6 +73,7 @@ function upgrade(db: Database): Database {
   db.identities ??= []
   db.applications ??= []
   db.invitations ??= []
+  db.productFeedback ??= feedbackStore.emptyFeedbackStore()
   return db
 }
 
@@ -1070,6 +1073,40 @@ export const mockService: DataService = {
       if (signedInUser(db)?.role !== 'PLATFORM_ADMIN') throw new Error('Only Relay Collective admins can see feedback.')
       return db.feedback.filter((f) => (!driverId || f.driverId === driverId) && (!orgId || f.orgId === orgId))
     }),
+
+  submitProductFeedback: (feedback, clientRequestId) =>
+    transact((db) => feedbackStore.submitFeedback(db, signedInUser(db), feedback, clientRequestId)),
+
+  // Grant, store the file, then confirm: the same three steps as the real backend
+  attachFeedbackScreenshot: async (feedbackId, file, fileName) => {
+    const grant = await transact((db) => feedbackStore.beginAttachment(db, signedInUser(db), feedbackId, file, fileName))
+    await putDemoFile(grant.storagePath, file)
+    return transact((db) => feedbackStore.confirmAttachment(db, signedInUser(db), grant.id))
+  },
+
+  listMyProductFeedback: () => transact((db) => feedbackStore.listMine(db, signedInUser(db))),
+
+  getMyProductFeedback: (feedbackId) => transact((db) => feedbackStore.getMine(db, signedInUser(db), feedbackId)),
+
+  getFeedbackScreenshotUrl: async (attachment) => {
+    const allowed = await transact((db) => feedbackStore.canReadAttachment(db, signedInUser(db), attachment.storagePath))
+    const file = allowed ? await getDemoFile(attachment.storagePath) : undefined
+    if (!file) throw new Error('This screenshot isn’t available in this browser.')
+    return URL.createObjectURL(file)
+  },
+
+  getFeedbackSummary: () => transact((db) => feedbackStore.summary(db, signedInUser(db))),
+
+  listProductFeedback: (query) => transact((db) => feedbackStore.list(db, signedInUser(db), query)),
+
+  getProductFeedback: (feedbackId) => transact((db) => feedbackStore.detail(db, signedInUser(db), feedbackId)),
+
+  listFeedbackAssignees: () => transact((db) => feedbackStore.assignees(db, signedInUser(db))),
+
+  updateFeedbackTriage: (feedbackId, change) => transact((db) => feedbackStore.updateTriage(db, signedInUser(db), feedbackId, change)),
+
+  addFeedbackMessage: (feedbackId, message, visibility) =>
+    transact((db) => feedbackStore.addMessage(db, signedInUser(db), feedbackId, message, visibility)),
 
   getImpact: () =>
     transact((db) => {

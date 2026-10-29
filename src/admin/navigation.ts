@@ -1,4 +1,4 @@
-import { Activity, Blocks, Building2, ClipboardCheck, Flag, LayoutDashboard, Settings, Truck, Users } from 'lucide-react'
+import { Activity, Blocks, Building2, ClipboardCheck, Flag, LayoutDashboard, MessagesSquare, Settings, Truck, Users } from 'lucide-react'
 import type { NavGroup } from '../components/shell/SidebarNav'
 import { adminPaths } from './paths'
 
@@ -25,6 +25,7 @@ export const ADMIN_NAV: NavGroup[] = [
     items: [
       { to: adminPaths.activity, label: 'Activity', icon: Activity },
       { to: adminPaths.issues, label: 'Issues', icon: Flag, badge: 'issues' },
+      { to: adminPaths.feedback, label: 'Feedback', icon: MessagesSquare, badge: 'feedback' },
     ],
   },
   { label: 'Administration', items: [{ to: adminPaths.settings, label: 'Settings', icon: Settings }] },
@@ -39,6 +40,7 @@ const TITLES: [prefix: string, title: string][] = [
   [adminPaths.transportation, 'Transportation'],
   [adminPaths.activity, 'Activity'],
   [adminPaths.issues, 'Issues'],
+  [adminPaths.feedback, 'Feedback'],
   [adminPaths.settings, 'Settings'],
   [adminPaths.search, 'Search'],
   [adminPaths.overview, 'Dashboard'],

@@ -293,3 +293,98 @@ export interface InvitationPreview {
   expiresAt?: string
   emailHint?: string // WRONG_ACCOUNT only, e.g. "j•••@example.org"
 }
+
+// ---- Feedback & Suggestions (product feedback, not feedback on one ride)
+
+export type ProductFeedbackType = 'bug' | 'feature_request' | 'improvement' | 'release_feedback' | 'general'
+export type ProductFeedbackStatus = 'new' | 'under_review' | 'planned' | 'in_progress' | 'resolved' | 'closed'
+export type ProductFeedbackPriority = 'low' | 'medium' | 'high' | 'critical'
+// Where it was sent from. Drivers can be in their volunteer workspace or on the driving pages of it.
+export type FeedbackWorkspace = 'organization' | 'volunteer' | 'driver' | 'admin'
+export type FeedbackVisibility = 'public' | 'internal'
+
+// What the submitter (and anyone else who isn't a platform admin) may see of their own feedback.
+// Priority and assignment are for Relay Collective's team only.
+export interface ProductFeedback {
+  id: string
+  reference: number // shown as FB-1042
+  feedbackType: ProductFeedbackType
+  title: string
+  description: string
+  sourcePage?: string // an app route with ids blanked out, e.g. /workspace/transportation/rides/:id
+  sourceWorkspace: FeedbackWorkspace
+  relatedRelease?: string // a version from the What's New list
+  status: ProductFeedbackStatus
+  createdAt: string
+  updatedAt: string
+  resolvedAt?: string
+}
+
+// A screenshot someone attached. Its file is private: screens ask for a short-lived link to show it.
+export interface FeedbackAttachment {
+  id: string
+  storagePath: string
+  fileName: string
+  mimeType: string
+  fileSize: number
+  uploadedAt?: string // missing while the upload hasn't finished
+}
+
+export interface FeedbackMessage {
+  id: string
+  message: string
+  visibility: FeedbackVisibility
+  createdAt: string
+  authorName?: string // admins only; submitters hear from "the Relay Collective team"
+}
+
+export interface FeedbackStatusChange {
+  id: string
+  previousStatus?: ProductFeedbackStatus // missing on the submission itself
+  newStatus: ProductFeedbackStatus
+  changedAt: string
+  changedByName?: string // admins only
+}
+
+// A submitter's own feedback with what they may see around it: public replies, status changes, their screenshot
+export interface ProductFeedbackThread {
+  feedback: ProductFeedback
+  messages: FeedbackMessage[] // public only, whatever the screen asks for
+  history: FeedbackStatusChange[]
+  attachment?: FeedbackAttachment
+}
+
+export interface FeedbackPerson {
+  id: string
+  name: string
+}
+
+// One row of the admin inbox
+export interface AdminFeedbackRow extends Omit<ProductFeedback, 'description'> {
+  priority?: ProductFeedbackPriority
+  submittedBy: FeedbackPerson & { active: boolean }
+  organization?: FeedbackPerson
+  assignedTo?: FeedbackPerson
+  hasAttachment: boolean
+}
+
+// Everything an admin sees about one submission, including internal notes and who changed what
+export interface AdminFeedbackDetail extends ProductFeedback {
+  priority?: ProductFeedbackPriority
+  submittedBy: FeedbackPerson & { active: boolean; role: UserRole; email?: string }
+  organization?: FeedbackPerson
+  assignedTo?: FeedbackPerson
+  attachment?: FeedbackAttachment
+  messages: FeedbackMessage[]
+  history: FeedbackStatusChange[]
+}
+
+export interface FeedbackSummary {
+  total: number
+  new: number
+  underReview: number
+  planned: number
+  inProgress: number
+  resolved: number
+  closed: number
+}

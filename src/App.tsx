@@ -2,6 +2,7 @@ import { Navigate, Route, Routes, useLocation, useParams } from 'react-router-do
 import { Layout } from './components/Layout'
 import { RequireAccount, RequireAuth, RequireOrgNotRejected, RequireRole } from './components/RequireAuth'
 import { VersionBadge } from './components/VersionBadge'
+import { FeedbackProvider } from './context/FeedbackProvider'
 import { WorkspaceShell } from './components/workspace/WorkspaceShell'
 import { useApp } from './hooks/useApp'
 import { useLoadable } from './hooks/useLoadable'
@@ -18,6 +19,8 @@ import { AdminSearch } from './pages/admin/AdminSearch'
 import { AdminServices } from './pages/admin/AdminServices'
 import { AdminSettings } from './pages/admin/AdminSettings'
 import { Approvals } from './pages/admin/Approvals'
+import { Feedback as AdminFeedback } from './pages/admin/Feedback'
+import { FeedbackDetail as AdminFeedbackDetail } from './pages/admin/FeedbackDetail'
 import { Issues } from './pages/admin/Issues'
 import { OrganizationDetail } from './pages/admin/OrganizationDetail'
 import { Organizations } from './pages/admin/Organizations'
@@ -39,6 +42,8 @@ import { OrganizationOnboarding } from './pages/onboarding/organization/Organiza
 import { PendingApproval } from './pages/onboarding/PendingApproval'
 import { ProviderOnboarding } from './pages/onboarding/ProviderOnboarding'
 import { Demo } from './pages/demo/Demo'
+import { MyFeedback } from './pages/feedback/MyFeedback'
+import { MyFeedbackDetail } from './pages/feedback/MyFeedbackDetail'
 import { Bookings } from './pages/org/Bookings'
 import { Destinations } from './pages/org/Destinations'
 import { Drivers } from './pages/org/Drivers'
@@ -110,7 +115,8 @@ export default function App() {
   const { pathname } = useLocation()
 
   return (
-    <>
+    // Feedback & Suggestions is one dialog for the whole signed-in app, so every page (and What's New) can open it
+    <FeedbackProvider>
       <NativeBridge />
       {pathname !== '/demo' && <VersionBadge />}
       <Routes>
@@ -142,6 +148,8 @@ export default function App() {
                   <Route path={paths.services} element={<Services />} />
                   <Route path={paths.organization} element={<OrganizationProfile />} />
                   <Route path={paths.help} element={<Help />} />
+                  <Route path={paths.feedback} element={<MyFeedback />} />
+                  <Route path={`${paths.feedback}/:id`} element={<MyFeedbackDetail />} />
                   <Route path={paths.transport} element={<TransportLayout />}>
                     <Route index element={<Dashboard />} />
                     <Route path="new" element={<RequestRide />} />
@@ -172,6 +180,8 @@ export default function App() {
                 <Route path={`${adminPaths.transportation}/rides/:id`} element={<RideOversight />} />
                 <Route path={adminPaths.activity} element={<Activity />} />
                 <Route path={adminPaths.issues} element={<Issues />} />
+                <Route path={adminPaths.feedback} element={<AdminFeedback />} />
+                <Route path={`${adminPaths.feedback}/:id`} element={<AdminFeedbackDetail />} />
                 <Route path={adminPaths.settings} element={<AdminSettings />} />
                 <Route path={adminPaths.search} element={<AdminSearch />} />
               </Route>
@@ -185,6 +195,8 @@ export default function App() {
                 <Route path="/org" element={<OrgHome />} />
                 <Route path="/org/drivers" element={<Drivers />} />
                 <Route path="/org/bookings" element={<Bookings />} />
+                <Route path="/org/feedback" element={<MyFeedback />} />
+                <Route path="/org/feedback/:id" element={<MyFeedbackDetail />} />
               </Route>
             </Route>
 
@@ -202,6 +214,8 @@ export default function App() {
                 <Route path={volunteerPaths.verification} element={<Verification />} />
                 <Route path={volunteerPaths.settings} element={<VolunteerSettings />} />
                 <Route path={volunteerPaths.help} element={<VolunteerHelp />} />
+                <Route path={volunteerPaths.feedback} element={<MyFeedback />} />
+                <Route path={`${volunteerPaths.feedback}/:id`} element={<MyFeedbackDetail />} />
               </Route>
               {/* Driver pages used to live under /driver. Old links and bookmarks still land on the same page. */}
               <Route path="/driver" element={<MovedTo to={volunteerPaths.transport} />} />
@@ -215,6 +229,6 @@ export default function App() {
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </>
+    </FeedbackProvider>
   )
 }

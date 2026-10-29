@@ -1,7 +1,9 @@
-import { ChevronDown, LogOut, Repeat, Trash2 } from 'lucide-react'
+import { ChevronDown, LogOut, MessageSquarePlus, MessagesSquare, Repeat, Trash2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { myFeedbackPaths } from '../feedback/paths'
 import { useApp } from '../hooks/useApp'
+import { useFeedback } from '../hooks/useFeedback'
 import { ROLE_LABELS } from '../logic/homeFor'
 import { BuildStamp } from '../native/BuildStamp'
 import { DeleteMyAccount } from './DeleteMyAccount'
@@ -18,6 +20,7 @@ function initials(name: string): string {
 
 export function AccountMenu() {
   const { currentUser, signOut } = useApp()
+  const { openFeedback } = useFeedback()
   const [open, setOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -70,6 +73,26 @@ export function AccountMenu() {
               {ROLE_LABELS[currentUser.role]}
             </p>
           </div>
+          <div className="my-1 border-t border-slate-100" />
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => {
+              setOpen(false)
+              openFeedback()
+            }}
+            className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+          >
+            <MessageSquarePlus className="h-4 w-4" aria-hidden /> Send feedback
+          </button>
+          <Link
+            to={myFeedbackPaths(currentUser.role).list}
+            role="menuitem"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+          >
+            <MessagesSquare className="h-4 w-4" aria-hidden /> {currentUser.role === 'PLATFORM_ADMIN' ? 'All feedback' : 'My feedback'}
+          </Link>
           <div className="my-1 border-t border-slate-100" />
           {canDelete && (
             <button

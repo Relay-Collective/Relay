@@ -11,6 +11,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   const houses = useLoadable(() => dataService.listHouses())
   const rides = useLoadable(() => dataService.listAllRides())
   const feedback = useLoadable(() => dataService.listFeedback({}))
+  const feedbackSummary = useLoadable(() => dataService.getFeedbackSummary())
 
   const personName = useCallback((id?: string) => (id ? people.data?.find((u) => u.id === id)?.name : undefined), [people.data])
   const orgName = useCallback((id?: string) => (id ? orgs.data?.find((o) => o.id === id)?.name : undefined), [orgs.data])
@@ -20,8 +21,8 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   )
 
   const value = useMemo(
-    () => ({ orgs, drivers, accounts, people, houses, rides, feedback, personName, orgName, driverName }),
-    [orgs, drivers, accounts, people, houses, rides, feedback, personName, orgName, driverName],
+    () => ({ orgs, drivers, accounts, people, houses, rides, feedback, feedbackSummary, personName, orgName, driverName }),
+    [orgs, drivers, accounts, people, houses, rides, feedback, feedbackSummary, personName, orgName, driverName],
   )
   return <AdminContext.Provider value={value}>{children}</AdminContext.Provider>
 }

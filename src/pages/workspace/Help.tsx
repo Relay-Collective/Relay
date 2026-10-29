@@ -1,6 +1,7 @@
 import { ArrowUpRight, CalendarPlus, Inbox, LayoutDashboard, Truck } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import { FeedbackHelpSection } from '../../components/feedback/FeedbackHelpSection'
 import { StatusBadge } from '../../components/StatusBadge'
 import { PageHeader } from '../../components/workspace/PageHeader'
 import { focusRing, panel, panelHead, panelTitle } from '../../components/workspace/styles'
@@ -77,6 +78,8 @@ export function Help() {
           ))}
         </dl>
       </section>
+
+      <FeedbackHelpSection />
 
       <section aria-labelledby="support-title" className={panel}>
         <div className={panelHead}>

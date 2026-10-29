@@ -1,4 +1,5 @@
 import { ArrowUpRight, CalendarClock, Inbox, LayoutDashboard, Truck, UserRound } from 'lucide-react'
+import { FeedbackHelpSection } from '../../components/feedback/FeedbackHelpSection'
 import { StatusBadge } from '../../components/StatusBadge'
 import { SafetyNote } from '../../components/volunteer/TripPanel'
 import { PageHeader } from '../../components/workspace/PageHeader'
@@ -72,6 +73,8 @@ export function Help() {
           ))}
         </dl>
       </section>
+
+      <FeedbackHelpSection />
 
       <section aria-labelledby="support-title" className={panel}>
         <div className={panelHead}>

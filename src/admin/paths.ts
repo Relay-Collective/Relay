@@ -16,6 +16,8 @@ export const adminPaths = {
   ride: (id: string) => `${ROOT}/transportation/rides/${id}`,
   activity: `${ROOT}/activity`,
   issues: `${ROOT}/issues`,
+  feedback: `${ROOT}/feedback`,
+  feedbackItem: (id: string) => `${ROOT}/feedback/${encodeURIComponent(id)}`,
   settings: `${ROOT}/settings`,
   search: `${ROOT}/search`,
 } as const
