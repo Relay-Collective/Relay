@@ -1,4 +1,4 @@
-import { ArrowRight, BadgeCheck, Building2, Car, ChevronRight, CircleCheck, ClipboardCheck, Flag, History, PartyPopper, Route, Truck, Users } from 'lucide-react'
+import { ArrowRight, BadgeCheck, Building2, Car, ChevronRight, CircleCheck, ClipboardCheck, Flag, History, MessagesSquare, PartyPopper, Route, Truck, Users } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { adminPaths } from '../../admin/paths'
@@ -35,7 +35,7 @@ interface Task {
 
 // The admin's landing page: what needs a decision, how the network is doing, and what changed lately
 export function AdminOverview() {
-  const { orgs, drivers, accounts, rides, feedback, personName, orgName, driverName } = useAdmin()
+  const { orgs, drivers, accounts, rides, feedback, feedbackSummary, personName, orgName, driverName } = useAdmin()
   const now = useNow()
 
   const core = orgs.data && drivers.data && accounts.data && rides.data
@@ -88,6 +88,19 @@ export function AdminOverview() {
         action: 'View ride',
       })
     }
+  }
+  // Feedback & Suggestions waiting for a first look: one line for all of it, opening the filtered inbox
+  const newFeedback = feedbackSummary.data?.new ?? 0
+  if (newFeedback > 0) {
+    tasks.push({
+      id: 'feedback:new',
+      type: 'Feedback & suggestions',
+      icon: <MessagesSquare className="h-4 w-4" />,
+      subject: plural(newFeedback, 'new submission', 'new submissions'),
+      status: <span className="text-xs font-semibold text-amber-800">Not reviewed yet</span>,
+      to: `${adminPaths.feedback}?status=new`,
+      action: 'Review',
+    })
   }
   const tasksLoading = !orgs.data || !drivers.data
 

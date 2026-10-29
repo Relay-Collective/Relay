@@ -3,9 +3,17 @@ import { MIN_PASSWORD_LENGTH } from '../constants'
 import { faresSavedFor } from '../logic/estimateFare'
 import { isNative } from '../native/platform'
 import type {
+  AdminFeedbackDetail,
+  AdminFeedbackRow,
   Destination,
   Driver,
   DriverBackground,
+  FeedbackAttachment,
+  FeedbackMessage,
+  FeedbackPerson,
+  FeedbackStatusChange,
+  FeedbackSummary,
+  FeedbackWorkspace,
   FeedbackRating,
   House,
   Identity,
@@ -15,6 +23,10 @@ import type {
   OrganizationApplication,
   Organization,
   OrgType,
+  ProductFeedback,
+  ProductFeedbackPriority,
+  ProductFeedbackStatus,
+  ProductFeedbackType,
   RequestHours,
   Ride,
   RideEvent,
@@ -32,6 +44,7 @@ import {
   ALL_RIDES_LIMIT,
   type DataService,
   type DriverSettings,
+  type FeedbackPage,
   type NewDriver,
   type NewDriverUser,
   type Registration,
@@ -421,6 +434,142 @@ function driverDetails(user: NewDriverUser, driver: NewDriver) {
     serviceCities: driver.serviceCities,
     requestHours: driver.requestHours,
   }
+}
+
+// ---------------------------------------------------------------------------
+// Feedback & Suggestions
+// ---------------------------------------------------------------------------
+
+// What a submitter may read of their own feedback (matches the column grants in the product feedback migration)
+const PRODUCT_FEEDBACK_COLUMNS =
+  'id, reference, feedback_type, title, description, source_page, source_workspace, related_release, status, created_at, updated_at, resolved_at'
+const FEEDBACK_ATTACHMENT_COLUMNS = 'id, storage_path, file_name, mime_type, file_size, uploaded_at'
+const FEEDBACK_BUCKET = 'feedback-attachments'
+// Long enough to load the image, short enough that a copied link soon stops working
+const SCREENSHOT_LINK_SECONDS = 300
+
+interface ProductFeedbackRow {
+  id: string
+  reference: number | string
+  feedback_type: ProductFeedbackType
+  title: string
+  description: string
+  source_page: string | null
+  source_workspace: FeedbackWorkspace
+  related_release: string | null
+  status: ProductFeedbackStatus
+  created_at: string
+  updated_at: string
+  resolved_at: string | null
+}
+
+interface FeedbackAttachmentRow {
+  id: string
+  storage_path: string
+  file_name: string
+  mime_type: string
+  file_size: number
+  uploaded_at: string | null
+}
+
+// The admin functions answer in JSON, already camelCase; only times and nulls need care
+interface AdminFeedbackJson extends Omit<AdminFeedbackRow, 'sourcePage' | 'relatedRelease' | 'resolvedAt' | 'priority' | 'organization' | 'assignedTo'> {
+  sourcePage: string | null
+  relatedRelease: string | null
+  resolvedAt: string | null
+  priority: ProductFeedbackPriority | null
+  organization: FeedbackPerson | null
+  assignedTo: FeedbackPerson | null
+}
+
+interface AdminFeedbackDetailJson extends AdminFeedbackJson {
+  description: string
+  submittedBy: AdminFeedbackDetail['submittedBy'] & { email: string | null }
+  attachment: (Omit<FeedbackAttachment, 'uploadedAt'> & { uploadedAt: string | null }) | null
+  messages: (Omit<FeedbackMessage, 'authorName'> & { authorName: string | null })[]
+  history: { id: string; previousStatus: ProductFeedbackStatus | null; newStatus: ProductFeedbackStatus; changedAt: string; changedByName: string | null }[]
+}
+
+function toProductFeedback(row: ProductFeedbackRow): ProductFeedback {
+  return {
+    id: row.id,
+    reference: Number(row.reference),
+    feedbackType: row.feedback_type,
+    title: row.title,
+    description: row.description,
+    sourcePage: row.source_page ?? undefined,
+    sourceWorkspace: row.source_workspace,
+    relatedRelease: row.related_release ?? undefined,
+    status: row.status,
+    createdAt: iso(row.created_at),
+    updatedAt: iso(row.updated_at),
+    resolvedAt: iso(row.resolved_at),
+  }
+}
+
+function toFeedbackAttachment(row: FeedbackAttachmentRow): FeedbackAttachment {
+  return {
+    id: row.id,
+    storagePath: row.storage_path,
+    fileName: row.file_name,
+    mimeType: row.mime_type,
+    fileSize: row.file_size,
+    uploadedAt: iso(row.uploaded_at),
+  }
+}
+
+function toAdminFeedbackRow(row: AdminFeedbackJson): AdminFeedbackRow {
+  return {
+    ...row,
+    reference: Number(row.reference),
+    sourcePage: row.sourcePage ?? undefined,
+    relatedRelease: row.relatedRelease ?? undefined,
+    priority: row.priority ?? undefined,
+    organization: row.organization ?? undefined,
+    assignedTo: row.assignedTo ?? undefined,
+    createdAt: iso(row.createdAt),
+    updatedAt: iso(row.updatedAt),
+    resolvedAt: iso(row.resolvedAt),
+  }
+}
+
+function toAdminFeedbackDetail(row: AdminFeedbackDetailJson): AdminFeedbackDetail {
+  const { hasAttachment, ...base } = toAdminFeedbackRow(row)
+  void hasAttachment
+  return {
+    ...base,
+    description: row.description,
+    submittedBy: { ...row.submittedBy, email: row.submittedBy.email ?? undefined },
+    attachment: row.attachment ? { ...row.attachment, uploadedAt: iso(row.attachment.uploadedAt) } : undefined,
+    messages: row.messages.map((m) => ({ ...m, createdAt: iso(m.createdAt), authorName: m.authorName ?? undefined })),
+    history: row.history.map(
+      (h): FeedbackStatusChange => ({
+        id: h.id,
+        previousStatus: h.previousStatus ?? undefined,
+        newStatus: h.newStatus,
+        changedAt: iso(h.changedAt),
+        changedByName: h.changedByName ?? undefined,
+      }),
+    ),
+  }
+}
+
+// The signed-in person's profile id. Admins can read everyone's feedback, so "mine" has to be asked for.
+async function myProfileId(): Promise<string> {
+  const { data } = await getSupabase().auth.getSession()
+  const row = data.session ? await queryProfile(data.session.user.id) : null
+  if (!row) throw new Error('Please sign in to see your feedback.')
+  return row.id
+}
+
+async function readProductFeedback(feedbackId: string): Promise<ProductFeedback> {
+  const { data, error } = await getSupabase()
+    .from('feedback_submissions')
+    .select(PRODUCT_FEEDBACK_COLUMNS)
+    .eq('id', feedbackId)
+    .single<ProductFeedbackRow>()
+  if (error) fail(error, "We couldn't load your feedback.")
+  return toProductFeedback(data)
 }
 
 // ---------------------------------------------------------------------------
@@ -1136,6 +1285,151 @@ export const supabaseService: DataService = {
     if (driverId) query = query.eq('driver_id', driverId)
     if (orgId) query = query.eq('org_id', orgId)
     return readFeedback(query.returns<FeedbackRow[]>())
+  },
+
+  async submitProductFeedback(feedback, clientRequestId) {
+    const { data: id, error } = await getSupabase().rpc('submit_feedback', {
+      p_client_request_id: clientRequestId,
+      p_type: feedback.feedbackType,
+      p_title: feedback.title,
+      p_description: feedback.description,
+      p_source_page: feedback.sourcePage ?? null,
+      p_source_workspace: feedback.sourceWorkspace,
+      p_related_release: feedback.relatedRelease ?? null,
+    })
+    if (error) fail(error, "We couldn't send your feedback.")
+    return readProductFeedback(id as string)
+  },
+
+  // The database names the path and grants one upload of it; Storage enforces the bucket's size and type limits.
+  async attachFeedbackScreenshot(feedbackId, file, fileName) {
+    const supabase = getSupabase()
+    const { data: grant, error } = await supabase.rpc('begin_feedback_attachment', {
+      p_feedback_id: feedbackId,
+      p_file_name: fileName,
+      p_mime_type: file.type,
+      p_file_size: file.size,
+    })
+    if (error) fail(error, "We couldn't upload your screenshot.")
+    const { id, storagePath } = grant as { id: string; storagePath: string }
+    const upload = await supabase.storage.from(FEEDBACK_BUCKET).upload(storagePath, file, { contentType: file.type, upsert: false })
+    // Already there: an earlier try uploaded it but didn't hear back. Confirming below checks it really is.
+    const alreadyThere = upload.error && /exists|duplicate/i.test(upload.error.message)
+    if (upload.error && !alreadyThere) throw new Error(`We couldn't upload your screenshot. ${CONNECTION}`)
+    const confirmed = await supabase.rpc('confirm_feedback_attachment', { p_attachment_id: id })
+    if (confirmed.error) fail(confirmed.error, "We couldn't upload your screenshot.")
+    const { data, error: readError } = await supabase
+      .from('feedback_attachments')
+      .select(FEEDBACK_ATTACHMENT_COLUMNS)
+      .eq('id', id)
+      .single<FeedbackAttachmentRow>()
+    if (readError) fail(readError, "We couldn't upload your screenshot.")
+    return toFeedbackAttachment(data)
+  },
+
+  async listMyProductFeedback() {
+    const { data, error } = await getSupabase()
+      .from('feedback_submissions')
+      .select(PRODUCT_FEEDBACK_COLUMNS)
+      .eq('submitted_by', await myProfileId())
+      .order('created_at', { ascending: false })
+      .returns<ProductFeedbackRow[]>()
+    if (error) fail(error, "We couldn't load your feedback.")
+    return (data ?? []).map(toProductFeedback)
+  },
+
+  // Internal notes are filtered out here and, whatever is asked, by the access rules
+  async getMyProductFeedback(feedbackId) {
+    const supabase = getSupabase()
+    const [submission, messages, history, attachment] = await Promise.all([
+      supabase
+        .from('feedback_submissions')
+        .select(PRODUCT_FEEDBACK_COLUMNS)
+        .eq('id', feedbackId)
+        .eq('submitted_by', await myProfileId())
+        .maybeSingle<ProductFeedbackRow>(),
+      supabase
+        .from('feedback_messages')
+        .select('id, message, visibility, created_at')
+        .eq('feedback_id', feedbackId)
+        .eq('visibility', 'public')
+        .order('created_at')
+        .returns<{ id: string; message: string; visibility: 'public'; created_at: string }[]>(),
+      supabase
+        .from('feedback_status_history')
+        .select('id, previous_status, new_status, changed_at')
+        .eq('feedback_id', feedbackId)
+        .order('id')
+        .returns<{ id: number; previous_status: ProductFeedbackStatus | null; new_status: ProductFeedbackStatus; changed_at: string }[]>(),
+      supabase
+        .from('feedback_attachments')
+        .select(FEEDBACK_ATTACHMENT_COLUMNS)
+        .eq('feedback_id', feedbackId)
+        .not('uploaded_at', 'is', null)
+        .maybeSingle<FeedbackAttachmentRow>(),
+    ])
+    const failed = submission.error ?? messages.error ?? history.error ?? attachment.error
+    if (failed) fail(failed, "We couldn't load your feedback.")
+    if (!submission.data) return undefined
+    return {
+      feedback: toProductFeedback(submission.data),
+      messages: (messages.data ?? []).map((m) => ({ id: m.id, message: m.message, visibility: m.visibility, createdAt: iso(m.created_at) })),
+      history: (history.data ?? []).map((h) => ({
+        id: String(h.id),
+        previousStatus: h.previous_status ?? undefined,
+        newStatus: h.new_status,
+        changedAt: iso(h.changed_at),
+      })),
+      attachment: attachment.data ? toFeedbackAttachment(attachment.data) : undefined,
+    }
+  },
+
+  async getFeedbackScreenshotUrl(attachment) {
+    const { data, error } = await getSupabase().storage.from(FEEDBACK_BUCKET).createSignedUrl(attachment.storagePath, SCREENSHOT_LINK_SECONDS)
+    if (error || !data) throw new Error(`We couldn't load the screenshot. ${CONNECTION}`)
+    return data.signedUrl
+  },
+
+  async getFeedbackSummary() {
+    const { data, error } = await getSupabase().rpc('admin_feedback_summary')
+    if (error) fail(error, "We couldn't load feedback totals.")
+    return data as FeedbackSummary
+  },
+
+  async listProductFeedback({ limit, offset, ...filters }) {
+    // Only the filters that are set, so the database treats the rest as "any"
+    const set = Object.fromEntries(Object.entries(filters).filter(([, v]) => v !== undefined && v !== ''))
+    const { data, error } = await getSupabase().rpc('admin_list_feedback', { p_filters: set, p_limit: limit, p_offset: offset })
+    if (error) fail(error, "We couldn't load feedback.")
+    const page = data as { total: number; rows: AdminFeedbackJson[] }
+    return { total: Number(page.total), rows: page.rows.map(toAdminFeedbackRow) } satisfies FeedbackPage
+  },
+
+  async getProductFeedback(feedbackId) {
+    const { data, error } = await getSupabase().rpc('admin_get_feedback', { p_feedback_id: feedbackId })
+    if (error) fail(error, "We couldn't load this feedback.")
+    return data ? toAdminFeedbackDetail(data as AdminFeedbackDetailJson) : undefined
+  },
+
+  async listFeedbackAssignees() {
+    const { data, error } = await getSupabase().rpc('admin_feedback_assignees')
+    if (error) fail(error, "We couldn't load the list of admins.")
+    return data as FeedbackPerson[]
+  },
+
+  async updateFeedbackTriage(feedbackId, change) {
+    const { error } = await getSupabase().rpc('update_feedback_triage', {
+      p_feedback_id: feedbackId,
+      p_field: change.field === 'assignedTo' ? 'assigned_to' : change.field,
+      p_expected: change.expected ?? null,
+      p_value: change.value ?? null,
+    })
+    if (error) fail(error, "We couldn't save that change.")
+  },
+
+  async addFeedbackMessage(feedbackId, message, visibility) {
+    const { error } = await getSupabase().rpc('add_feedback_message', { p_feedback_id: feedbackId, p_message: message, p_visibility: visibility })
+    if (error) fail(error, "We couldn't save your message.")
   },
 
   async getImpact() {

@@ -1,8 +1,10 @@
+import { MessageSquarePlus } from 'lucide-react'
+import { useFeedback } from '../../hooks/useFeedback'
 import { useNow } from '../../hooks/useNow'
 import { useWorkspace } from '../../hooks/useWorkspace'
 import { initials } from '../../logic/initials'
 import { requestMetrics } from '../../logic/requestSummary'
-import { HELP_NAV, WORKSPACE_NAV } from '../../workspace/navigation'
+import { HELP_NAV, MY_FEEDBACK_NAV, WORKSPACE_NAV } from '../../workspace/navigation'
 import { paths } from '../../workspace/paths'
 import { SidebarNav } from '../shell/SidebarNav'
 import type { SidebarSlotProps } from '../shell/SidebarShell'
@@ -10,6 +12,7 @@ import type { SidebarSlotProps } from '../shell/SidebarShell'
 // The workspace's navigation. One account belongs to one organization, so there is nothing to switch to.
 export function WorkspaceSidebar(props: SidebarSlotProps) {
   const { org, rides } = useWorkspace()
+  const { openFeedback, unseenCount } = useFeedback()
   const now = useNow()
   const attention = rides.data ? requestMetrics(rides.data, new Date(now)).attention : 0
 
@@ -24,8 +27,12 @@ export function WorkspaceSidebar(props: SidebarSlotProps) {
         className: 'bg-rc-navy text-white',
       }}
       groups={WORKSPACE_NAV}
-      footer={[HELP_NAV]}
-      badges={{ attention: { count: attention, label: 'need attention' } }}
+      footer={[HELP_NAV, MY_FEEDBACK_NAV]}
+      actions={[{ label: 'Send feedback', icon: MessageSquarePlus, onClick: () => openFeedback() }]}
+      badges={{
+        attention: { count: attention, label: 'need attention' },
+        feedback: { count: unseenCount, label: 'with new updates', tone: 'waiting' },
+      }}
     />
   )
 }

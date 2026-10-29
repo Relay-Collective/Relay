@@ -100,6 +100,8 @@ Ride rules live in two places that must stay in step: [`src/logic/dispatch.ts`](
 
 **Accounts and onboarding.** Sign-up creates only an identity (the Auth login). A signed-in identity with no profile goes to `/onboarding`, where it registers an organization, signs up as a driver, or opens an invitation. Each path is a database function (`submit_organization_application`, `register_driver_profile`, `accept_invitation`) that builds the profile server-side. Organizations and drivers start `PENDING`, and only a platform admin approves them. Each identity has one profile, so one organization; partner staff of an approved organization invite colleagues from **Organization → Team**. Invitation links are single-use, tied to one email, valid for 7 days, and only a hash of the token is stored. Administrator accounts are never self-service. The onboarding pieces live in [`src/onboarding`](../src/onboarding), [`src/pages/onboarding`](../src/pages/onboarding), and [the identity migration](../supabase/migrations/20261024120000_identity_onboarding.sql).
 
+**Feedback & Suggestions.** Anyone signed in can send product feedback from the sidebar, the account menu, Help, or What's New, and follow it on My feedback. Platform admins manage it under Operations → Feedback. Schema, access rules, storage, and limitations are in [FEEDBACK.md](FEEDBACK.md).
+
 Start with [the service contract](../src/services/dataService.ts), [driver matching](../src/logic/matchDrivers.ts), and [dispatch rules](../src/logic/dispatch.ts).
 
 ### Commands
@@ -109,7 +111,8 @@ Start with [the service contract](../src/services/dataService.ts), [driver match
 | `npm ci` | Install dependencies from the committed lockfile. |
 | `npm run dev` | Start the local Vite development server. |
 | `npm run lint` | Run ESLint. |
-| `npm test` | Run the ride-rule tests. |
+| `npm test` | Run the ride-rule and feedback tests. |
+| `npm run test:db` | Run every migration in an embedded Postgres and test the feedback access rules against it. |
 | `npm run build` | Run TypeScript project checks and create the production build in `dist/`. |
 | `npm run preview` | Serve an existing production build locally. |
 | `npm run deploy` | Zip the current `dist/` as an Android live-update bundle, then deploy with Wrangler. Run `npm run build` first. |

@@ -21,6 +21,13 @@ export interface NavGroup {
   items: NavEntry[]
 }
 
+// A button among the footer links, e.g. "Send feedback", which opens a dialog instead of a page
+export interface NavAction {
+  label: string
+  icon: LucideIcon
+  onClick: () => void
+}
+
 // A live count beside a link, and what it counts, for screen readers ("3 need attention")
 export interface NavBadge {
   count: number
@@ -37,11 +44,12 @@ interface Props {
   contextIcon?: ReactNode // shown in place of the initials
   groups: NavGroup[]
   footer: NavEntry[]
+  actions?: NavAction[] // after the footer links
   badges?: Record<string, NavBadge | undefined>
 }
 
 // The sidebar of a signed-in console: whose space it is, where you can go, and how to leave.
-export function SidebarNav({ mode, onNavigate, onToggleCollapse, home, context, contextIcon, groups, footer, badges = {} }: Props) {
+export function SidebarNav({ mode, onNavigate, onToggleCollapse, home, context, contextIcon, groups, footer, actions = [], badges = {} }: Props) {
   const { signOut } = useApp()
 
   // Words show in full mode, and from the desktop breakpoint in responsive mode. They stay readable to screen readers.
@@ -128,7 +136,27 @@ export function SidebarNav({ mode, onNavigate, onToggleCollapse, home, context, 
       </nav>
 
       <div className="space-y-0.5 border-t border-slate-200 p-3">
-        {footer.length > 0 && <ul>{footer.map(item)}</ul>}
+        {(footer.length > 0 || actions.length > 0) && (
+          <ul>
+            {footer.map(item)}
+            {actions.map(({ label, icon: Icon, onClick }) => (
+              <li key={label}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onNavigate?.() // close the phone drawer first, so the dialog isn't stacked on it
+                    onClick()
+                  }}
+                  title={mode === 'full' ? undefined : label}
+                  className={`flex min-h-11 w-full items-center gap-3 rounded-lg px-3 text-[15px] font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-rc-navy ${center} ${focusRing}`}
+                >
+                  <Icon className="h-5 w-5 shrink-0" aria-hidden />
+                  <span className={`min-w-0 flex-1 truncate text-left ${words}`}>{label}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
         {onToggleCollapse && (
           <button
             type="button"

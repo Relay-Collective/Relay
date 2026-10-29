@@ -1,4 +1,4 @@
-import { CalendarCheck, CalendarClock, CircleHelp, Inbox, LayoutDashboard, Settings, Truck, UserRound, type LucideIcon } from 'lucide-react'
+import { CalendarCheck, CalendarClock, CircleHelp, Inbox, LayoutDashboard, MessagesSquare, Settings, Truck, UserRound, type LucideIcon } from 'lucide-react'
 import type { NavEntry, NavGroup } from '../components/shell/SidebarNav'
 import { volunteerPaths as paths } from './paths'
 
@@ -31,6 +31,7 @@ export function volunteerNav(approved: boolean): NavGroup[] {
 }
 
 export const VOLUNTEER_HELP_NAV: NavEntry = { to: paths.help, label: 'Help', icon: CircleHelp }
+export const VOLUNTEER_FEEDBACK_NAV: NavEntry = { to: paths.feedback, label: 'My feedback', icon: MessagesSquare, badge: 'feedback' }
 
 // Phones: the few places drivers go most, always one tap away
 export interface TabEntry {
@@ -62,6 +63,7 @@ const TITLES: [prefix: string, title: string][] = [
   [paths.profile, 'My profile'],
   [paths.settings, 'Settings'],
   [paths.help, 'Help'],
+  [paths.feedback, 'My feedback'],
   [paths.overview, 'Overview'],
 ]
 

@@ -9,6 +9,17 @@ export interface Release {
 
 export const RELEASES: Release[] = [
   {
+    version: '1.4.0',
+    date: '2026-10-28',
+    changes: [
+      'Send feedback from anywhere in the app: report a bug, ask for a feature, suggest an improvement, or tell us what you think. Choose Send feedback at the bottom of the sidebar or in your account menu.',
+      'You can add one screenshot to your feedback (PNG, JPEG or WebP, up to 5 MB). Only you and the Relay Collective team can see it.',
+      'My feedback lists everything you’ve sent, where each piece stands, and any replies from the Relay Collective team. Anything with news is marked Updated.',
+      'Each update in What’s New now has a “Give feedback on this update” link.',
+      'Admins have a new Feedback page under Operations: search and filter every submission, set its status, priority and owner, reply to the person who sent it, and keep internal notes only admins can see. Every status change is recorded.',
+    ],
+  },
+  {
     version: '1.3.0',
     date: '2026-10-25',
     changes: [

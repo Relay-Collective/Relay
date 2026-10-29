@@ -9,6 +9,8 @@ export const paths = {
   services: `${ROOT}/services`,
   organization: `${ROOT}/organization`,
   help: `${ROOT}/help`,
+  feedback: `${ROOT}/feedback`,
+  feedbackItem: (id: string) => `${ROOT}/feedback/${encodeURIComponent(id)}`,
   transport: TRANSPORT,
   newRide: `${TRANSPORT}/new`,
   destinations: `${TRANSPORT}/destinations`,

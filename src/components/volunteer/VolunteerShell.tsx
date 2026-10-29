@@ -1,11 +1,12 @@
-import { Menu } from 'lucide-react'
+import { Menu, MessageSquarePlus } from 'lucide-react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { VolunteerProvider } from '../../context/VolunteerProvider'
 import { useApp } from '../../hooks/useApp'
+import { useFeedback } from '../../hooks/useFeedback'
 import { useVolunteer } from '../../hooks/useVolunteer'
 import { initials } from '../../logic/initials'
 import { canDrive, DRIVER_KIND_LABELS, driverKind } from '../../volunteer/participation'
-import { VOLUNTEER_HELP_NAV, volunteerNav, volunteerTabs, volunteerTitle } from '../../volunteer/navigation'
+import { VOLUNTEER_FEEDBACK_NAV, VOLUNTEER_HELP_NAV, volunteerNav, volunteerTabs, volunteerTitle } from '../../volunteer/navigation'
 import { volunteerPaths } from '../../volunteer/paths'
 import { AccountMenu } from '../AccountMenu'
 import { SidebarNav } from '../shell/SidebarNav'
@@ -49,6 +50,7 @@ function ShellFrame() {
 function VolunteerSidebar(props: SidebarSlotProps) {
   const { currentUser } = useApp()
   const { driver, offers } = useVolunteer()
+  const { openFeedback, unseenCount } = useFeedback()
   const name = currentUser?.name ?? ''
   return (
     <SidebarNav
@@ -61,8 +63,12 @@ function VolunteerSidebar(props: SidebarSlotProps) {
         className: 'bg-rc-teal text-white',
       }}
       groups={volunteerNav(canDrive(driver))}
-      footer={[VOLUNTEER_HELP_NAV]}
-      badges={{ requests: { count: offers.data?.length ?? 0, label: 'ride requests waiting', tone: 'waiting' } }}
+      footer={[VOLUNTEER_HELP_NAV, VOLUNTEER_FEEDBACK_NAV]}
+      actions={[{ label: 'Send feedback', icon: MessageSquarePlus, onClick: () => openFeedback() }]}
+      badges={{
+        requests: { count: offers.data?.length ?? 0, label: 'ride requests waiting', tone: 'waiting' },
+        feedback: { count: unseenCount, label: 'with new updates', tone: 'waiting' },
+      }}
     />
   )
 }

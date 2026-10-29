@@ -1,6 +1,7 @@
-import { Sparkles, X } from 'lucide-react'
+import { MessageSquarePlus, Sparkles, X } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { CURRENT_VERSION, RELEASES } from '../changelog'
+import { useFeedback } from '../hooks/useFeedback'
 
 const SEEN_KEY = 'careride-seen-version'
 
@@ -21,6 +22,7 @@ function formatDate(date: string): string {
 export function VersionBadge() {
   const dialog = useRef<HTMLDialogElement>(null)
   const [unseen, setUnseen] = useState(() => readSeenVersion() !== CURRENT_VERSION)
+  const { canSend, openFeedback } = useFeedback()
 
   function open() {
     dialog.current?.showModal()
@@ -85,6 +87,20 @@ export function VersionBadge() {
                   <li key={change}>{change}</li>
                 ))}
               </ul>
+              {/* Signed-in people can tell us what they think of an update, tied to its version */}
+              {canSend && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    dialog.current?.close()
+                    openFeedback({ type: 'release_feedback', release: release.version })
+                  }}
+                  className="mt-2 inline-flex min-h-11 items-center gap-1.5 rounded-lg px-2 -ml-2 text-sm font-semibold text-brand-700 hover:bg-brand-50 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-brand-500"
+                >
+                  <MessageSquarePlus className="h-4 w-4" aria-hidden /> Give feedback on this update
+                  <span className="sr-only"> (version {release.version})</span>
+                </button>
+              )}
             </section>
           ))}
         </div>

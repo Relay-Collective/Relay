@@ -15,4 +15,6 @@ export const volunteerPaths = {
   verification: `${ROOT}/profile/verification`,
   settings: `${ROOT}/settings`,
   help: `${ROOT}/help`,
+  feedback: `${ROOT}/feedback`,
+  feedbackItem: (id: string) => `${ROOT}/feedback/${encodeURIComponent(id)}`,
 } as const
