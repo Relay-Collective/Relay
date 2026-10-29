@@ -3,6 +3,7 @@ import { knownPlace } from '../logic/places'
 import { backfillRideEvents } from '../logic/rideEvents'
 import { emptyFeedbackStore, type ProductFeedbackStore } from './mockFeedback'
 import type {
+  AccountDeletionJob,
   Destination,
   Driver,
   House,
@@ -60,6 +61,7 @@ export interface Database {
   joinRequests: StoredJoinRequest[]
   // Members an administrator removed. Their profile stays on past rides; their login moved to a new identity.
   removals: { userId: string; at: string; by: string; identityId: string }[]
+  deletionJobs: AccountDeletionJob[] // permanent deletions; like the database's, they hold no name or email
 }
 
 // A request to join an organization, as the demo backend keeps it. userId is the applicant's identity id,
@@ -179,7 +181,7 @@ const demoUsers: User[] = [
   { id: 'u-jordan', name: 'Jordan', email: 'jordan@careride.demo', phone: '604-555-0106', role: 'DRIVER' },
 ]
 
-const seedBase: Omit<Database, 'events' | 'feedback' | 'identities' | 'applications' | 'invitations' | 'productFeedback' | 'joinRequests' | 'removals'> = {
+const seedBase: Omit<Database, 'events' | 'feedback' | 'identities' | 'applications' | 'invitations' | 'productFeedback' | 'joinRequests' | 'removals' | 'deletionJobs'> = {
   credentials: demoUsers.map((u) => ({ email: u.email!, userId: u.id, password: demoPasswordFor(u.email!) })),
   users: demoUsers,
   organizations: [
@@ -289,4 +291,5 @@ export const seed: Database = {
   productFeedback: emptyFeedbackStore(),
   joinRequests: [],
   removals: [],
+  deletionJobs: [],
 }

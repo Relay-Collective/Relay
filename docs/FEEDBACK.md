@@ -75,7 +75,7 @@ Indexes cover the submitter, creation time, status, type, priority, workspace, o
 
 ### Relationships and deletion
 
-All foreign keys use the default `NO ACTION`. Nothing cascades. Profiles are deactivated rather than deleted (closing an account sets `is_active = false` and drops the Auth login), so feedback, replies and history survive a closed account. The admin console shows the submitter as *Account closed*.
+All foreign keys use the default `NO ACTION`. Nothing cascades. Closing an account sets `is_active = false` and drops the Auth login, so feedback, replies and history survive a closed account; the admin console shows the submitter as *Account closed*. A platform admin's **permanent deletion** deletes the person's own submissions with their replies, history and screenshot, and keeps replies they wrote as an admin under an anonymous author (see [ACCOUNT_DELETION.md](ACCOUNT_DELETION.md)).
 
 ## Access control
 
@@ -163,5 +163,5 @@ The migration doesn't change any existing table. It only adds tables, functions,
 - **Abandoned uploads.** An upload grant that is never used leaves a metadata row with no file, and a file uploaded but never confirmed leaves an unconfirmed object. Neither is visible to anyone but admins. Cleaning them up needs a scheduled job with the Storage API (service role), which isn't built.
 - **`confirm_feedback_attachment` reads `storage.objects`** as the function owner. On hosted Supabase that's `postgres`, which can read Storage metadata. If a project restricts that, confirmation fails safely (the screenshot is reported as not uploaded).
 - **Search is substring matching** (`ILIKE`). That's fine at today's volumes. Add `pg_trgm` or full-text search if the inbox grows large.
-- **Retention.** There is no deletion workflow, by design. Feedback can include personal details despite the warnings. A retention policy (for example, purge closed feedback after N months) should be agreed. A purge has to delete messages, history and the attachment row, and remove the Storage object through the Storage API, before deleting the submission.
+- **Retention.** Feedback is deleted with its submitter's account when a platform admin permanently deletes it ([ACCOUNT_DELETION.md](ACCOUNT_DELETION.md)); otherwise there is no deletion workflow. Feedback can include personal details despite the warnings. A retention policy (for example, purge closed feedback after N months) should be agreed. A purge has to delete messages, history and the attachment row, and remove the Storage object through the Storage API, before deleting the submission.
 - **Demo backend.** Screenshots are kept in this browser's IndexedDB, so another browser or device doesn't have them.

@@ -16,6 +16,7 @@ import {
   pickupTimeAfterEdit,
 } from '../logic/dispatch'
 import { etaTimestamp } from '../logic/driverEta'
+import { BLOCKER_MESSAGES, DELETED_NAME, emailMatches } from '../logic/accountDeletion'
 import { faresSavedFor } from '../logic/estimateFare'
 import {
   FEEDBACK_NOT_YET,
@@ -29,6 +30,12 @@ import { rideEventsBetween, type RideEventDraft } from '../logic/rideEvents'
 import { EMAIL } from '../logic/validate'
 import { MIN_SEARCH_LENGTH, optionalText, rankDirectory } from '../logic/membership'
 import type {
+  AccountDeletionAction,
+  AccountDeletionBlocker,
+  AccountDeletionCategory,
+  AccountDeletionCategoryKey,
+  AccountDeletionJob,
+  AccountDeletionPreview,
   Driver,
   House,
   Identity,
@@ -58,7 +65,7 @@ import {
   MAX_JOIN_POSITION,
   MAX_REVIEW_NOTE,
 } from './dataService'
-import { getDemoFile, putDemoFile } from './demoFiles'
+import { deleteDemoFile, getDemoFile, putDemoFile } from './demoFiles'
 import * as feedbackStore from './mockFeedback'
 import { backfilledEvents, seed, type Database, type StoredJoinRequest } from './seed'
 
@@ -97,6 +104,7 @@ function upgrade(db: Database): Database {
   db.productFeedback ??= feedbackStore.emptyFeedbackStore()
   db.joinRequests ??= []
   db.removals ??= []
+  db.deletionJobs ??= []
   // Like the database migration: every existing member keeps managing their organization, and demo
   // partners stay findable in search as the fresh seed has them
   for (const user of db.users) if (user.role === 'PARTNER') user.orgRole ??= 'ADMIN'
@@ -337,6 +345,148 @@ function finishOnboarding(db: Database, identity: Identity, user: User): User {
     if (r.userId === identity.id && r.status === 'pending') Object.assign(r, { status: 'cancelled', cancelledAt: now() })
   }
   return user
+}
+
+// ---- Permanent account deletion. Same rules and counts as the database functions
+// (20261029150000_account_deletion.sql). Ride history here records names, not profile ids, so it's matched by both.
+
+function requireDeletionAdmin(db: Database): User {
+  const me = signedInUser(db)
+  if (me?.role !== 'PLATFORM_ADMIN') throw new Error('Only Relay Collective admins can delete accounts.')
+  return me
+}
+
+function checkAdminPassword(db: Database, admin: User, password: string): void {
+  if (!password) throw new Error('Enter your password to confirm it’s you.')
+  if (!db.credentials.some((c) => c.userId === admin.id && c.password === password)) throw new Error('That password isn’t right.')
+}
+
+function deletedProfile(db: Database, userId: string): AccountDeletionJob | undefined {
+  return db.deletionJobs.find((j) => j.profileId === userId && j.status === 'completed')
+}
+
+const OPEN_RIDE: RideStatus[] = ['SEARCHING', 'OFFERED', 'ACCEPTED', 'NEEDS_ATTENTION', 'PICKED_UP']
+
+function deletionPlan(db: Database, me: User, user: User) {
+  const login = db.credentials.find((c) => c.userId === user.id)
+  const driver = db.drivers.find((d) => d.userId === user.id)
+  const store = db.productFeedback
+  const submissions = store.submissions.filter((f) => f.submittedBy === user.id)
+  const files = [
+    ...store.attachments.filter((a) => a.uploadedAt && submissions.some((f) => f.id === a.feedbackId)).map((a) => a.storagePath),
+  ]
+  const removed = db.removals.some((r) => r.userId === user.id)
+  const canSignIn = (u: User) => db.credentials.some((c) => c.userId === u.id) && !db.removals.some((r) => r.userId === u.id)
+  const colleagues = db.users.filter((u) => u.id !== user.id && u.orgId === user.orgId && u.role === user.role && canSignIn(u))
+
+  const blockers: AccountDeletionBlocker[] = []
+  if (user.id === me.id) blockers.push('SELF')
+  if (user.role === 'PLATFORM_ADMIN' && !db.users.some((u) => u.id !== user.id && u.role === 'PLATFORM_ADMIN' && canSignIn(u))) {
+    blockers.push('LAST_PLATFORM_ADMIN')
+  }
+  if (user.role === 'PARTNER' && user.orgRole === 'ADMIN' && canSignIn(user) && colleagues.length && !colleagues.some((u) => u.orgRole === 'ADMIN')) {
+    blockers.push('LAST_ORG_ADMIN')
+  }
+  if (user.role === 'PARTNER' && canSignIn(user) && !colleagues.length && db.rides.some((r) => r.orgId === user.orgId && OPEN_RIDE.includes(r.status))) {
+    blockers.push('ORG_OPEN_RIDES')
+  }
+  if (user.role === 'ORG_ADMIN' && !colleagues.length && db.drivers.some((d) => d.orgId === user.orgId)) blockers.push('LAST_PROVIDER_ADMIN')
+  if (driver && db.rides.some((r) => r.driverId === driver.id && r.status === 'PICKED_UP')) blockers.push('DRIVER_ON_TRIP')
+  if (!login) blockers.push('NO_SIGN_IN_EMAIL')
+
+  const n = (count: number | boolean) => Number(count)
+  const counts: [AccountDeletionCategoryKey, AccountDeletionAction, number][] = [
+    ['auth_account', 'delete', n(!!login)],
+    ['profile', 'anonymize', 1],
+    ['organization_membership', 'remove', n((user.role === 'PARTNER' || user.role === 'ORG_ADMIN') && !!user.orgId && !removed)],
+    ['driver_profile', 'delete', n(!!driver)],
+    ['driver_documents', 'delete', n(!!driver?.licenceFile) + n(!!driver?.proofFile)],
+    [
+      'open_rides',
+      'reassign',
+      driver
+        ? db.rides.filter(
+            (r) =>
+              (r.driverId === driver.id && r.status === 'ACCEPTED') ||
+              db.offers.some((o) => o.rideId === r.id && o.driverId === driver.id && o.status === 'PENDING'),
+          ).length
+        : 0,
+    ],
+    ['product_feedback', 'delete', submissions.length],
+    ['personal_files', 'delete', files.length],
+    ['feedback_assignments', 'detach', store.submissions.filter((f) => f.assignedTo === user.id).length],
+    ['feedback_replies', 'retain', store.messages.filter((m) => m.authorId === user.id && !submissions.some((f) => f.id === m.feedbackId)).length],
+    ['join_requests', 'delete', db.joinRequests.filter((r) => r.userId === user.id).length],
+    ['invitations', 'delete', db.invitations.filter((i) => login && i.email === normalizeEmail(login.email)).length],
+    ['ride_issue_reports', 'delete', driver ? db.feedback.filter((f) => f.authorRole === 'DRIVER' && f.driverId === driver.id).length : 0],
+    ['rides_requested', 'retain', db.rides.filter((r) => r.requestedBy === user.id).length],
+    ['rides_driven', 'retain', driver ? db.rides.filter((r) => r.driverId === driver.id && ['PICKED_UP', 'COMPLETED', 'NO_SHOW'].includes(r.status)).length : 0],
+    ['ride_ratings', 'retain', 0], // the demo doesn't record which staff member rated a ride
+    ['ride_history', 'anonymize', db.events.filter((e) => e.actorRole === user.role && e.actorName === user.name).length],
+    ['organization_applications', 'retain', db.applications.filter((a) => a.submittedBy === user.id).length],
+    ['preferences', 'none', 0],
+    ['deletion_record', 'retain', 1],
+  ]
+  const categories: AccountDeletionCategory[] = counts.map(([key, action, count]) => ({ key, action, count }))
+  return { blockers, categories, files }
+}
+
+function deletionPreview(db: Database, me: User, userId: string): AccountDeletionPreview {
+  const done = deletedProfile(db, userId)
+  const user = db.users.find((u) => u.id === userId)
+  if (done) return { state: 'DELETED', profileId: userId, role: user?.role ?? 'PARTNER', blockers: [], categories: [], job: done }
+  if (!user) throw new Error('Account not found. It may already have been deleted.')
+  const plan = deletionPlan(db, me, user)
+  return {
+    state: plan.blockers.length ? 'BLOCKED' : 'READY',
+    profileId: user.id,
+    name: user.name,
+    email: db.credentials.find((c) => c.userId === user.id)?.email,
+    role: user.role,
+    orgName: db.organizations.find((o) => o.id === user.orgId)?.name,
+    blockers: plan.blockers,
+    categories: plan.categories,
+  }
+}
+
+// Everything about the person goes or loses its name. Their profile stays as a placeholder while rides,
+// invitations or replies point at it, like the database's.
+function eraseAccount(db: Database, user: User): void {
+  const login = db.credentials.find((c) => c.userId === user.id)
+  const driver = db.drivers.find((d) => d.userId === user.id)
+  if (driver) {
+    releaseDriverWork(db, driver.id)
+    for (const ride of db.rides) {
+      if (['COMPLETED', 'NO_SHOW', 'CANCELLED'].includes(ride.status)) continue
+      if (ride.preferredDriverId === driver.id) ride.preferredDriverId = undefined
+      if (ride.reconfirmDriverId === driver.id) ride.reconfirmDriverId = undefined
+    }
+    db.feedback = db.feedback.filter((f) => !(f.authorRole === 'DRIVER' && f.driverId === driver.id))
+    db.drivers = db.drivers.filter((d) => d.id !== driver.id)
+  }
+
+  const store = db.productFeedback
+  const theirs = new Set(store.submissions.filter((f) => f.submittedBy === user.id).map((f) => f.id))
+  store.submissions = store.submissions.filter((f) => !theirs.has(f.id))
+  store.messages = store.messages.filter((m) => !theirs.has(m.feedbackId))
+  store.attachments = store.attachments.filter((a) => !theirs.has(a.feedbackId))
+  store.history = store.history.filter((h) => !theirs.has(h.feedbackId))
+  for (const f of store.submissions) if (f.assignedTo === user.id) f.assignedTo = undefined
+
+  for (const e of db.events) if (e.actorRole === user.role && e.actorName === user.name) e.actorName = DELETED_NAME
+  db.joinRequests = db.joinRequests.filter((r) => r.userId !== user.id)
+  if (login) db.invitations = db.invitations.filter((i) => i.email !== normalizeEmail(login.email))
+  db.credentials = db.credentials.filter((c) => c.userId !== user.id)
+  db.identities = db.identities.filter((i) => i.id !== user.id)
+
+  const pointedAt =
+    db.rides.some((r) => r.requestedBy === user.id) ||
+    db.invitations.some((i) => i.invitedBy === user.id) ||
+    db.applications.some((a) => a.submittedBy === user.id) ||
+    store.messages.some((m) => m.authorId === user.id) ||
+    db.removals.some((r) => r.userId === user.id || r.by === user.id)
+  if (pointedAt) Object.assign(user, { name: DELETED_NAME, email: undefined, phone: '' })
+  else db.users = db.users.filter((u) => u.id !== user.id)
 }
 
 // ---- Organization membership. Same rules as the database functions (20261029120000_organization_membership.sql).
@@ -976,33 +1126,51 @@ export const mockService: DataService = {
       return { kind: 'NEW_PASSWORD', email: login.email, password }
     }),
 
-  deleteAccount: (userId) =>
+  previewAccountDeletion: (userId) => transact((db) => deletionPreview(db, requireDeletionAdmin(db), userId)),
+
+  // The demo has no Storage or Auth to fail, so every step runs at once and the job completes
+  async startAccountDeletion(userId, { email, password }) {
+    const { job, files } = await transact((db) => {
+      const admin = requireDeletionAdmin(db)
+      checkAdminPassword(db, admin, password)
+      const user = db.users.find((u) => u.id === userId)
+      if (!user || deletedProfile(db, userId)) throw new Error('Account not found. It may already have been deleted.')
+      const login = db.credentials.find((c) => c.userId === userId)
+      if (!emailMatches(email, login?.email)) throw new Error('The email you typed doesn’t match this account.')
+      const plan = deletionPlan(db, admin, user)
+      if (plan.blockers.length) throw new Error(BLOCKER_MESSAGES[plan.blockers[0]!])
+      eraseAccount(db, user)
+      const at = now()
+      const done: AccountDeletionJob = {
+        id: crypto.randomUUID(),
+        profileId: userId,
+        status: 'completed',
+        step: 'done',
+        attempts: 1,
+        plan: plan.categories,
+        startedAt: at,
+        updatedAt: at,
+        completedAt: at,
+      }
+      db.deletionJobs.push(done)
+      return { job: done, files: plan.files }
+    })
+    await Promise.all(files.map((path) => deleteDemoFile(path)))
+    return job
+  },
+
+  retryAccountDeletion: (jobId, password) =>
     transact((db) => {
-      const user = findOrThrow(db.users, userId, 'Account')
-      if (user.role === 'PLATFORM_ADMIN' && db.users.filter((u) => u.role === 'PLATFORM_ADMIN').length === 1) {
-        throw new Error("This is the only Relay Collective admin account, so it can't be deleted.")
-      }
+      checkAdminPassword(db, requireDeletionAdmin(db), password)
+      const job = db.deletionJobs.find((j) => j.id === jobId)
+      if (!job) throw new Error('That deletion wasn’t found.')
+      return job
+    }),
 
-      const driver = db.drivers.find((d) => d.userId === userId)
-      if (driver) {
-        if (db.rides.some((r) => r.driverId === driver.id && r.status === 'PICKED_UP')) {
-          throw new Error('This driver has a client in the car right now. Try again once the ride is finished.')
-        }
-        db.drivers = db.drivers.filter((d) => d.id !== driver.id)
-        // Requests waiting on them move to the next driver
-        for (const offer of db.offers.filter((o) => o.driverId === driver.id && o.status === 'PENDING')) {
-          offer.status = 'EXPIRED'
-          dispatchIfUnanswered(db, offer.rideId)
-        }
-        // Upcoming rides they accepted go back out
-        for (const ride of db.rides.filter((r) => r.driverId === driver.id && r.status === 'ACCEPTED')) {
-          clearDriverProgress(ride)
-          dispatch(db, ride)
-        }
-      }
-
-      db.credentials = db.credentials.filter((c) => c.userId !== userId)
-      db.users = db.users.filter((u) => u.id !== userId)
+  getAccountDeletion: (jobId) =>
+    transact((db) => {
+      requireDeletionAdmin(db)
+      return db.deletionJobs.find((j) => j.id === jobId)
     }),
 
   // Keeps the person on past rides. Only the sign-in goes away.

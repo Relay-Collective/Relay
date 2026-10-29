@@ -11,6 +11,7 @@ import { EmptyState, SectionError, SkeletonRows } from '../../components/workspa
 import { focusRing, panel } from '../../components/workspace/styles'
 import { useAdmin } from '../../hooks/useAdmin'
 import { useApp } from '../../hooks/useApp'
+import { DELETED_NAME } from '../../logic/accountDeletion'
 import { matches } from '../../logic/adminSummary'
 import type { User, UserRole } from '../../types'
 
@@ -32,6 +33,14 @@ export function Users() {
   const driverOf = (u: User) => drivers.data?.find((d) => d.userId === u.id)
 
   const status = (u: User) => {
+    if (u.deletionStatus) {
+      const stopped = u.deletionStatus === 'failed' || u.deletionStatus === 'requires_attention'
+      return (
+        <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${stopped ? 'bg-red-50 text-red-700' : 'bg-amber-50 text-amber-800'}`}>
+          {stopped ? 'Deletion needs attention' : 'Being deleted'}
+        </span>
+      )
+    }
     const d = u.role === 'DRIVER' ? driverOf(u) : undefined
     return d ? <VerificationBadge status={d.status} /> : <span className="text-sm text-slate-600">Can sign in</span>
   }
@@ -74,7 +83,7 @@ export function Users() {
       />
       {deleted && (
         <Notice tone="success" onDismiss={() => setDeleted(undefined)}>
-          Deleted {deleted}’s account.
+          {deleted === DELETED_NAME ? 'Permanently deleted the account.' : `Permanently deleted ${deleted}’s account.`}
         </Notice>
       )}
       <section aria-label="Users" className={panel}>

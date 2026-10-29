@@ -1,5 +1,7 @@
 import type { DriverEtaHint } from '../logic/driverEta'
 import type {
+  AccountDeletionJob,
+  AccountDeletionPreview,
   AdminFeedbackDetail,
   AdminFeedbackRow,
   Destination,
@@ -78,6 +80,12 @@ export const MAX_JOIN_MESSAGE = 1000
 export const MAX_JOIN_POSITION = 120
 export const MAX_DIRECTORY_DESCRIPTION = 280
 export const MAX_REVIEW_NOTE = 500
+
+// What a platform admin gives to delete an account: the account's email as they typed it, and their own password
+export interface AccountDeletionConfirmation {
+  email: string
+  password: string
+}
 
 // What an admin's password reset produced. The demo sets a password to share; the real backend emails a reset link.
 export type PasswordReset = { kind: 'NEW_PASSWORD'; email: string; password: string } | { kind: 'EMAIL_SENT'; email: string }
@@ -259,9 +267,16 @@ export interface DataService {
   listAccounts(): Promise<User[]> // users who can sign in
   // Helps someone who is locked out. Platform admins only.
   resetPassword(userId: string, newPassword?: string): Promise<PasswordReset>
-  // Removes the account and its sign-in. A driver stops getting requests, and their upcoming rides
-  // go back out to other drivers. Houses, organizations, and past rides stay.
-  deleteAccount(userId: string): Promise<void>
+  // Permanent deletion (docs/ACCOUNT_DELETION.md). Platform admins only, checked by the backend at every step.
+  // What deleting this account would do, counted from the data now. Changes nothing.
+  previewAccountDeletion(userId: string): Promise<AccountDeletionPreview>
+  // Erases the account's sign-in and personal information; shared records stay, anonymized. The account is
+  // the id; the email is what the admin typed to confirm, and the password is theirs, checked again.
+  // Resolves with the job however it went: check its status, since a failed step waits for a retry.
+  startAccountDeletion(userId: string, confirmation: AccountDeletionConfirmation): Promise<AccountDeletionJob>
+  // Carries on with a deletion that failed or was cut off, from the step it stopped at
+  retryAccountDeletion(jobId: string, password: string): Promise<AccountDeletionJob>
+  getAccountDeletion(jobId: string): Promise<AccountDeletionJob | undefined>
   // The signed-in driver or partner organization closes their own sign-in. Ride history stays.
   // A driver with a client in the car has to finish that ride first.
   deleteMyAccount(): Promise<void>

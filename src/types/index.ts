@@ -53,6 +53,7 @@ export interface User {
   orgId?: string
   houseId?: string // set on a partner organization account: its pickup location
   orgRole?: OrgRole // set on a partner organization member
+  deletionStatus?: AccountDeletionStatus // admin account list only: a permanent deletion is under way
 }
 
 export type DriverBackground = 'TAXI' | 'RIDESHARE' | 'ORG_DRIVER' | 'INDEPENDENT'
@@ -454,4 +455,82 @@ export interface FeedbackSummary {
   inProgress: number
   resolved: number
   closed: number
+}
+
+// ---- Permanent account deletion (platform admins). See docs/ACCOUNT_DELETION.md.
+
+export type AccountDeletionStatus = 'pending' | 'in_progress' | 'completed' | 'failed' | 'requires_attention'
+// storage: the person's files; records: their rows; auth: their login; verify: nothing personal is left
+export type AccountDeletionStep = 'storage' | 'records' | 'auth' | 'verify' | 'done'
+export type AccountDeletionErrorCode =
+  | 'STORAGE_DELETE_FAILED'
+  | 'RECORDS_CLEANUP_FAILED'
+  | 'AUTH_DELETE_FAILED'
+  | 'VERIFICATION_FAILED'
+  | 'INTERRUPTED'
+export type AccountDeletionAction = 'delete' | 'anonymize' | 'remove' | 'detach' | 'reassign' | 'retain' | 'none'
+export type AccountDeletionCategoryKey =
+  | 'auth_account'
+  | 'profile'
+  | 'organization_membership'
+  | 'driver_profile'
+  | 'driver_documents'
+  | 'open_rides'
+  | 'product_feedback'
+  | 'personal_files'
+  | 'feedback_assignments'
+  | 'feedback_replies'
+  | 'join_requests'
+  | 'invitations'
+  | 'ride_issue_reports'
+  | 'rides_requested'
+  | 'rides_driven'
+  | 'ride_ratings'
+  | 'ride_history'
+  | 'organization_applications'
+  | 'preferences'
+  | 'deletion_record'
+// Why an account can't be deleted right now
+export type AccountDeletionBlocker =
+  | 'SELF'
+  | 'LAST_PLATFORM_ADMIN'
+  | 'LAST_ORG_ADMIN'
+  | 'ORG_OPEN_RIDES'
+  | 'LAST_PROVIDER_ADMIN'
+  | 'DRIVER_ON_TRIP'
+  | 'NO_SIGN_IN_EMAIL'
+
+// One kind of data and what deleting the account does to it, counted by the backend
+export interface AccountDeletionCategory {
+  key: AccountDeletionCategoryKey
+  action: AccountDeletionAction
+  count: number
+}
+
+// A deletion as the backend tracks it. Holds no name or email.
+export interface AccountDeletionJob {
+  id: string
+  profileId: string
+  status: AccountDeletionStatus
+  step: AccountDeletionStep
+  errorCode?: AccountDeletionErrorCode
+  attempts: number
+  plan: AccountDeletionCategory[] // what was planned when it started
+  startedAt: string
+  updatedAt: string
+  completedAt?: string
+  failedAt?: string
+}
+
+// What deleting an account would do, worked out by the backend from the data as it is now
+export interface AccountDeletionPreview {
+  state: 'READY' | 'BLOCKED' | 'IN_PROGRESS' | 'DELETED'
+  profileId: string
+  name?: string // READY and BLOCKED only: once deletion starts, the profile no longer has one
+  email?: string
+  role: UserRole
+  orgName?: string
+  blockers: AccountDeletionBlocker[]
+  categories: AccountDeletionCategory[]
+  job?: AccountDeletionJob // the open deletion (IN_PROGRESS), or the finished one (DELETED)
 }
