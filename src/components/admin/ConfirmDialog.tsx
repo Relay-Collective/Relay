@@ -1,5 +1,5 @@
 import { LoaderCircle } from 'lucide-react'
-import { useEffect, useRef, type ReactNode } from 'react'
+import { useEffect, useId, useRef, type ReactNode } from 'react'
 import { dangerButton, primaryButton, secondaryButton } from '../ui'
 
 interface Props {
@@ -17,6 +17,7 @@ interface Props {
 // result (or an error) is seen in context, and Escape can't dismiss it mid-request.
 export function ConfirmDialog({ open, title, body, confirmLabel, tone = 'primary', busy, onConfirm, onCancel }: Props) {
   const ref = useRef<HTMLDialogElement>(null)
+  const titleId = useId() // several dialogs can share a page
 
   useEffect(() => {
     const dialog = ref.current
@@ -28,14 +29,14 @@ export function ConfirmDialog({ open, title, body, confirmLabel, tone = 'primary
   return (
     <dialog
       ref={ref}
-      aria-labelledby="confirm-title"
+      aria-labelledby={titleId}
       onCancel={(e) => {
         e.preventDefault() // Escape: close through state, and never while busy
         if (!busy) onCancel()
       }}
       className="m-auto w-[min(30rem,calc(100vw-2rem))] rounded-xl p-6 text-rc-navy shadow-xl backdrop:bg-rc-navy/40"
     >
-      <h2 id="confirm-title" className="font-heading text-xl font-bold">
+      <h2 id={titleId} className="font-heading text-xl font-bold">
         {title}
       </h2>
       <div className="mt-2 space-y-2 text-sm text-slate-700">{body}</div>

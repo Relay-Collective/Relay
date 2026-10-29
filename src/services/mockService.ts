@@ -27,7 +27,24 @@ import {
 } from '../logic/feedback'
 import { rideEventsBetween, type RideEventDraft } from '../logic/rideEvents'
 import { EMAIL } from '../logic/validate'
-import type { Driver, House, Identity, Invitation, InvitationState, OfferStatus, Organization, Ride, RideFeedback, RideStatus, User } from '../types'
+import { MIN_SEARCH_LENGTH, optionalText, rankDirectory } from '../logic/membership'
+import type {
+  Driver,
+  House,
+  Identity,
+  Invitation,
+  InvitationState,
+  JoinRequest,
+  MyJoinRequest,
+  OfferStatus,
+  OrgRole,
+  Organization,
+  OrganizationMember,
+  Ride,
+  RideFeedback,
+  RideStatus,
+  User,
+} from '../types'
 import {
   ALL_RIDES_LIMIT,
   type DataService,
@@ -36,10 +53,14 @@ import {
   type NewDriverUser,
   type RideChanges,
   type Session,
+  MAX_DIRECTORY_DESCRIPTION,
+  MAX_JOIN_MESSAGE,
+  MAX_JOIN_POSITION,
+  MAX_REVIEW_NOTE,
 } from './dataService'
 import { getDemoFile, putDemoFile } from './demoFiles'
 import * as feedbackStore from './mockFeedback'
-import { backfilledEvents, seed, type Database } from './seed'
+import { backfilledEvents, seed, type Database, type StoredJoinRequest } from './seed'
 
 // Hackathon backend: keeps everything in the browser's localStorage.
 // Swap this file for a real backend later; screens won't need to change.
@@ -74,6 +95,16 @@ function upgrade(db: Database): Database {
   db.applications ??= []
   db.invitations ??= []
   db.productFeedback ??= feedbackStore.emptyFeedbackStore()
+  db.joinRequests ??= []
+  db.removals ??= []
+  // Like the database migration: every existing member keeps managing their organization, and demo
+  // partners stay findable in search as the fresh seed has them
+  for (const user of db.users) if (user.role === 'PARTNER') user.orgRole ??= 'ADMIN'
+  for (const org of db.organizations) {
+    const seeded = seed.organizations.find((o) => o.id === org.id)
+    org.discoverability ??= seeded?.discoverability ?? 'invitation_only'
+    org.directoryDescription ??= seeded?.directoryDescription
+  }
   return db
 }
 
@@ -280,6 +311,9 @@ function signedInUser(db: Database): User | undefined {
 
 // The signed-in identity and its profile. An identity id becomes the profile id when onboarding finishes.
 function sessionFor(db: Database, id: string): Session | undefined {
+  // Removed from their organization: the login carries on as an identity without a role, like a new sign-up
+  const removal = db.removals.find((r) => r.userId === id)
+  if (removal) return sessionFor(db, removal.identityId)
   const user = db.users.find((u) => u.id === id)
   if (user) return { identity: { id: user.id, email: user.email ?? '', name: user.name }, user }
   const identity = db.identities.find((i) => i.id === id)
@@ -298,7 +332,73 @@ function identityToOnboard(db: Database): Identity {
 function finishOnboarding(db: Database, identity: Identity, user: User): User {
   db.identities = db.identities.filter((i) => i.id !== identity.id)
   db.users.push(user)
+  // Joined some way: any request still waiting is no longer needed (approval marks its own one afterwards)
+  for (const r of db.joinRequests) {
+    if (r.userId === identity.id && r.status === 'pending') Object.assign(r, { status: 'cancelled', cancelledAt: now() })
+  }
   return user
+}
+
+// ---- Organization membership. Same rules as the database functions (20261029120000_organization_membership.sql).
+
+const MAX_REQUESTS_PER_DAY = 5
+
+function isActiveMember(db: Database, u: User): boolean {
+  return u.role === 'PARTNER' && !db.removals.some((r) => r.userId === u.id) && db.credentials.some((c) => c.userId === u.id)
+}
+
+// The signed-in administrator's organization, or a refusal in their words
+function adminOrgId(db: Database, action: string): string {
+  const user = signedInUser(db)
+  if (!user || !isActiveMember(db, user) || user.orgRole !== 'ADMIN' || !user.orgId) {
+    throw new Error(`Only your organization's administrators can ${action}.`)
+  }
+  return user.orgId
+}
+
+function discoverable(db: Database, org: Organization): boolean {
+  return org.status === 'APPROVED' && org.type === 'PARTNER_ORG' && org.discoverability === 'discoverable' && db.houses.some((h) => h.orgId === org.id)
+}
+
+// An organization with active members always keeps an active administrator
+function keepAnAdmin(db: Database, leaving: User): void {
+  if (leaving.orgRole !== 'ADMIN') return
+  const others = db.users.filter((u) => u.id !== leaving.id && u.orgId === leaving.orgId && isActiveMember(db, u))
+  if (others.length && !others.some((u) => u.orgRole === 'ADMIN')) {
+    throw new Error('Your organization needs at least one administrator. Make another member an administrator first.')
+  }
+}
+
+function applicantOf(db: Database, userId: string): Identity | undefined {
+  const user = db.users.find((u) => u.id === userId)
+  return db.identities.find((i) => i.id === userId) ?? (user && { id: user.id, email: user.email ?? '', name: user.name })
+}
+
+function toMyJoinRequest(db: Database, r: StoredJoinRequest): MyJoinRequest {
+  return {
+    id: r.id,
+    orgId: r.orgId,
+    orgName: db.organizations.find((o) => o.id === r.orgId)?.name ?? 'Organization',
+    orgCity: db.houses.find((h) => h.orgId === r.orgId)?.city,
+    status: r.status,
+    requestedPosition: r.requestedPosition,
+    message: r.message,
+    createdAt: r.createdAt,
+    reviewedAt: r.reviewedAt,
+    cancelledAt: r.cancelledAt,
+  }
+}
+
+function findJoinRequest(db: Database, requestId: string, orgId: string): StoredJoinRequest {
+  const request = db.joinRequests.find((r) => r.id === requestId && r.orgId === orgId)
+  if (!request) throw new Error("This request wasn't found.")
+  return request
+}
+
+function activeMemberOf(db: Database, profileId: string, orgId: string): User {
+  const member = db.users.find((u) => u.id === profileId && u.orgId === orgId && isActiveMember(db, u))
+  if (!member) throw new Error("This person isn't an active member of your organization.")
+  return member
 }
 
 function withoutToken({ token, ...invitation }: Invitation & { token: string }): Invitation {
@@ -395,6 +495,8 @@ export const mockService: DataService = {
       const id = readSession()
       const session = id ? sessionFor(db, id) : undefined
       if (id && !session) writeSession('') // account was removed or the demo was reset
+      // Removed from their organization: carry on as the identity their login moved to
+      if (session && session.identity.id !== id) writeSession(session.identity.id)
       return session
     }),
 
@@ -489,6 +591,7 @@ export const mockService: DataService = {
         role: 'PARTNER',
         orgId: org.id,
         houseId: house.id,
+        orgRole: 'ADMIN',
       })
     }),
 
@@ -512,8 +615,8 @@ export const mockService: DataService = {
   createInvitation: (email) =>
     transact((db) => {
       const user = signedInUser(db)
-      const org = db.organizations.find((o) => o.id === user?.orgId)
-      if (!user || user.role !== 'PARTNER' || !org) throw new Error('Only staff of a partner organization can invite colleagues.')
+      const org = db.organizations.find((o) => o.id === adminOrgId(db, 'invite colleagues'))
+      if (!user || !org) throw new Error("Only your organization's administrators can invite colleagues.")
       if (org.status !== 'APPROVED') throw new Error('You can invite colleagues once your organization is approved.')
       const normalized = normalizeEmail(email)
       if (!EMAIL.test(normalized)) throw new Error('Enter a valid email address.')
@@ -540,7 +643,7 @@ export const mockService: DataService = {
   listInvitations: () =>
     transact((db) => {
       const user = signedInUser(db)
-      const mine = (i: Invitation) => user?.role === 'PLATFORM_ADMIN' || (user?.role === 'PARTNER' && i.orgId === user.orgId)
+      const mine = (i: Invitation) => user?.role === 'PLATFORM_ADMIN' || (user?.role === 'PARTNER' && user.orgRole === 'ADMIN' && i.orgId === user.orgId)
       // The token never leaves the backend after creation
       return db.invitations
         .filter(mine)
@@ -552,7 +655,7 @@ export const mockService: DataService = {
     transact((db) => {
       const user = signedInUser(db)
       const inv = db.invitations.find((i) => i.id === invitationId)
-      const allowed = inv && (user?.role === 'PLATFORM_ADMIN' || (user?.role === 'PARTNER' && inv.orgId === user.orgId))
+      const allowed = inv && (user?.role === 'PLATFORM_ADMIN' || (user?.role === 'PARTNER' && user.orgRole === 'ADMIN' && inv.orgId === user.orgId))
       if (!inv || !allowed || inv.acceptedAt || inv.revokedAt) {
         throw new Error("That invitation can't be withdrawn. It may already be used or withdrawn.")
       }
@@ -611,7 +714,181 @@ export const mockService: DataService = {
         role: inv.role,
         orgId: inv.orgId,
         houseId: house.id,
+        orgRole: 'STAFF',
       })
+    }),
+
+  searchOrganizations: (query) =>
+    transact((db) => {
+      if (!readSession()) throw new Error('Please sign in first.')
+      if (query.trim().length < MIN_SEARCH_LENGTH) return []
+      const entries = db.organizations
+        .filter((o) => discoverable(db, o))
+        .map((o) => ({ id: o.id, name: o.name, city: db.houses.find((h) => h.orgId === o.id)?.city, description: o.directoryDescription }))
+      return rankDirectory(entries, query)
+    }),
+
+  submitJoinRequest: ({ orgId, requestedPosition, message }) =>
+    transact((db) => {
+      const id = readSession()
+      if (!id) throw new Error('Please sign in first.')
+      const user = sessionFor(db, id)?.user
+      if (user) {
+        if (user.orgId === orgId) throw new Error('You’re already a member of this organization.')
+        throw new Error('This account already has a Relay Collective role, and an account can belong to one organization.')
+      }
+      const identity = identityToOnboard(db)
+      const org = db.organizations.find((o) => o.id === orgId)
+      if (!org || !discoverable(db, org)) throw new Error('This organization isn’t accepting requests to join right now.')
+      const pending = db.joinRequests.find((r) => r.userId === identity.id && r.status === 'pending')
+      if (pending?.orgId === orgId) return toMyJoinRequest(db, pending)
+      if (pending) throw new Error('You already have a request waiting with another organization. Withdraw it first to ask somewhere else.')
+      const today = db.joinRequests.filter((r) => r.userId === identity.id && Date.now() - new Date(r.createdAt).getTime() < 86_400_000)
+      if (today.length >= MAX_REQUESTS_PER_DAY) throw new Error('You’ve sent several requests today. Please try again tomorrow.')
+      const position = optionalText(requestedPosition)
+      const note = optionalText(message)
+      if (position && position.length > MAX_JOIN_POSITION) throw new Error('Keep your role or position under 120 characters.')
+      if (note && note.length > MAX_JOIN_MESSAGE) throw new Error('Keep your message under 1,000 characters.')
+      const request: StoredJoinRequest = { id: newId('join'), orgId, userId: identity.id, requestedPosition: position, message: note, status: 'pending', createdAt: now() }
+      db.joinRequests.push(request)
+      return toMyJoinRequest(db, request)
+    }),
+
+  listMyJoinRequests: () =>
+    transact((db) => {
+      const id = readSession()
+      const me = id ? sessionFor(db, id)?.identity.id : undefined
+      return db.joinRequests
+        .filter((r) => r.userId === me)
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+        .slice(0, 10)
+        .map((r) => toMyJoinRequest(db, r))
+    }),
+
+  cancelJoinRequest: (requestId) =>
+    transact((db) => {
+      const id = readSession()
+      const me = id ? sessionFor(db, id)?.identity.id : undefined
+      const request = db.joinRequests.find((r) => r.id === requestId && r.userId === me && r.status === 'pending')
+      if (!request) throw new Error('This request can’t be withdrawn. It may already have been reviewed.')
+      Object.assign(request, { status: 'cancelled', cancelledAt: now() })
+    }),
+
+  listJoinRequests: (status) =>
+    transact((db) => {
+      const orgId = adminOrgId(db, 'see requests to join')
+      return db.joinRequests
+        .filter((r) => r.orgId === orgId && (status === 'all' || r.status === status))
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+        .map((r): JoinRequest => {
+          const applicant = applicantOf(db, r.userId)
+          return {
+            id: r.id,
+            orgId: r.orgId,
+            applicantName: applicant?.name ?? 'Applicant',
+            applicantEmail: applicant?.email ?? '',
+            emailVerified: true, // the demo can't send email, so sign-up counts as confirmed
+            requestedPosition: r.requestedPosition,
+            message: r.message,
+            status: r.status,
+            assignedRole: r.assignedRole,
+            reviewNote: r.reviewNote,
+            reviewedByName: db.users.find((u) => u.id === r.reviewedBy)?.name,
+            reviewedAt: r.reviewedAt,
+            createdAt: r.createdAt,
+          }
+        })
+    }),
+
+  approveJoinRequest: (requestId, role) =>
+    transact((db) => {
+      const orgId = adminOrgId(db, 'review requests to join')
+      if (role !== 'ADMIN' && role !== 'STAFF') throw new Error('Choose a role for this member.')
+      const request = findJoinRequest(db, requestId, orgId)
+      if (request.status !== 'pending') {
+        const was = { approved: 'approved', rejected: 'declined', cancelled: 'withdrawn' }[request.status]
+        throw new Error(`This request was already ${was}. Refresh to see the latest.`)
+      }
+      if (db.organizations.find((o) => o.id === orgId)?.status !== 'APPROVED') throw new Error('Your organization needs to be approved before it can add members.')
+      const identity = db.identities.find((i) => i.id === request.userId)
+      if (!identity) throw new Error('This person already has a Relay Collective role, so they can’t join through this request.')
+      const house = db.houses.find((h) => h.orgId === orgId)
+      if (!house) throw new Error('Your organization isn’t set up for staff yet. Contact Relay Collective.')
+      finishOnboarding(db, identity, { id: identity.id, name: identity.name, email: identity.email, phone: '', role: 'PARTNER', orgId, houseId: house.id, orgRole: role })
+      Object.assign(request, { status: 'approved', cancelledAt: undefined, assignedRole: role, reviewedBy: readSession(), reviewedAt: now() })
+    }),
+
+  rejectJoinRequest: (requestId, note) =>
+    transact((db) => {
+      const orgId = adminOrgId(db, 'review requests to join')
+      const text = optionalText(note)
+      if (text && text.length > MAX_REVIEW_NOTE) throw new Error('Keep the note under 500 characters.')
+      const request = findJoinRequest(db, requestId, orgId)
+      if (request.status !== 'pending') throw new Error('This request was already reviewed or withdrawn. Refresh to see the latest.')
+      Object.assign(request, { status: 'rejected', reviewNote: text, reviewedBy: readSession(), reviewedAt: now() })
+    }),
+
+  listOrganizationMembers: (includeFormer = false) =>
+    transact((db) => {
+      const me = signedInUser(db)
+      if (!me || !isActiveMember(db, me)) throw new Error('Only members of a partner organization can see its team.')
+      const admin = me.orgRole === 'ADMIN'
+      return db.users
+        .filter((u) => u.role === 'PARTNER' && u.orgId === me.orgId)
+        .map((u): OrganizationMember => {
+          const removal = db.removals.find((r) => r.userId === u.id)
+          const status = removal ? 'removed' : isActiveMember(db, u) ? 'active' : 'closed'
+          return {
+            id: u.id,
+            name: u.name,
+            email: admin ? u.email : undefined,
+            role: u.orgRole ?? 'STAFF',
+            status,
+            joinedAt: db.applications.find((a) => a.submittedBy === u.id)?.submittedAt ?? db.joinRequests.find((r) => r.userId === u.id && r.status === 'approved')?.reviewedAt ?? '2026-09-01T16:00:00.000Z',
+            removedAt: removal?.at,
+            isYou: u.id === me.id,
+          }
+        })
+        .filter((m) => includeFormer || m.status === 'active')
+        .sort((a, b) => a.status.localeCompare(b.status) || a.name.localeCompare(b.name))
+    }),
+
+  setMemberRole: (profileId, role) =>
+    transact((db) => {
+      const orgId = adminOrgId(db, 'change roles')
+      if (role !== 'ADMIN' && role !== 'STAFF') throw new Error('Choose a role.')
+      const member = activeMemberOf(db, profileId, orgId)
+      if (member.id === readSession()) throw new Error('You can’t change your own role. Ask another administrator.')
+      if (member.orgRole === role) return
+      if (role === 'STAFF') keepAnAdmin(db, member)
+      member.orgRole = role as OrgRole
+    }),
+
+  removeMember: (profileId) =>
+    transact((db) => {
+      const orgId = adminOrgId(db, 'remove members')
+      const member = activeMemberOf(db, profileId, orgId)
+      const by = readSession()
+      if (member.id === by) throw new Error('You can’t remove yourself. Ask another administrator.')
+      keepAnAdmin(db, member)
+      // The login moves to a fresh identity with no role; the profile stays on the organization's history
+      const identity: Identity = { id: newId('u'), email: member.email ?? '', name: member.name }
+      db.identities.push(identity)
+      for (const c of db.credentials) if (c.userId === member.id) c.userId = identity.id
+      db.removals.push({ userId: member.id, at: now(), by, identityId: identity.id })
+    }),
+
+  setOrganizationVisibility: (discoverability, description) =>
+    transact((db) => {
+      const orgId = adminOrgId(db, 'change its visibility')
+      if (discoverability !== 'discoverable' && discoverability !== 'invitation_only') throw new Error('Choose who can find your organization.')
+      const text = optionalText(description)
+      if (text && text.length > MAX_DIRECTORY_DESCRIPTION) throw new Error('Keep the description under 280 characters.')
+      const org = findOrThrow(db.organizations, orgId, 'Organization')
+      if (discoverability === 'discoverable' && org.status !== 'APPROVED') {
+        throw new Error('Your organization can be found in search once Relay Collective approves it.')
+      }
+      Object.assign(org, { discoverability, directoryDescription: text })
     }),
 
   listUsers: () => transact((db) => db.users),
@@ -635,6 +912,7 @@ export const mockService: DataService = {
         role: isPartner ? 'PARTNER' : 'ORG_ADMIN',
         orgId: created.id,
         houseId: house?.id,
+        orgRole: isPartner ? 'ADMIN' : undefined,
       }
       addLogin(db, user.id, account.email, account.password)
       db.organizations.push(created)
@@ -736,6 +1014,8 @@ export const mockService: DataService = {
       if (user.role !== 'DRIVER' && user.role !== 'PARTNER') {
         throw new Error("This account can't be closed from here.")
       }
+
+      if (user.role === 'PARTNER') keepAnAdmin(db, user)
 
       if (user.role === 'DRIVER') {
         const driver = db.drivers.find((d) => d.userId === userId)

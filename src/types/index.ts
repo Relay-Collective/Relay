@@ -15,6 +15,9 @@ export interface Organization {
   contactPhone: string
   bookingNotifications?: string // phone or email that hears about new bookings
   status: VerificationStatus
+  // Whether people can find it in search and ask to join. Hidden (invitation only) unless its admins choose otherwise.
+  discoverability?: OrgDiscoverability
+  directoryDescription?: string // what search shows about it, written by its admins
   createdAt?: string // when it registered
   reviewedAt?: string // when a platform admin last approved or rejected it
   reviewedBy?: string // User id of that admin
@@ -31,9 +34,15 @@ export interface House {
   phone: string
 }
 
-// PARTNER: a partner organization's shared account. Books rides from its location and manages its places.
+// PARTNER: a member of a partner organization. Books rides from its location and manages its places.
 // ORG_ADMIN: a transport provider's admin.
 export type UserRole = 'PLATFORM_ADMIN' | 'ORG_ADMIN' | 'PARTNER' | 'DRIVER'
+
+// A partner organization member's role within it. ADMIN manages the team, its visibility and invitations;
+// STAFF uses the organization's services. Neither is a Relay Collective platform role.
+export type OrgRole = 'ADMIN' | 'STAFF'
+
+export type OrgDiscoverability = 'discoverable' | 'invitation_only'
 
 export interface User {
   id: string
@@ -43,6 +52,7 @@ export interface User {
   role: UserRole
   orgId?: string
   houseId?: string // set on a partner organization account: its pickup location
+  orgRole?: OrgRole // set on a partner organization member
 }
 
 export type DriverBackground = 'TAXI' | 'RIDESHARE' | 'ORG_DRIVER' | 'INDEPENDENT'
@@ -292,6 +302,63 @@ export interface InvitationPreview {
   email?: string
   expiresAt?: string
   emailHint?: string // WRONG_ACCOUNT only, e.g. "j•••@example.org"
+}
+
+// ---- Organization discovery and membership
+
+// What search shows about an organization that chose to be found. Nothing else about it is public.
+export interface OrganizationDirectoryEntry {
+  id: string
+  name: string
+  city?: string
+  description?: string
+}
+
+export type JoinRequestStatus = 'pending' | 'approved' | 'rejected' | 'cancelled'
+
+// The applicant's view of their own request. Never includes the reviewers' notes.
+export interface MyJoinRequest {
+  id: string
+  orgId: string
+  orgName: string
+  orgCity?: string
+  status: JoinRequestStatus
+  requestedPosition?: string
+  message?: string
+  createdAt: string
+  reviewedAt?: string
+  cancelledAt?: string
+}
+
+// An organization administrator's view of a request to join their organization
+export interface JoinRequest {
+  id: string
+  orgId: string
+  applicantName: string
+  applicantEmail: string
+  emailVerified: boolean
+  requestedPosition?: string // descriptive only
+  message?: string
+  status: JoinRequestStatus
+  assignedRole?: OrgRole // once approved
+  reviewNote?: string // administrators only
+  reviewedByName?: string
+  reviewedAt?: string
+  createdAt: string
+}
+
+// active: can sign in to the workspace. removed: an administrator removed them. closed: they closed their account.
+export type MembershipStatus = 'active' | 'removed' | 'closed'
+
+export interface OrganizationMember {
+  id: string // profile id
+  name: string
+  email?: string // administrators only
+  role: OrgRole
+  status: MembershipStatus
+  joinedAt: string
+  removedAt?: string
+  isYou: boolean
 }
 
 // ---- Feedback & Suggestions (product feedback, not feedback on one ride)

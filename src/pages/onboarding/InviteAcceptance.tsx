@@ -9,15 +9,16 @@ import { authLead, authTitle, eyebrow } from '../../components/auth/styles'
 import { ghostButton, primaryButton, secondaryButton } from '../../components/ui'
 import { useApp } from '../../hooks/useApp'
 import { initials } from '../../logic/initials'
+import { ORG_ROLES } from '../../logic/membership'
 import { onboardingPaths } from '../../onboarding/routing'
 import { dataService } from '../../services'
 import type { InvitationPreview } from '../../types'
 import { paths } from '../../workspace/paths'
 import { FullPageLoader } from '../auth/FullPageLoader'
 
-// What a staff member can do in their organization's workspace. The same for everyone invited:
-// there is no higher organization role, so an invitation can't grant more than its sender has.
-const STAFF_CAN = ['Request and track rides for the people you serve', 'Manage your organization’s saved destinations', 'Invite other colleagues']
+// What a staff member can do in their organization's workspace. Everyone invited joins as staff, the
+// least-privileged organization role; an administrator can change it afterwards from Team.
+const STAFF_CAN = ORG_ROLES.find((r) => r.value === 'STAFF')!.can
 
 const DATE = new Intl.DateTimeFormat(undefined, { month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' })
 

@@ -8,6 +8,8 @@ import type {
   House,
   Identity,
   Invitation,
+  JoinRequestStatus,
+  OrgRole,
   Organization,
   OrganizationApplication,
   Ride,
@@ -55,6 +57,26 @@ export interface Database {
   applications: OrganizationApplication[]
   invitations: (Invitation & { token: string })[] // demo only: the real backend keeps a hash, never the token
   productFeedback: ProductFeedbackStore // Feedback & Suggestions; screenshots themselves live in demoFiles
+  joinRequests: StoredJoinRequest[]
+  // Members an administrator removed. Their profile stays on past rides; their login moved to a new identity.
+  removals: { userId: string; at: string; by: string; identityId: string }[]
+}
+
+// A request to join an organization, as the demo backend keeps it. userId is the applicant's identity id,
+// which becomes their profile id if they're approved (as with every onboarding path in the demo).
+export interface StoredJoinRequest {
+  id: string
+  orgId: string
+  userId: string
+  requestedPosition?: string
+  message?: string
+  status: JoinRequestStatus
+  assignedRole?: OrgRole
+  reviewNote?: string
+  reviewedBy?: string
+  reviewedAt?: string
+  cancelledAt?: string
+  createdAt: string
 }
 
 // History for rides that don't have any yet (the seed, or demo data saved before the log existed),
@@ -118,16 +140,19 @@ function partner(
   address: string,
   city: string,
   status: Organization['status'] = 'APPROVED',
+  directoryDescription?: string,
 ): { org: Organization; house: House } {
+  // Approved demo partners can be found in organization search; the pending one can't be yet
+  const discoverability = status === 'APPROVED' ? 'discoverable' : 'invitation_only'
   return {
-    org: { id: `org-${id}`, name, type: 'PARTNER_ORG', contactName: name, contactPhone: phone, status },
+    org: { id: `org-${id}`, name, type: 'PARTNER_ORG', contactName: name, contactPhone: phone, status, discoverability, directoryDescription },
     house: { id: `house-${id}`, orgId: `org-${id}`, name, address, city, phone },
   }
 }
 
 const partners = [
-  partner('belkin', 'Belkin House', '604-555-0120', BELKIN_ADDRESS, 'Vancouver'),
-  partner('richmond', 'Richmond House', '604-555-0121', '12040 Horseshoe Way', 'Richmond'),
+  partner('belkin', 'Belkin House', '604-555-0120', BELKIN_ADDRESS, 'Vancouver', 'APPROVED', 'Transitional housing and support for women and families.'),
+  partner('richmond', 'Richmond House', '604-555-0121', '12040 Horseshoe Way', 'Richmond', 'APPROVED', 'Emergency shelter and meals in Richmond.'),
   partner('grace', 'Grace Mansion', '604-555-0122', '596 E Hastings St', 'Vancouver'),
   partner('example', 'Example Shelter Society (Fictional)', '604-555-0130', 'Address to confirm', 'Vancouver', 'PENDING'),
 ]
@@ -144,9 +169,9 @@ const FREQUENT_PLACES: Record<string, string[]> = {
 
 const demoUsers: User[] = [
   { id: 'u-admin', name: 'Relay Collective Admin', email: ADMIN_EMAIL, phone: '604-555-0100', role: 'PLATFORM_ADMIN' },
-  { id: 'u-belkin', name: 'Belkin House', email: 'belkin@careride.demo', phone: '604-555-0120', role: 'PARTNER', orgId: 'org-belkin', houseId: 'house-belkin' },
-  { id: 'u-richmond', name: 'Richmond House', email: 'richmond@careride.demo', phone: '604-555-0121', role: 'PARTNER', orgId: 'org-richmond', houseId: 'house-richmond' },
-  { id: 'u-grace', name: 'Grace Mansion', email: 'grace@careride.demo', phone: '604-555-0122', role: 'PARTNER', orgId: 'org-grace', houseId: 'house-grace' },
+  { id: 'u-belkin', name: 'Belkin House', email: 'belkin@careride.demo', phone: '604-555-0120', role: 'PARTNER', orgId: 'org-belkin', houseId: 'house-belkin', orgRole: 'ADMIN' },
+  { id: 'u-richmond', name: 'Richmond House', email: 'richmond@careride.demo', phone: '604-555-0121', role: 'PARTNER', orgId: 'org-richmond', houseId: 'house-richmond', orgRole: 'ADMIN' },
+  { id: 'u-grace', name: 'Grace Mansion', email: 'grace@careride.demo', phone: '604-555-0122', role: 'PARTNER', orgId: 'org-grace', houseId: 'house-grace', orgRole: 'ADMIN' },
   { id: 'u-vanshare-admin', name: 'Community Van Share Admin', email: 'vanshare@careride.demo', phone: '604-555-0110', role: 'ORG_ADMIN', orgId: 'org-vanshare' },
   { id: 'u-frank', name: 'Frank', email: 'frank@careride.demo', phone: '604-555-0103', role: 'DRIVER' },
   { id: 'u-olive', name: 'Maya', email: 'maya@careride.demo', phone: '604-555-0104', role: 'DRIVER' },
@@ -154,7 +179,7 @@ const demoUsers: User[] = [
   { id: 'u-jordan', name: 'Jordan', email: 'jordan@careride.demo', phone: '604-555-0106', role: 'DRIVER' },
 ]
 
-const seedBase: Omit<Database, 'events' | 'feedback' | 'identities' | 'applications' | 'invitations' | 'productFeedback'> = {
+const seedBase: Omit<Database, 'events' | 'feedback' | 'identities' | 'applications' | 'invitations' | 'productFeedback' | 'joinRequests' | 'removals'> = {
   credentials: demoUsers.map((u) => ({ email: u.email!, userId: u.id, password: demoPasswordFor(u.email!) })),
   users: demoUsers,
   organizations: [
@@ -262,4 +287,6 @@ export const seed: Database = {
   invitations: [],
   // Starts empty: the admin console shows real submissions only
   productFeedback: emptyFeedbackStore(),
+  joinRequests: [],
+  removals: [],
 }

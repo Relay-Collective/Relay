@@ -11,7 +11,7 @@ import type { SidebarSlotProps } from '../shell/SidebarShell'
 
 // The workspace's navigation. One account belongs to one organization, so there is nothing to switch to.
 export function WorkspaceSidebar(props: SidebarSlotProps) {
-  const { org, rides } = useWorkspace()
+  const { org, rides, pendingJoinRequests } = useWorkspace()
   const { openFeedback, unseenCount } = useFeedback()
   const now = useNow()
   const attention = rides.data ? requestMetrics(rides.data, new Date(now)).attention : 0
@@ -32,6 +32,7 @@ export function WorkspaceSidebar(props: SidebarSlotProps) {
       badges={{
         attention: { count: attention, label: 'need attention' },
         feedback: { count: unseenCount, label: 'with new updates', tone: 'waiting' },
+        joinRequests: { count: pendingJoinRequests ?? 0, label: 'waiting to join', tone: 'waiting' },
       }}
     />
   )

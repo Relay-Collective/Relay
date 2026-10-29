@@ -1,6 +1,7 @@
 import { FunctionsHttpError, type AuthError, type PostgrestError, type User as AuthUser } from '@supabase/supabase-js'
 import { MIN_PASSWORD_LENGTH } from '../constants'
 import { faresSavedFor } from '../logic/estimateFare'
+import { SEARCH_RESULT_LIMIT, canSearch, normalizeSearch, optionalText } from '../logic/membership'
 import { isNative } from '../native/platform'
 import type {
   AdminFeedbackDetail,
@@ -19,7 +20,13 @@ import type {
   Identity,
   Invitation,
   InvitationPreview,
+  JoinRequest,
+  MyJoinRequest,
   OfferStatus,
+  OrgDiscoverability,
+  OrgRole,
+  OrganizationDirectoryEntry,
+  OrganizationMember,
   OrganizationApplication,
   Organization,
   OrgType,
@@ -62,8 +69,9 @@ import { getSupabase } from './supabaseClient'
 
 // profiles.email is not readable from the browser (see the access-policies migration),
 // so always list columns instead of select('*').
-const PROFILE_COLUMNS = 'id, name, phone, role, org_id, house_id'
-const ORG_COLUMNS = 'id, name, type, contact_name, contact_phone, booking_notifications, status, created_at, reviewed_at, reviewed_by'
+const PROFILE_COLUMNS = 'id, name, phone, role, org_id, house_id, org_role'
+const ORG_COLUMNS =
+  'id, name, type, contact_name, contact_phone, booking_notifications, status, discoverability, directory_description, created_at, reviewed_at, reviewed_by'
 const HOUSE_COLUMNS = 'id, org_id, name, address, city, phone'
 const DRIVER_COLUMNS =
   'id, profile_id, org_id, background, vehicle, wheelchair_accessible, seats, service_cities, request_hours, status, created_at, reviewed_at, reviewed_by'
@@ -91,6 +99,7 @@ interface ProfileRow {
   role: UserRole
   org_id: string | null
   house_id: string | null
+  org_role?: OrgRole | null
 }
 
 interface OrgRow {
@@ -101,6 +110,8 @@ interface OrgRow {
   contact_phone: string
   booking_notifications: string | null
   status: VerificationStatus
+  discoverability: OrgDiscoverability
+  directory_description: string | null
   created_at: string
   reviewed_at: string | null
   reviewed_by: string | null
@@ -234,6 +245,61 @@ interface InvitationRow {
   revoked_at: string | null
 }
 
+// What the membership functions return (jsonb): camelCase already, nulls for missing values
+type Nullable<T> = { [K in keyof T]-?: undefined extends T[K] ? Exclude<T[K], undefined> | null : T[K] }
+
+function toMyJoinRequest(row: Nullable<MyJoinRequest>): MyJoinRequest {
+  return {
+    id: row.id,
+    orgId: row.orgId,
+    orgName: row.orgName,
+    orgCity: row.orgCity ?? undefined,
+    status: row.status,
+    requestedPosition: row.requestedPosition ?? undefined,
+    message: row.message ?? undefined,
+    createdAt: iso(row.createdAt),
+    reviewedAt: iso(row.reviewedAt),
+    cancelledAt: iso(row.cancelledAt),
+  }
+}
+
+function toJoinRequest(row: Nullable<JoinRequest>): JoinRequest {
+  return {
+    id: row.id,
+    orgId: row.orgId,
+    applicantName: row.applicantName,
+    applicantEmail: row.applicantEmail,
+    emailVerified: row.emailVerified,
+    requestedPosition: row.requestedPosition ?? undefined,
+    message: row.message ?? undefined,
+    status: row.status,
+    assignedRole: row.assignedRole ?? undefined,
+    reviewNote: row.reviewNote ?? undefined,
+    reviewedByName: row.reviewedByName ?? undefined,
+    reviewedAt: iso(row.reviewedAt),
+    createdAt: iso(row.createdAt),
+  }
+}
+
+function toMember(row: Nullable<OrganizationMember>): OrganizationMember {
+  return {
+    id: row.id,
+    name: row.name,
+    email: row.email ?? undefined,
+    role: row.role,
+    status: row.status,
+    joinedAt: iso(row.joinedAt),
+    removedAt: iso(row.removedAt),
+    isYou: row.isYou,
+  }
+}
+
+async function readMyJoinRequests(): Promise<MyJoinRequest[]> {
+  const { data, error } = await getSupabase().rpc('my_join_requests')
+  if (error) fail(error, "We couldn't load your request.")
+  return (data as Nullable<MyJoinRequest>[]).map(toMyJoinRequest)
+}
+
 // Postgres returns "2026-10-03 12:00:00+00"-style times; the app compares ISO strings like the mock's.
 function iso(value: string): string
 function iso(value: string | null): string | undefined
@@ -250,6 +316,7 @@ function toUser(row: ProfileRow, email?: string): User {
     role: row.role,
     orgId: row.org_id ?? undefined,
     houseId: row.house_id ?? undefined,
+    orgRole: row.org_role ?? undefined,
   }
 }
 
@@ -262,6 +329,8 @@ function toOrganization(row: OrgRow): Organization {
     contactPhone: row.contact_phone,
     bookingNotifications: row.booking_notifications ?? undefined,
     status: row.status,
+    discoverability: row.discoverability,
+    directoryDescription: row.directory_description ?? undefined,
     createdAt: iso(row.created_at),
     reviewedAt: iso(row.reviewed_at),
     reviewedBy: row.reviewed_by ?? undefined,
@@ -728,7 +797,7 @@ function rideDetails(ride: Partial<Ride>) {
 }
 
 // Tables whose changes should refresh open screens. Realtime only sends rows this person may read.
-const LIVE_TABLES = ['rides', 'ride_offers', 'organizations', 'drivers', 'destinations', 'profiles']
+const LIVE_TABLES = ['rides', 'ride_offers', 'organizations', 'drivers', 'destinations', 'profiles', 'organization_join_requests']
 
 // The website that email links (confirm, reset password) open. On the website that's wherever the person is,
 // so localhost and the live site both work. The Android app's own address is https://localhost, which a
@@ -942,6 +1011,84 @@ export const supabaseService: DataService = {
     const { error } = await getSupabase().rpc('accept_invitation', { p_token: token })
     if (error) fail(error, "We couldn't accept the invitation.")
     return requireUser(await currentAuthUser())
+  },
+
+  async searchOrganizations(query) {
+    const q = normalizeSearch(query)
+    if (!canSearch(q)) return []
+    const { data, error } = await getSupabase().rpc('search_organizations', { p_query: q, p_limit: SEARCH_RESULT_LIMIT })
+    if (error) fail(error, "We couldn't search organizations.")
+    return (data as Nullable<OrganizationDirectoryEntry>[]).map((o) => ({
+      id: o.id,
+      name: o.name,
+      city: o.city ?? undefined,
+      description: o.description ?? undefined,
+    }))
+  },
+
+  async submitJoinRequest({ orgId, requestedPosition, message }) {
+    const { data, error } = await getSupabase().rpc('submit_join_request', {
+      p_org_id: orgId,
+      p_position: optionalText(requestedPosition) ?? null,
+      p_message: optionalText(message) ?? null,
+    })
+    if (error) {
+      if (error.code === '23514') throw new Error('Please check your request and try again.')
+      fail(error, "We couldn't send your request.")
+    }
+    const sent = (await readMyJoinRequests()).find((r) => r.id === data)
+    if (!sent) throw new Error('Your request was sent, but we couldn’t load it. Please refresh the page.')
+    return sent
+  },
+
+  listMyJoinRequests: readMyJoinRequests,
+
+  async cancelJoinRequest(requestId) {
+    const { error } = await getSupabase().rpc('cancel_join_request', { p_request_id: requestId })
+    if (error) fail(error, "We couldn't withdraw your request.")
+  },
+
+  async listJoinRequests(status) {
+    const { data, error } = await getSupabase().rpc('list_join_requests', { p_status: status })
+    if (error) fail(error, "We couldn't load requests to join.")
+    return (data as Nullable<JoinRequest>[]).map(toJoinRequest)
+  },
+
+  async approveJoinRequest(requestId, role) {
+    const { error } = await getSupabase().rpc('approve_join_request', { p_request_id: requestId, p_role: role })
+    if (error) fail(error, "We couldn't approve this request.")
+  },
+
+  async rejectJoinRequest(requestId, note) {
+    const { error } = await getSupabase().rpc('reject_join_request', { p_request_id: requestId, p_note: optionalText(note) ?? null })
+    if (error) fail(error, "We couldn't decline this request.")
+  },
+
+  async listOrganizationMembers(includeFormer = false) {
+    const { data, error } = await getSupabase().rpc('list_organization_members', { p_include_former: includeFormer })
+    if (error) fail(error, "We couldn't load your team.")
+    return (data as Nullable<OrganizationMember>[]).map(toMember)
+  },
+
+  async setMemberRole(profileId, role) {
+    const { error } = await getSupabase().rpc('set_member_role', { p_profile_id: profileId, p_role: role })
+    if (error) fail(error, "We couldn't change this member's role.")
+  },
+
+  async removeMember(profileId) {
+    const { error } = await getSupabase().rpc('remove_member', { p_profile_id: profileId })
+    if (error) fail(error, "We couldn't remove this member.")
+  },
+
+  async setOrganizationVisibility(discoverability, description) {
+    const { error } = await getSupabase().rpc('set_organization_visibility', {
+      p_discoverability: discoverability,
+      p_description: optionalText(description) ?? null,
+    })
+    if (error) {
+      if (error.code === '23514') throw new Error('Please check the description and try again.')
+      fail(error, "We couldn't save your organization's visibility.")
+    }
   },
 
   // Only the profiles this caller may see (access rules decide). Emails are never included.

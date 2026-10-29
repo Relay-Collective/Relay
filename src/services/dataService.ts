@@ -13,8 +13,15 @@ import type {
   House,
   Identity,
   Impact,
+  OrgDiscoverability,
+  OrgRole,
+  OrganizationDirectoryEntry,
+  OrganizationMember,
   Invitation,
   InvitationPreview,
+  JoinRequest,
+  JoinRequestStatus,
+  MyJoinRequest,
   Organization,
   OrganizationApplication,
   ProductFeedback,
@@ -60,6 +67,18 @@ export interface CreatedInvitation {
   invitation: Invitation
   token: string
 }
+// What someone asking to join tells the organization. Descriptive only: an administrator picks the role.
+export interface NewJoinRequest {
+  orgId: string
+  requestedPosition?: string
+  message?: string
+}
+
+export const MAX_JOIN_MESSAGE = 1000
+export const MAX_JOIN_POSITION = 120
+export const MAX_DIRECTORY_DESCRIPTION = 280
+export const MAX_REVIEW_NOTE = 500
+
 // What an admin's password reset produced. The demo sets a password to share; the real backend emails a reset link.
 export type PasswordReset = { kind: 'NEW_PASSWORD'; email: string; password: string } | { kind: 'EMAIL_SENT'; email: string }
 export type NewDriverUser = Pick<User, 'name' | 'phone'>
@@ -187,6 +206,26 @@ export interface DataService {
   revokeInvitation(invitationId: string): Promise<void>
   previewInvitation(token: string): Promise<InvitationPreview> // signed-in only
   acceptInvitation(token: string): Promise<User>
+
+  // Organization discovery and join requests. Search returns only approved organizations that chose to be
+  // found, a few at a time; fewer than two characters returns nothing.
+  searchOrganizations(query: string): Promise<OrganizationDirectoryEntry[]>
+  // For a signed-in identity without a role. Grants nothing: the organization's administrators decide.
+  // Safe to repeat: a retry returns the pending request instead of creating another.
+  submitJoinRequest(request: NewJoinRequest): Promise<MyJoinRequest>
+  listMyJoinRequests(): Promise<MyJoinRequest[]> // newest first
+  cancelJoinRequest(requestId: string): Promise<void> // the applicant's own pending request only
+
+  // Team management. Organization administrators only, for their own organization (checked by the backend).
+  listJoinRequests(status: JoinRequestStatus | 'all'): Promise<JoinRequest[]>
+  // Creates the membership and approves the request together; the role is the administrator's choice
+  approveJoinRequest(requestId: string, role: OrgRole): Promise<void>
+  rejectJoinRequest(requestId: string, note?: string): Promise<void>
+  // Any member sees names and roles; only administrators see emails. Former members only when asked.
+  listOrganizationMembers(includeFormer?: boolean): Promise<OrganizationMember[]>
+  setMemberRole(profileId: string, role: OrgRole): Promise<void> // never your own; never the last admin
+  removeMember(profileId: string): Promise<void> // ends their access; their login and history stay
+  setOrganizationVisibility(discoverability: OrgDiscoverability, description?: string): Promise<void>
 
   // Accounts
   listUsers(): Promise<User[]>

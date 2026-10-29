@@ -8,6 +8,8 @@ export const paths = {
   requests: `${ROOT}/requests`,
   services: `${ROOT}/services`,
   organization: `${ROOT}/organization`,
+  team: `${ROOT}/team`,
+  teamTab: (tab: 'members' | 'requests' | 'invitations') => `${ROOT}/team?tab=${tab}`,
   help: `${ROOT}/help`,
   feedback: `${ROOT}/feedback`,
   feedbackItem: (id: string) => `${ROOT}/feedback/${encodeURIComponent(id)}`,

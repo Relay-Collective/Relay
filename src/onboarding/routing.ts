@@ -5,6 +5,8 @@ export const onboardingPaths = {
   start: '/onboarding',
   organization: '/onboarding/organization',
   provider: '/onboarding/provider',
+  join: '/onboarding/join', // find an organization and ask to join it
+  joinStatus: '/onboarding/join/status', // where that request stands
   application: '/application', // an organization's review status
   invite: (token: string) => `/invite/${encodeURIComponent(token)}`,
 }

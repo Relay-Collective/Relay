@@ -9,6 +9,17 @@ export interface Release {
 
 export const RELEASES: Release[] = [
   {
+    version: '1.5.0',
+    date: '2026-10-29',
+    changes: [
+      'Joining an organization no longer needs an invitation link: search for your organization, ask to join, and follow your request until an administrator decides. Invitation links still work too.',
+      'Organizations have a new Team page under Organization, with Members, Join Requests and Invitations. New requests show as a count beside Team.',
+      'Organization members now have a role: administrators manage the team, staff use the organization’s services. Everyone who could manage the team before is an administrator, and anyone invited joins as staff.',
+      'Administrators approve or decline requests and pick each new member’s role, change roles, and remove people. Removing someone ends their access but keeps their sign-in and your ride history. An organization always keeps at least one administrator.',
+      'Choose whether people can find your organization in search, and what search says about it, under Organization profile > Organization Visibility. Organizations start as invitation only.',
+    ],
+  },
+  {
     version: '1.4.0',
     date: '2026-10-28',
     changes: [

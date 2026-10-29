@@ -189,10 +189,10 @@ test('invitations: one use, one email, and withdrawn or expired links fail safel
   await assert.rejects(mockService.acceptInvitation(third.token), /expired/)
 })
 
-test('only partner staff of an approved organization can invite, and only into their own organization', async () => {
+test('only administrators of an approved organization can invite, and only into their own organization', async () => {
   resetDemoData()
   await mockService.signIn('maya@careride.demo', PASSWORD) // a driver
-  await assert.rejects(mockService.createInvitation('x@example.org'), /Only staff of a partner organization/)
+  await assert.rejects(mockService.createInvitation('x@example.org'), /Only your organization's administrators/)
 
   // Another organization can't withdraw Belkin's invitation
   await mockService.signIn('belkin@careride.demo', PASSWORD)
