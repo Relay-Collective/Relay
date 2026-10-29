@@ -102,6 +102,8 @@ Ride rules live in two places that must stay in step: [`src/logic/dispatch.ts`](
 
 **Organization membership.** People can search organizations that chose to be found and ask to join; organization administrators review requests, pick roles (Administrator or Staff), manage members, and set visibility under **Organization → Team** and **Organization profile**. Schema, access rules, approval, and limitations are in [ORGANIZATION_MEMBERSHIP.md](ORGANIZATION_MEMBERSHIP.md).
 
+**Permanent account deletion.** Platform admins delete an account for good from **Users → (person) → Danger Zone**: a tracked, retryable job that erases the person's login, files and personal records while shared records stay, anonymized. Data decisions, safeguards, recovery and rollout are in [ACCOUNT_DELETION.md](ACCOUNT_DELETION.md).
+
 **Feedback & Suggestions.** Anyone signed in can send product feedback from the sidebar, the account menu, Help, or What's New, and follow it on My feedback. Platform admins manage it under Operations → Feedback. Schema, access rules, storage, and limitations are in [FEEDBACK.md](FEEDBACK.md).
 
 Start with [the service contract](../src/services/dataService.ts), [driver matching](../src/logic/matchDrivers.ts), and [dispatch rules](../src/logic/dispatch.ts).
@@ -114,7 +116,7 @@ Start with [the service contract](../src/services/dataService.ts), [driver match
 | `npm run dev` | Start the local Vite development server. |
 | `npm run lint` | Run ESLint. |
 | `npm test` | Run the ride-rule and feedback tests. |
-| `npm run test:db` | Run every migration in an embedded Postgres and test the feedback access rules against it. |
+| `npm run test:db` | Run every migration in an embedded Postgres and test the feedback, membership and account-deletion rules against it. |
 | `npm run build` | Run TypeScript project checks and create the production build in `dist/`. |
 | `npm run preview` | Serve an existing production build locally. |
 | `npm run deploy` | Zip the current `dist/` as an Android live-update bundle, then deploy with Wrangler. Run `npm run build` first. |

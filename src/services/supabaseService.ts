@@ -4,6 +4,9 @@ import { faresSavedFor } from '../logic/estimateFare'
 import { SEARCH_RESULT_LIMIT, canSearch, normalizeSearch, optionalText } from '../logic/membership'
 import { isNative } from '../native/platform'
 import type {
+  AccountDeletionJob,
+  AccountDeletionPreview,
+  AccountDeletionStatus,
   AdminFeedbackDetail,
   AdminFeedbackRow,
   Destination,
@@ -834,6 +837,36 @@ function passwordMessage(error: AuthError): string {
 // Service
 // ---------------------------------------------------------------------------
 
+// A deletion job as the database functions return it (camelCase already; missing values are null)
+type DeletionJobRow = { [K in keyof AccountDeletionJob]-?: AccountDeletionJob[K] | null }
+
+function toDeletionJob(row: DeletionJobRow): AccountDeletionJob {
+  return {
+    id: row.id!,
+    profileId: row.profileId!,
+    status: row.status!,
+    step: row.step!,
+    errorCode: row.errorCode ?? undefined,
+    attempts: row.attempts ?? 1,
+    plan: row.plan ?? [],
+    startedAt: row.startedAt!,
+    updatedAt: row.updatedAt!,
+    completedAt: row.completedAt ?? undefined,
+    failedAt: row.failedAt ?? undefined,
+  }
+}
+
+// The Edge Function answers with the job however it went, or an error written for people
+async function runAccountDeletion(body: Record<string, string>): Promise<AccountDeletionJob> {
+  const { data, error } = await getSupabase().functions.invoke('admin-delete-account', { body })
+  if (!error) return toDeletionJob((data as { job: DeletionJobRow }).job)
+  if (error instanceof FunctionsHttpError) {
+    const answer = (await error.context.json().catch(() => ({}))) as { error?: string }
+    throw new Error(answer.error ?? "We couldn't delete this account. Please try again.")
+  }
+  throw new Error(`We couldn't reach Relay Collective to delete this account. ${CONNECTION}`)
+}
+
 export const supabaseService: DataService = {
   async restoreSession() {
     const { data, error } = await getSupabase().auth.getSession()
@@ -1155,7 +1188,8 @@ export const supabaseService: DataService = {
   },
 
   async listDrivers(orgId) {
-    let query = getSupabase().from('drivers').select(DRIVER_COLUMNS).order('created_at')
+    // Erased drivers (a deleted account) stay in the table only for finished rides to point at
+    let query = getSupabase().from('drivers').select(DRIVER_COLUMNS).is('deleted_at', null).order('created_at')
     if (orgId) query = query.eq('org_id', orgId)
     const { data, error } = await query.returns<DriverRow[]>()
     if (error) fail(error, "We couldn't load drivers.")
@@ -1187,7 +1221,7 @@ export const supabaseService: DataService = {
     const supabase = getSupabase()
     const [orgs, drivers] = await Promise.all([
       supabase.from('organizations').select(ORG_COLUMNS).eq('status', 'PENDING').order('created_at').returns<OrgRow[]>(),
-      supabase.from('drivers').select(DRIVER_COLUMNS).eq('status', 'PENDING').order('created_at').returns<DriverRow[]>(),
+      supabase.from('drivers').select(DRIVER_COLUMNS).eq('status', 'PENDING').is('deleted_at', null).order('created_at').returns<DriverRow[]>(),
     ])
     if (orgs.error) fail(orgs.error, "We couldn't load organizations waiting for review.")
     if (drivers.error) fail(drivers.error, "We couldn't load drivers waiting for review.")
@@ -1216,7 +1250,10 @@ export const supabaseService: DataService = {
   async listAccounts() {
     const { data, error } = await getSupabase().rpc('admin_list_accounts')
     if (error) fail(error, "We couldn't load accounts.")
-    return (data as (ProfileRow & { email: string | null })[]).map((row) => toUser(row, row.email ?? undefined))
+    return (data as (ProfileRow & { email: string | null; deletion_status: AccountDeletionStatus | null })[]).map((row) => ({
+      ...toUser(row, row.email ?? undefined),
+      deletionStatus: row.deletion_status ?? undefined,
+    }))
   },
 
   // Emails the person a link to choose a new password. Nobody else ever sees or sets it.
@@ -1229,15 +1266,33 @@ export const supabaseService: DataService = {
     return { kind: 'EMAIL_SENT', email }
   },
 
-  // Server-side: the admin-delete-account Edge Function switches the account off, then removes the login.
-  async deleteAccount(userId) {
-    const { error } = await getSupabase().functions.invoke('admin-delete-account', { body: { profileId: userId } })
-    if (!error) return
-    if (error instanceof FunctionsHttpError) {
-      const body = (await error.context.json().catch(() => ({}))) as { error?: string }
-      throw new Error(body.error ?? "We couldn't remove this account. Please try again.")
+  // Admin only, checked in the database. Counts come from the data as it is now.
+  async previewAccountDeletion(userId) {
+    const { data, error } = await getSupabase().rpc('admin_account_deletion_preview', { p_profile_id: userId })
+    if (error) fail(error, "We couldn't check what deleting this account would do.")
+    const row = data as Omit<AccountDeletionPreview, 'job'> & { job?: DeletionJobRow | null; email?: string | null; name?: string | null; orgName?: string | null }
+    return {
+      ...row,
+      name: row.name ?? undefined,
+      email: row.email ?? undefined,
+      orgName: row.orgName ?? undefined,
+      job: row.job ? toDeletionJob(row.job) : undefined,
     }
-    throw new Error(`We couldn't remove this account. ${CONNECTION}`)
+  },
+
+  // Server-side: the admin-delete-account Edge Function checks the admin's password, then runs the job.
+  startAccountDeletion(userId, { email, password }) {
+    return runAccountDeletion({ action: 'start', profileId: userId, confirmEmail: email, password })
+  },
+
+  retryAccountDeletion(jobId, password) {
+    return runAccountDeletion({ action: 'retry', jobId, password })
+  },
+
+  async getAccountDeletion(jobId) {
+    const { data, error } = await getSupabase().rpc('admin_get_account_deletion', { p_job_id: jobId })
+    if (error) fail(error, "We couldn't check on this deletion.")
+    return data ? toDeletionJob(data as DeletionJobRow) : undefined
   },
 
   // Server-side: delete-my-account switches this driver or partner off, then removes their login.

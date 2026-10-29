@@ -49,3 +49,20 @@ export async function getDemoFile(path: string): Promise<Blob | undefined> {
     return undefined
   }
 }
+
+export async function deleteDemoFile(path: string): Promise<void> {
+  memory.delete(path)
+  try {
+    const db = await openDb()
+    if (!db) return
+    await new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(STORE, 'readwrite')
+      tx.objectStore(STORE).delete(path)
+      tx.oncomplete = () => resolve()
+      tx.onerror = () => reject(tx.error)
+    })
+    db.close()
+  } catch {
+    // Nothing kept to delete
+  }
+}

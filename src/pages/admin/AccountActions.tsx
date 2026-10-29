@@ -1,17 +1,16 @@
-import { CheckCircle2, KeyRound, Mail, Trash2 } from 'lucide-react'
+import { CheckCircle2, KeyRound, Mail } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { CopyButton } from '../../components/CopyButton'
 import { ChoiceCard } from '../../components/form/ChoiceCard'
 import { PasswordField } from '../../components/form/PasswordField'
-import { TextField } from '../../components/form/TextField'
-import { dangerButton, primaryButton, secondaryButton } from '../../components/ui'
+import { primaryButton, secondaryButton } from '../../components/ui'
 import { MIN_PASSWORD_LENGTH } from '../../constants'
 import { dataService, isDemoBackend } from '../../services'
 import type { PasswordReset } from '../../services/dataService'
-import type { User, UserRole } from '../../types'
+import type { User } from '../../types'
 
-// The account actions a platform admin can take. Each one is checked again by the backend:
-// resets go through Supabase Auth or the admin-only account list, deletes through an admin-only Edge Function.
+// Password resets a platform admin can give. Each one is checked again by the backend: resets go through
+// Supabase Auth or the admin-only account list. Permanent deletion is in AccountDangerZone.
 
 // Real accounts: email the person a reset link. Nobody but them ever sees or chooses the new password.
 function EmailResetPanel({ user, onClose }: { user: User; onClose: () => void }) {
@@ -186,68 +185,6 @@ function DemoResetPanel({ user, isSelf, onClose }: { user: User; isSelf: boolean
       <div className="grid gap-3 sm:flex sm:flex-wrap">
         <button type="submit" className={primaryButton} disabled={busy}>
           <KeyRound className="h-5 w-5" aria-hidden /> {busy ? 'Resetting…' : 'Reset password'}
-        </button>
-        <button type="button" className={secondaryButton} onClick={onClose}>
-          Cancel
-        </button>
-      </div>
-    </form>
-  )
-}
-
-// What deleting means for each type of account, shown before confirming.
-const DELETE_EFFECTS: Record<UserRole, string> = {
-  DRIVER:
-    "Their driver profile is removed. Requests waiting on them go to the next driver, and upcoming rides they accepted go back out to other drivers.",
-  PARTNER: "Staff can no longer sign in for this organization. The organization and its rides stay.",
-  ORG_ADMIN: "They can no longer manage their transport provider. The provider, its drivers, and its rides stay.",
-  PLATFORM_ADMIN: "They lose access to approvals and accounts.",
-}
-
-// Asks the admin to type the account's name before deleting, since it can't be undone.
-export function DeletePanel({ user, onDeleted, onClose }: { user: User; onDeleted: () => void; onClose: () => void }) {
-  const [typed, setTyped] = useState('')
-  const [error, setError] = useState<string>()
-  const [busy, setBusy] = useState(false)
-  const matches = typed.trim().toLowerCase() === user.name.trim().toLowerCase()
-
-  async function submit(e: FormEvent) {
-    e.preventDefault()
-    if (!matches) return
-    setBusy(true)
-    setError(undefined)
-    try {
-      await dataService.deleteAccount(user.id)
-      onDeleted()
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
-      setBusy(false)
-    }
-  }
-
-  return (
-    <form onSubmit={submit} className="mt-4 space-y-4 rounded-xl border border-red-200 bg-red-50/60 p-5">
-      <div>
-        <p className="font-bold text-red-900">Delete {user.name}'s account?</p>
-        <p className="mt-1 text-slate-700">{DELETE_EFFECTS[user.role]}</p>
-        <p className="mt-1 font-semibold text-slate-700">This can't be undone.</p>
-      </div>
-      <TextField
-        id={`confirm-delete-${user.id}`}
-        label={`Type "${user.name}" to confirm`}
-        autoComplete="off"
-        autoFocus
-        value={typed}
-        onChange={(e) => setTyped(e.target.value)}
-      />
-      {error && (
-        <p role="alert" className="rounded-xl border border-red-200 bg-white p-3 text-sm font-medium text-red-700">
-          {error}
-        </p>
-      )}
-      <div className="grid gap-3 sm:flex sm:flex-wrap">
-        <button type="submit" className={dangerButton} disabled={!matches || busy}>
-          <Trash2 className="h-5 w-5" aria-hidden /> {busy ? 'Deleting…' : 'Delete account'}
         </button>
         <button type="button" className={secondaryButton} onClick={onClose}>
           Cancel
