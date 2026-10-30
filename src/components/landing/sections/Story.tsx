@@ -140,7 +140,11 @@ export function Story() {
               ))}
             </p>
             <p className="mt-3 text-sm text-slate-500">
-              Relay Collective is an independent project. Naming the organizations we’ve worked with does not imply their endorsement.
+              Relay Collective is an independent project, built in{' '}
+              <a href="#partners" className={textLink}>
+                partnership with The Salvation Army
+              </a>
+              .
             </p>
           </Reveal>
         </div>

@@ -18,6 +18,7 @@ const COLUMNS: { title: string; links: { label: string; href: string }[] }[] = [
       { label: 'Our mission', href: '#mission' },
       { label: 'The platform', href: '#platform' },
       { label: 'Our story', href: '#story' },
+      { label: 'Our partners', href: '#partners' },
       { label: 'Principles', href: '#principles' },
       { label: 'Get involved', href: '#get-involved' },
     ],
@@ -32,7 +33,7 @@ const COLUMNS: { title: string; links: { label: string; href: string }[] }[] = [
   },
 ]
 
-// 09: who we are, every way in, and the fine print, kept factual
+// 10: who we are, every way in, and the fine print, kept factual
 export function SiteFooter() {
   return (
     <footer className="bg-white">
@@ -68,8 +69,8 @@ export function SiteFooter() {
         <div className={`${container} flex flex-col gap-3 py-8 text-sm leading-relaxed text-slate-500 lg:flex-row lg:items-start lg:justify-between lg:gap-10`}>
           <p className="shrink-0">© {new Date().getFullYear()} Relay Collective</p>
           <p className="max-w-3xl lg:text-right">
-            Born at FaithTech HACKVAN 2026 and developed in collaboration with The Salvation Army – Belkin Communities of Hope. Naming an
-            organization does not imply its endorsement. Relay Collective is not an emergency service: in an emergency, call 911.
+            Born at FaithTech HACKVAN 2026 and developed in partnership with The Salvation Army – Belkin Communities of Hope. Relay Collective
+            is an independent platform. It is not an emergency service: in an emergency, call 911.
           </p>
         </div>
       </div>

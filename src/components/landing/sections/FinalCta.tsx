@@ -13,7 +13,7 @@ const STAR_LINKS: [number, number][] = [
   [6, 7], [7, 8], [7, 10], [8, 9], [9, 10], [9, 11],
 ]
 
-// 08: the closing invitation
+// 09: the closing invitation
 export function FinalCta() {
   return (
     <section aria-labelledby="cta-heading" className="relative overflow-hidden bg-rc-navy py-28 text-white sm:py-32 lg:py-40">

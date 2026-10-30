@@ -10,7 +10,7 @@ const ACCENT: Record<Audience['accent'], { bar: string; icon: string; link: stri
   navy: { bar: 'bg-rc-navy', icon: 'bg-rc-navy/8 text-rc-navy', link: 'text-rc-navy' },
 }
 
-// 06: who Relay Collective is for, and the one thing each of them can do today
+// 07: who Relay Collective is for, and the one thing each of them can do today
 export function Audiences() {
   return (
     <section id="get-involved" aria-labelledby="audiences-heading" className={`scroll-mt-20 border-y border-rc-line bg-rc-canvas ${sectionY}`}>

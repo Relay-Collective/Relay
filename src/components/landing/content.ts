@@ -237,7 +237,7 @@ export const STORY_STEPS: { label: string; title: string; text: string }[] = [
   {
     label: 'HACKVAN 2026',
     title: 'A hackathon project',
-    text: 'Relay Collective began at FaithTech HACKVAN 2026, developed in collaboration with The Salvation Army – Belkin Communities of Hope.',
+    text: 'Relay Collective began at FaithTech HACKVAN 2026, developed in partnership with The Salvation Army – Belkin Communities of Hope.',
   },
   {
     label: 'The first barrier',
@@ -262,7 +262,34 @@ export const TEAM = [
   { name: 'Gilbert Fung', handle: 'gilbertfung' },
 ]
 
-/* ---------- 06 Audiences ---------- */
+/* ---------- 06 Partners ---------- */
+
+export const PARTNER = {
+  name: 'The Salvation Army',
+  program: 'Belkin Communities of Hope',
+  place: 'Vancouver, BC',
+  role: 'Pilot partner',
+}
+
+export const PARTNERSHIP: { title: string; text: string; icon: LucideIcon }[] = [
+  {
+    title: 'Built together from day one',
+    text: 'Relay Collective began at FaithTech HACKVAN 2026, developed in partnership with the Belkin Communities of Hope team.',
+    icon: HeartHandshake,
+  },
+  {
+    title: 'Grounded in front-line work',
+    text: 'Their staff showed us how often a missed ride means a missed hospital visit, appointment, or housing interview.',
+    icon: Route,
+  },
+  {
+    title: 'Our pilot partner',
+    text: 'They’re helping shape the shared infrastructure nonprofits can build on together, starting with transportation and growing from there.',
+    icon: Network,
+  },
+]
+
+/* ---------- 07 Audiences ---------- */
 
 export interface Audience {
   title: string
@@ -316,7 +343,7 @@ export const AUDIENCES: Audience[] = [
   },
 ]
 
-/* ---------- 07 Principles ---------- */
+/* ---------- 08 Principles ---------- */
 
 export const PRINCIPLES: { title: string; text: string; practice: string; icon: LucideIcon }[] = [
   {

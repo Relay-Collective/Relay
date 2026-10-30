@@ -4,6 +4,7 @@ import { useActiveSection } from '../../components/landing/hooks'
 import { Audiences } from '../../components/landing/sections/Audiences'
 import { FinalCta } from '../../components/landing/sections/FinalCta'
 import { Hero } from '../../components/landing/sections/Hero'
+import { Partners } from '../../components/landing/sections/Partners'
 import { Platform } from '../../components/landing/sections/Platform'
 import { Principles } from '../../components/landing/sections/Principles'
 import { Problem } from '../../components/landing/sections/Problem'
@@ -45,6 +46,7 @@ function PublicSite() {
         <Solution />
         <Platform />
         <Story />
+        <Partners />
         <Audiences />
         <Principles />
         <FinalCta />
