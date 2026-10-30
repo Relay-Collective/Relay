@@ -2,7 +2,7 @@ import { PRINCIPLES } from '../content'
 import { Reveal } from '../primitives'
 import { container, eyebrow, h2, lead, sectionY } from '../styles'
 
-// 07: the principles every product decision is checked against, each with what it looks like today
+// 08: the principles every product decision is checked against, each with what it looks like today
 export function Principles() {
   return (
     <section id="principles" aria-labelledby="principles-heading" className={`scroll-mt-20 bg-white ${sectionY}`}>

@@ -51,6 +51,12 @@ export function Hero() {
               </a>
             </span>
           </p>
+          <p className="mt-4 max-w-[34rem] animate-fade-up text-[15px] text-slate-600 [animation-delay:380ms]">
+            Built in partnership with{' '}
+            <a href="#partners" className={textLink}>
+              The Salvation Army
+            </a>
+          </p>
         </div>
 
         <div className="animate-fade-up [animation-delay:200ms] lg:col-span-5">
