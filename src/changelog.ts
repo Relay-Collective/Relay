@@ -9,7 +9,7 @@ export interface Release {
 
 export const RELEASES: Release[] = [
   {
-    version: '1.5.0',
+    version: '1.5',
     date: '2026-10-29',
     changes: [
       'Joining an organization no longer needs an invitation link: search for your organization, ask to join, and follow your request until an administrator decides. Invitation links still work too.',
@@ -20,7 +20,7 @@ export const RELEASES: Release[] = [
     ],
   },
   {
-    version: '1.4.0',
+    version: '1.4',
     date: '2026-10-28',
     changes: [
       'Send feedback from anywhere in the app: report a bug, ask for a feature, suggest an improvement, or tell us what you think. Choose Send feedback at the bottom of the sidebar or in your account menu.',
@@ -31,7 +31,7 @@ export const RELEASES: Release[] = [
     ],
   },
   {
-    version: '1.3.0',
+    version: '1.3',
     date: '2026-10-25',
     changes: [
       'A new Relay Collective look: a new logo, and a public site that shows transportation as the first of several services, with the others marked as planned.',
@@ -47,7 +47,7 @@ export const RELEASES: Release[] = [
     ],
   },
   {
-    version: '1.2.0',
+    version: '1.2',
     date: '2026-10-21',
     changes: [
       'CareRide is now Relay Collective. Same free rides, same drivers, and your account and rides carry over unchanged.',
@@ -55,7 +55,7 @@ export const RELEASES: Release[] = [
     ],
   },
   {
-    version: '1.1.0',
+    version: '1.1',
     date: '2026-10-18',
     changes: [
       'Staff can give a finished ride a thumbs up or down, with an optional note. Only Relay Collective sees it, not the driver.',
@@ -65,7 +65,7 @@ export const RELEASES: Release[] = [
     ],
   },
   {
-    version: '1.0.0',
+    version: '1.0',
     date: '2026-10-04',
     changes: [
       'Drivers add a mobile number with their account, and no longer pick taxi, rideshare or volunteer.',
