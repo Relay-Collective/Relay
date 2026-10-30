@@ -65,7 +65,7 @@ export const RELEASES: Release[] = [
     ],
   },
   {
-    version: '1.0.1',
+    version: '1.0.0',
     date: '2026-10-04',
     changes: [
       'Drivers add a mobile number with their account, and no longer pick taxi, rideshare or volunteer.',
