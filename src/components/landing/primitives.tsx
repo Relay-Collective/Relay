@@ -1,5 +1,5 @@
 import { ArrowUpRight } from 'lucide-react'
-import { useRef, type CSSProperties, type ReactNode } from 'react'
+import { useRef, type CSSProperties, type ElementType, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import logoMark from '../../assets/logo-mark.svg'
 import type { Availability } from './content'
@@ -7,19 +7,38 @@ import { useInView } from './hooks'
 import { focusRing } from './styles'
 
 // Fades its children up the first time they scroll into view. Stagger siblings with delay.
-export function Reveal({ children, delay = 0, className = '' }: { children: ReactNode; delay?: number; className?: string }) {
-  const ref = useRef<HTMLDivElement>(null)
+export function Reveal({
+  children,
+  delay = 0,
+  className = '',
+  as: Tag = 'div',
+  ...rest
+}: {
+  children: ReactNode
+  delay?: number
+  className?: string
+  as?: ElementType
+  'aria-labelledby'?: string
+  'aria-label'?: string
+}) {
+  const ref = useRef<HTMLElement>(null)
   const shown = useInView(ref)
   return (
-    <div
+    <Tag
+      {...rest}
       ref={ref}
       data-revealed={shown || undefined}
-      className={`rc-reveal ${className}`}
+      className={`rcl-reveal ${className}`}
       style={{ '--reveal-delay': `${delay}ms` } as CSSProperties}
     >
       {children}
-    </div>
+    </Tag>
   )
+}
+
+// The editorial voice: one or two words per heading in Instrument Serif italic
+export function Accent({ children, className = '' }: { children: ReactNode; className?: string }) {
+  return <em className={`font-editorial text-[1.08em] font-normal italic tracking-[-0.02em] ${className}`}>{children}</em>
 }
 
 interface SmartLinkProps {
@@ -57,23 +76,19 @@ export function ExternalIcon({ className = 'h-4 w-4' }: { className?: string }) 
   return <ArrowUpRight className={className} aria-hidden />
 }
 
-// Live work and planned work never look the same: a solid dot versus a dashed ring
-export function StatusPill({ availability, children, onDark = false }: { availability: Availability; children?: ReactNode; onDark?: boolean }) {
-  const live = availability === 'live'
-  const tone = live
-    ? onDark
-      ? 'bg-rc-teal/20 text-rc-mint'
-      : 'bg-rc-mint text-rc-teal-ink'
-    : onDark
-      ? 'border border-dashed border-white/30 text-white/75'
-      : 'border border-dashed border-slate-300 text-slate-600'
+// Live work and planned work never look the same: a solid dot, a half dot, a dashed ring
+export function StatusTag({ availability, children, onLight = false }: { availability: Availability; children: ReactNode; onLight?: boolean }) {
+  const dot =
+    availability === 'live'
+      ? 'bg-electric'
+      : availability === 'partial'
+        ? 'bg-[linear-gradient(90deg,var(--color-cantaloupe)_50%,transparent_50%)] ring-1 ring-cantaloupe'
+        : `border border-dashed ${onLight ? 'border-graphite/50' : 'border-white/60'}`
+  const tone = onLight ? 'border-graphite/15 text-graphite/80' : 'border-white/15 text-white/75'
   return (
-    <span className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold ${tone}`}>
-      <span
-        className={`h-1.5 w-1.5 rounded-full ${live ? 'bg-rc-teal' : `border ${onDark ? 'border-white/60' : 'border-slate-400'}`}`}
-        aria-hidden
-      />
-      {children ?? (live ? 'Working MVP' : 'Planned')}
+    <span className={`inline-flex items-center gap-2 whitespace-nowrap rounded-full border px-3 py-1 font-dm text-xs font-medium ${tone}`}>
+      <span className={`h-2 w-2 shrink-0 rounded-full ${dot}`} aria-hidden />
+      {children}
     </span>
   )
 }
@@ -81,10 +96,8 @@ export function StatusPill({ availability, children, onDark = false }: { availab
 export function Wordmark({ to = '/', onClick }: { to?: string; onClick?: () => void }) {
   return (
     <Link to={to} onClick={onClick} className={`inline-flex items-center gap-2.5 rounded-lg ${focusRing}`} aria-label="Relay Collective home">
-      <img src={logoMark} alt="" className="h-9 w-9" width={36} height={36} />
-      <span className="font-heading text-[19px] font-extrabold tracking-[-0.02em] whitespace-nowrap text-rc-navy">
-        Relay <span className="text-rc-blue">Collective</span>
-      </span>
+      <img src={logoMark} alt="" className="h-8 w-8" width={32} height={32} />
+      <span className="whitespace-nowrap font-grotesk text-[18px] font-semibold tracking-[-0.03em] text-white">Relay Collective</span>
     </Link>
   )
 }

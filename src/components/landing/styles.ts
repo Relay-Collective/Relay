@@ -1,29 +1,33 @@
 // Shared class names for the public website. The signed-in app uses ../ui.ts instead.
 
 // One frame for every section, header and footer, so left edges line up down the page
-export const container = 'mx-auto w-full max-w-[1240px] px-4 sm:px-6 lg:px-8'
+export const container = 'mx-auto w-full max-w-[1320px] px-4 sm:px-6 lg:px-10'
 
 export const sectionY = 'py-24 sm:py-28 lg:py-36'
 
 export const focusRing =
-  'focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-rc-blue focus-visible:ring-offset-2'
-const focusRingOnDark =
-  'focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-rc-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-rc-navy'
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-electric focus-visible:ring-offset-2 focus-visible:ring-offset-midnight'
+export const focusRingOnLight =
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-electric-ink focus-visible:ring-offset-2 focus-visible:ring-offset-porcelain'
+const focusRingOnBlue =
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-midnight focus-visible:ring-offset-2 focus-visible:ring-offset-electric'
 
-const cta = 'group inline-flex min-h-12 select-none items-center justify-center gap-2 whitespace-nowrap rounded-full px-6 text-base font-semibold transition duration-200 active:scale-[0.98]'
+const cta =
+  'group inline-flex min-h-12 select-none items-center justify-center gap-2.5 whitespace-nowrap rounded-full px-6 font-dm text-[15px] font-semibold transition-[background-color,color,border-color,transform] duration-300 ease-out active:scale-[0.98]'
 
-export const ctaPrimary = `${cta} ${focusRing} bg-rc-blue text-white shadow-[0_8px_24px_-12px_rgba(34,81,232,0.7)] hover:bg-rc-blue-dark`
-export const ctaSecondary = `${cta} ${focusRing} border border-rc-line bg-white text-rc-navy hover:border-rc-navy/30 hover:bg-rc-canvas`
-export const ctaOnDark = `${cta} ${focusRingOnDark} bg-white text-rc-navy hover:bg-rc-mint`
-export const ctaOutlineOnDark = `${cta} ${focusRingOnDark} border border-white/30 text-white hover:border-white/60 hover:bg-white/5`
+// On midnight: a white pill that warms to cantaloupe, and a hairline outline
+export const ctaPrimary = `${cta} ${focusRing} bg-white text-midnight hover:bg-cantaloupe`
+export const ctaGhost = `${cta} ${focusRing} border border-white/25 text-white hover:border-white/70 hover:bg-white/[0.04]`
 
-// Arrow that nudges forward when its link is hovered
-export const ctaArrow = 'h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5'
+// On electric blue (the closing call to action)
+export const ctaOnBlue = `${cta} ${focusRingOnBlue} bg-midnight text-white hover:bg-white hover:text-midnight`
+export const ctaGhostOnBlue = `${cta} ${focusRingOnBlue} border border-midnight/40 text-midnight hover:border-midnight hover:bg-midnight/[0.06]`
 
-export const eyebrow = 'font-heading text-xs font-bold uppercase tracking-[0.16em] text-rc-teal-ink sm:text-[13px]'
+// Arrow that slips forward when its link is hovered
+export const ctaArrow = 'h-4 w-4 transition-transform duration-300 ease-out group-hover:translate-x-1'
 
-export const h2 = 'font-heading text-[34px] font-extrabold leading-[1.08] tracking-[-0.03em] text-balance text-rc-navy sm:text-[44px] lg:text-[50px]'
+export const eyebrow = 'font-dm text-xs font-semibold uppercase tracking-[0.22em]'
 
-export const lead = 'text-[17px] leading-relaxed text-slate-600 sm:text-lg lg:text-[19px]'
-
-export const textLink = `rounded font-semibold text-rc-blue underline-offset-4 hover:underline ${focusRing}`
+// Section titles: Space Grotesk, tight, with an Instrument Serif accent set in <Accent>
+export const display = 'font-grotesk font-semibold tracking-[-0.045em] text-balance'
+export const h2 = `${display} text-[44px] leading-[0.98] sm:text-[60px] lg:text-[76px]`
