@@ -111,9 +111,9 @@ export const CAPABILITIES: Capability[] = [
 /* ---------- How it works ---------- */
 
 export const STEPS: { n: string; title: string; text: string }[] = [
-  { n: '01', title: 'Join the network', text: 'Organizations create an account and set up their workspace. Every organization and driver is reviewed first.' },
-  { n: '02', title: 'Coordinate support', text: 'Teams send requests, connect people, and see every one through, in one shared view.' },
-  { n: '03', title: 'Make an impact', text: 'Less time on calls and follow-ups. More time with the people your organization supports.' },
+  { n: '01', title: 'Join the network', text: 'Organizations establish their workspace and connect their team. Every organization and driver is reviewed first.' },
+  { n: '02', title: 'Coordinate support', text: 'Manage service requests and organize available resources, in one shared view.' },
+  { n: '03', title: 'Make an impact', text: 'Help people access services and support more effectively.' },
 ]
 
 /* ---------- Impact: what is true today, in words ---------- */

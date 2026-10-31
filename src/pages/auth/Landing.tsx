@@ -37,10 +37,10 @@ export function Landing() {
 function PublicSite() {
   const active = useActiveSection(SECTION_IDS)
   return (
-    <div className="overflow-x-clip bg-midnight font-dm text-white antialiased selection:bg-electric selection:text-midnight">
+    <div className="rcl-page overflow-x-clip bg-porcelain font-dm text-midnight antialiased">
       <a
         href="#main"
-        className="sr-only z-50 rounded-full bg-white px-5 py-3 font-semibold text-midnight focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
+        className="sr-only z-50 rounded-full bg-midnight px-5 py-3 font-semibold text-white focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
       >
         Skip to content
       </a>
