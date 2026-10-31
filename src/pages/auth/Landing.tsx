@@ -1,17 +1,22 @@
 import { Navigate } from 'react-router-dom'
+import '@fontsource/space-grotesk/latin-500.css'
+import '@fontsource/space-grotesk/latin-600.css'
+import '@fontsource/space-grotesk/latin-700.css'
+import '@fontsource/dm-sans/latin-400.css'
+import '@fontsource/dm-sans/latin-500.css'
+import '@fontsource/dm-sans/latin-600.css'
+import '@fontsource/instrument-serif/latin-400-italic.css'
 import { NAV } from '../../components/landing/content'
 import { useActiveSection } from '../../components/landing/hooks'
-import { Audiences } from '../../components/landing/sections/Audiences'
-import { FinalCta } from '../../components/landing/sections/FinalCta'
-import { Hero } from '../../components/landing/sections/Hero'
-import { Partners } from '../../components/landing/sections/Partners'
-import { Platform } from '../../components/landing/sections/Platform'
-import { Principles } from '../../components/landing/sections/Principles'
-import { Problem } from '../../components/landing/sections/Problem'
-import { SiteFooter } from '../../components/landing/sections/SiteFooter'
-import { Solution } from '../../components/landing/sections/Solution'
-import { Story } from '../../components/landing/sections/Story'
-import { SiteHeader } from '../../components/landing/SiteHeader'
+import { LandingNavbar } from '../../components/landing/LandingNavbar'
+import { HowItWorks } from '../../components/landing/sections/HowItWorks'
+import { ImpactSection } from '../../components/landing/sections/ImpactSection'
+import { LandingCTA } from '../../components/landing/sections/LandingCTA'
+import { LandingFooter } from '../../components/landing/sections/LandingFooter'
+import { LandingHero } from '../../components/landing/sections/LandingHero'
+import { PlatformCapabilities } from '../../components/landing/sections/PlatformCapabilities'
+import { PlatformIntroduction } from '../../components/landing/sections/PlatformIntroduction'
+import { ProductShowcase } from '../../components/landing/sections/ProductShowcase'
 import { useApp } from '../../hooks/useApp'
 import { HOME_FOR } from '../../logic/homeFor'
 
@@ -32,26 +37,24 @@ export function Landing() {
 function PublicSite() {
   const active = useActiveSection(SECTION_IDS)
   return (
-    <div className="overflow-x-clip bg-white font-sans text-slate-800">
+    <div className="overflow-x-clip bg-midnight font-dm text-white antialiased selection:bg-electric selection:text-midnight">
       <a
         href="#main"
-        className="sr-only z-50 rounded-full bg-rc-navy px-5 py-3 font-semibold text-white focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
+        className="sr-only z-50 rounded-full bg-white px-5 py-3 font-semibold text-midnight focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
       >
         Skip to content
       </a>
-      <SiteHeader active={active} />
+      <LandingNavbar active={active} />
       <main id="main">
-        <Hero />
-        <Problem />
-        <Solution />
-        <Platform />
-        <Story />
-        <Partners />
-        <Audiences />
-        <Principles />
-        <FinalCta />
+        <LandingHero />
+        <PlatformIntroduction />
+        <PlatformCapabilities />
+        <ProductShowcase />
+        <HowItWorks />
+        <ImpactSection />
+        <LandingCTA />
       </main>
-      <SiteFooter />
+      <LandingFooter />
     </div>
   )
 }
