@@ -250,36 +250,20 @@
     0
   );
 }
-.rcl-hc-nudge-blue,
-.rcl-hc-nudge-orange {
+.rcl-hc-nudge {
   transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
 }
-/* Hovering either form passes the baton a little further along */
-.rcl-hc:hover .rcl-hc-nudge-blue {
-  transform: translate3d(-6px, 0, 0);
+/* Hovering either ring draws orange a little further through blue */
+.rcl-hc:hover .rcl-hc-nudge {
+  transform: translate3d(10px, -6px, 0);
 }
-.rcl-hc:hover .rcl-hc-nudge-orange {
-  transform: translate3d(14px, 0, 0);
+/* Blue opens out from the corner that crops it; orange then grows from its own centre, already linked */
+.rcl-hc-blue {
+  animation: rcl-hc-open 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
 }
-.rcl-hc-plain,
-.rcl-hc-accent {
-  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.rcl-hc-accent {
-  opacity: 0;
-}
-.rcl-hc:hover .rcl-hc-plain {
-  opacity: 0;
-}
-.rcl-hc:hover .rcl-hc-accent {
-  opacity: 1;
-}
-/* The disc opens out from the corner it is anchored to; the baton is drawn out from its left end */
-.rcl-hc-disc {
-  animation: rcl-hc-disc 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
-}
-.rcl-hc-baton {
-  animation: rcl-hc-baton 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both;
+.rcl-hc-orange {
+  --from: 38% 70%;
+  animation: rcl-hc-open 1s cubic-bezier(0.16, 1, 0.3, 1) 0.55s both;
 }
 /* A short bright dash that travels along a path, like a relay being passed */
 .rcl-relay {
@@ -318,13 +302,9 @@
 @keyframes rcl-fade {
   from { opacity: 0; }
 }
-@keyframes rcl-hc-disc {
-  from { clip-path: circle(0% at 70% 78%); }
-  to { clip-path: circle(50% at 50% 50%); }
-}
-@keyframes rcl-hc-baton {
-  from { clip-path: inset(0 100% 0 0 round 999px); transform: translate3d(-24px, 0, 0); }
-  to { clip-path: inset(0 0 0 0 round 999px); transform: none; }
+@keyframes rcl-hc-open {
+  from { clip-path: circle(0% at var(--from, 100% 0%)); }
+  to { clip-path: circle(150% at var(--from, 100% 0%)); }
 }
 @keyframes rcl-relay {
   from { stroke-dashoffset: 1; }
@@ -334,22 +314,18 @@
   .rcl-enter,
   .rcl-fade,
   .rcl-relay,
-  .rcl-hc-disc,
-  .rcl-hc-baton {
+  .rcl-hc-blue,
+  .rcl-hc-orange {
     animation: none;
   }
   .rcl-relay {
     stroke-dasharray: none;
     opacity: 0;
   }
-  .rcl-hc-nudge-blue,
-  .rcl-hc-nudge-orange,
-  .rcl-hc-plain,
-  .rcl-hc-accent {
+  .rcl-hc-nudge {
     transition: none;
   }
-  .rcl-hc:hover .rcl-hc-nudge-blue,
-  .rcl-hc:hover .rcl-hc-nudge-orange {
+  .rcl-hc:hover .rcl-hc-nudge {
     transform: none;
   }
   .rcl-reveal,

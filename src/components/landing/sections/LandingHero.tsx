@@ -48,9 +48,10 @@ export function LandingHero() {
           </p>
         </div>
 
-        {/* Below the actions on phones and tablets; from lg, the right half of the hero out to the screen's edge.
-            --d is the disc's diameter: the full width on a phone, the box's size on desktop. */}
-        <HeroAccentComposition className="relative -mx-4 mt-10 block h-[calc(min(100vw-16px,540px)*0.82+24px)] overflow-hidden [--d:min(100vw-16px,540px)] sm:-mx-6 lg:absolute lg:inset-y-0 lg:left-1/2 lg:right-[calc(50%-50vw)] lg:mx-0 lg:mt-0 lg:h-auto lg:[--d:min(88cqw,95cqh)] xl:[--d:min(105cqw,95cqh)] lg:overflow-visible lg:[clip-path:inset(0_0_0_-50vw)] lg:[container-type:size]" />
+        {/* Below the actions on phones and tablets, cropped only by the right edge. From lg, the right half of the hero
+            out to the screen's edge, pinned to its top-right corner so the corner crops it. --d is the drawing's side;
+            --ct and --cr push the drawing past the box's top and right edges. */}
+        <HeroAccentComposition className="relative -mx-4 mt-6 block h-[calc(min(100vw,560px)*1.06)] overflow-hidden [--cr:calc(var(--d)*-0.05)] [--ct:calc(var(--d)*0.12)] [--d:min(100vw,560px)] sm:-mx-6 lg:absolute lg:inset-y-0 lg:left-1/2 lg:right-[calc(50%-50vw)] lg:mx-0 lg:mt-0 lg:h-auto lg:overflow-visible lg:[--cr:calc(var(--d)*-0.09)] lg:[--ct:calc(var(--d)*-0.05)] lg:[--d:min(100cqw,100cqh)] lg:[clip-path:inset(0_0_0_-50vw)] lg:[container-type:size] xl:[--d:min(108cqw,104cqh)]" />
       </div>
 
       {/* Trust: what's true, in words, where a template would put invented numbers */}
