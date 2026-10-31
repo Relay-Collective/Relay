@@ -36,9 +36,10 @@ export function Reveal({
   )
 }
 
-// The editorial voice: one or two words per heading in Instrument Serif italic
-export function Accent({ children, className = '' }: { children: ReactNode; className?: string }) {
-  return <em className={`font-editorial text-[1.08em] font-normal italic tracking-[-0.02em] ${className}`}>{children}</em>
+// The editorial voice: one or two words per heading in Instrument Serif italic.
+// Cantaloupe by default, in the shade that holds 3:1 at display size on porcelain.
+export function Accent({ children, className = 'text-cantaloupe-display' }: { children: ReactNode; className?: string }) {
+  return <em className={`font-editorial text-[1.1em] font-normal italic tracking-[-0.02em] ${className}`}>{children}</em>
 }
 
 interface SmartLinkProps {
@@ -76,17 +77,17 @@ export function ExternalIcon({ className = 'h-4 w-4' }: { className?: string }) 
   return <ArrowUpRight className={className} aria-hidden />
 }
 
-// Live work and planned work never look the same: a solid dot, a half dot, a dashed ring
-export function StatusTag({ availability, children, onLight = false }: { availability: Availability; children: ReactNode; onLight?: boolean }) {
+// Live work and planned work never look the same: a solid dot, a half dot, a dashed ring. The words say it too.
+export function StatusTag({ availability, children }: { availability: Availability; children: ReactNode }) {
   const dot =
     availability === 'live'
       ? 'bg-electric'
       : availability === 'partial'
         ? 'bg-[linear-gradient(90deg,var(--color-cantaloupe)_50%,transparent_50%)] ring-1 ring-cantaloupe'
-        : `border border-dashed ${onLight ? 'border-graphite/50' : 'border-white/60'}`
-  const tone = onLight ? 'border-graphite/15 text-graphite/80' : 'border-white/15 text-white/75'
+        : 'border border-dashed border-hush'
+  const tone = availability === 'planned' ? 'border-dashed border-midnight/25 bg-transparent' : 'border-hairline bg-white'
   return (
-    <span className={`inline-flex items-center gap-2 whitespace-nowrap rounded-full border px-3 py-1 font-dm text-xs font-medium ${tone}`}>
+    <span className={`inline-flex items-center gap-2 whitespace-nowrap rounded-full border px-3 py-1 font-dm text-[13px] font-medium text-midnight-soft ${tone}`}>
       <span className={`h-2 w-2 shrink-0 rounded-full ${dot}`} aria-hidden />
       {children}
     </span>
@@ -95,9 +96,9 @@ export function StatusTag({ availability, children, onLight = false }: { availab
 
 export function Wordmark({ to = '/', onClick }: { to?: string; onClick?: () => void }) {
   return (
-    <Link to={to} onClick={onClick} className={`inline-flex items-center gap-2.5 rounded-lg ${focusRing}`} aria-label="Relay Collective home">
+    <Link to={to} onClick={onClick} className={`inline-flex min-h-11 items-center gap-2.5 rounded-lg ${focusRing}`} aria-label="Relay Collective home">
       <img src={logoMark} alt="" className="h-8 w-8" width={32} height={32} />
-      <span className="whitespace-nowrap font-grotesk text-[18px] font-semibold tracking-[-0.03em] text-white">Relay Collective</span>
+      <span className="whitespace-nowrap font-grotesk text-[18px] font-semibold tracking-[-0.03em] text-midnight">Relay Collective</span>
     </Link>
   )
 }

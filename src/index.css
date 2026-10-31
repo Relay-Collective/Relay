@@ -40,22 +40,24 @@
   --color-rc-mint: #e8f7f3;
   --color-rc-line: #e3e8f2;
 
-  /* Landing page (v2): midnight, electric blue, cantaloupe. Only components/landing uses these.
-     Electric and cantaloupe pass AA as text on midnight; on porcelain, small text uses the -ink shades. */
+  /* Landing page (v3, light): porcelain, midnight ink, electric blue, cantaloupe. Only components/landing uses these.
+     Electric and cantaloupe are graphic colours: small text on light grounds uses the -ink shades, and display-size
+     cantaloupe words use cantaloupe-display (3.35:1 on porcelain). */
   --font-grotesk: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
   --font-dm: 'DM Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-editorial: 'Instrument Serif', ui-serif, Georgia, 'Times New Roman', serif;
-  --color-midnight: #02070a;
-  --color-midnight-800: #10171b;
-  --color-midnight-700: #171f24;
+  --color-midnight: #111820;
+  --color-midnight-soft: #3a4553; /* body text, 9.2:1 on porcelain */
+  --color-hush: #64748b; /* small supporting text, 4.5:1 on porcelain */
+  --color-hairline: #e5e9ec;
   --color-electric: #0297de;
-  --color-electric-soft: #6cc8f3;
+  --color-electric-wash: #e6f4fc;
   --color-electric-ink: #0272a8;
   --color-cantaloupe: #fc734d;
+  --color-cantaloupe-wash: #fff0eb;
+  --color-cantaloupe-display: #e85a30;
   --color-cantaloupe-ink: #b8441f;
-  --color-porcelain: #f6f7f5;
-  --color-fog: #aab3b8;
-  --color-graphite: #13191c;
+  --color-porcelain: #f8f9f7;
 
   /* Flat app background. One step below white cards, so a card reads by its edge, not a shadow */
   --color-canvas: oklch(0.982 0.005 260);
@@ -218,58 +220,65 @@
   }
 }
 
-/* Landing page (v2). Everything is prefixed rcl- and only components/landing uses it.
-   The hero enters on load; later sections reveal once as they scroll into view.
-   Reduced motion: everything is shown in place and nothing loops. */
+/* Landing page (v3). Everything is prefixed rcl- and only components/landing uses it.
+   The hero plays one ride on load; later sections reveal once as they scroll into view.
+   Content is visible by default: reduced motion shows everything in its final place and nothing loops. */
+@media (prefers-reduced-motion: no-preference) {
+  html:has(.rcl-page) {
+    scroll-behavior: smooth;
+  }
+}
+/* No one-word last lines in running text, and no lopsided small headings */
+.rcl-page p,
+.rcl-page dd {
+  text-wrap: pretty;
+}
+.rcl-page h3 {
+  text-wrap: balance;
+}
+.rcl-page ::selection {
+  background: var(--color-electric);
+  color: #fff;
+}
 .rcl-enter {
-  animation: rcl-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: rcl-rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
   animation-delay: var(--enter-delay, 0ms);
 }
 /* Opacity only: a transform would make the sticky header the containing block for its fixed menu */
 .rcl-fade {
   animation: rcl-fade 0.6s ease-out both;
+  animation-delay: var(--enter-delay, 0ms);
 }
 .rcl-reveal {
   opacity: 0;
   transform: translateY(18px);
   transition:
-    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   transition-delay: var(--reveal-delay, 0ms);
 }
 .rcl-reveal[data-revealed] {
   opacity: 1;
   transform: none;
 }
-/* Hero composition (HeroAccentComposition). --mx/--my run -1..1 with the cursor, --sy 0..1 as the hero scrolls away;
-   each form's --px and --sc say how far it travels. */
-.rcl-hc-move {
-  transform: translate3d(
-    calc(var(--mx, 0) * var(--px) * 1px),
-    calc(var(--my, 0) * var(--px) * 1px + var(--sy, 0) * var(--sc) * 1px),
-    0
-  );
+/* Hero ride: each card settles in at its --enter-delay, the route draws between them, and the request's
+   status swaps from "Finding a driver" to "Driver confirmed" once the driver card lands. */
+.rcl-card {
+  animation: rcl-settle 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: var(--enter-delay, 0ms);
 }
-.rcl-hc-nudge {
-  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+.rcl-route {
+  stroke-dasharray: 1;
+  animation: rcl-draw 0.9s cubic-bezier(0.65, 0, 0.35, 1) both;
+  animation-delay: var(--enter-delay, 0ms);
 }
-/* Hovering either ring draws orange a little further through blue */
-.rcl-hc:hover .rcl-hc-nudge {
-  transform: translate3d(10px, -6px, 0);
+.rcl-swap-out {
+  animation: rcl-out 0.3s ease-in both;
+  animation-delay: var(--enter-delay, 0ms);
 }
-/* Blue opens out from the corner that crops it; orange then grows from its own centre, already linked */
-.rcl-hc-blue {
-  animation: rcl-hc-open 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
-}
-.rcl-hc-orange {
-  --from: 38% 70%;
-  animation: rcl-hc-open 1s cubic-bezier(0.16, 1, 0.3, 1) 0.55s both;
-}
-/* A short bright dash that travels along a path, like a relay being passed */
-.rcl-relay {
-  stroke-dasharray: 0.025 0.975;
-  animation: rcl-relay 7s linear infinite;
-  animation-delay: var(--relay-delay, 0ms);
+.rcl-swap-in {
+  animation: rcl-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--enter-delay, 0ms) + 0.2s);
 }
 /* A line that draws across once its parent is revealed (How it works) */
 .rcl-line {
@@ -286,51 +295,54 @@
     transform-origin: center top;
   }
 }
-/* The product picture settles from a slight tilt as it scrolls in */
-.rcl-tilt {
-  transform: rotateX(12deg) scale(0.96);
-  transform-origin: 50% 0;
-  transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.15s;
+/* Raised surfaces: a soft, offset shadow that deepens a little on hover */
+.rcl-lift {
+  box-shadow:
+    0 1px 2px rgb(17 24 32 / 0.04),
+    0 12px 32px -12px rgb(17 24 32 / 0.14);
 }
-[data-revealed] .rcl-tilt {
-  transform: none;
+.rcl-lift-lg {
+  box-shadow:
+    0 1px 2px rgb(17 24 32 / 0.05),
+    0 40px 80px -32px rgb(17 24 32 / 0.28);
 }
 @keyframes rcl-rise {
   from { opacity: 0; transform: translateY(22px); }
   to { opacity: 1; transform: none; }
 }
+@keyframes rcl-settle {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); filter: blur(4px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+@keyframes rcl-draw {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
 @keyframes rcl-fade {
   from { opacity: 0; }
 }
-@keyframes rcl-hc-open {
-  from { clip-path: circle(0% at var(--from, 100% 0%)); }
-  to { clip-path: circle(150% at var(--from, 100% 0%)); }
+@keyframes rcl-out {
+  to { opacity: 0; visibility: hidden; }
 }
-@keyframes rcl-relay {
-  from { stroke-dashoffset: 1; }
-  to { stroke-dashoffset: 0; }
+@keyframes rcl-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .rcl-enter,
   .rcl-fade,
-  .rcl-relay,
-  .rcl-hc-blue,
-  .rcl-hc-orange {
+  .rcl-card,
+  .rcl-route,
+  .rcl-swap-in {
     animation: none;
   }
-  .rcl-relay {
-    stroke-dasharray: none;
+  .rcl-swap-out {
+    animation: none;
     opacity: 0;
-  }
-  .rcl-hc-nudge {
-    transition: none;
-  }
-  .rcl-hc:hover .rcl-hc-nudge {
-    transform: none;
+    visibility: hidden;
   }
   .rcl-reveal,
-  .rcl-line,
-  .rcl-tilt {
+  .rcl-line {
     opacity: 1;
     transform: none;
     transition: none;

@@ -1,64 +1,49 @@
-import { IMPACT_POINTS } from '../content'
+import { IMPACT_POINTS, TRUST } from '../content'
 import { Accent, Reveal } from '../primitives'
-import { container, display, eyebrow } from '../styles'
+import { container, display } from '../styles'
 
-// A line of people, each connected to the next, passing something along. One of them is warm.
-const NODES = Array.from({ length: 13 }, (_, i) => ({ x: 40 + i * 110, y: 70 + Math.sin(i * 0.9) * 34 }))
-
-// 06: why it matters. Words instead of numbers: we only publish figures we can stand behind.
+// 06: why it matters. Words instead of numbers: we only publish figures we can stand behind,
+// so the proof here is what is true today.
 export function ImpactSection() {
   return (
-    <section id="impact" aria-labelledby="impact-heading" className="relative scroll-mt-16 overflow-hidden bg-midnight py-24 text-white sm:py-28 lg:py-40">
+    <section id="impact" aria-labelledby="impact-heading" className="relative scroll-mt-16 overflow-hidden border-t border-hairline bg-white py-24 sm:py-28 lg:py-40">
       <div className={container}>
         <Reveal>
-          <p className={`${eyebrow} text-electric`}>Impact</p>
-          <h2 id="impact-heading" className={`${display} mt-8 text-[44px] leading-[0.98] sm:text-[68px] lg:text-[104px]`}>
-            <span className="block text-white/45">Technology is powerful.</span>
-            <span className="block text-white">
-              Connection changes <Accent className="text-electric-soft lg:block">everything.</Accent>
+          <h2 id="impact-heading" className={`${display} text-[clamp(42px,7vw,104px)] leading-[0.98]`}>
+            <span className="block text-hush">Technology is powerful.</span>
+            <span className="block">
+              Connection changes <Accent>everything.</Accent>
             </span>
           </h2>
         </Reveal>
-      </div>
 
-      <Reveal className="relative mt-16 lg:mt-20">
-        <svg viewBox="0 0 1440 140" className="h-[90px] w-full sm:h-[140px]" preserveAspectRatio="xMidYMid slice" aria-hidden focusable="false">
-          <path
-            d={NODES.map((n, i) => `${i ? 'L' : 'M'}${n.x} ${n.y}`).join('')}
-            fill="none"
-            stroke="#0297de"
-            strokeOpacity="0.5"
-            strokeWidth="1"
-          />
-          <path
-            d={NODES.map((n, i) => `${i ? 'L' : 'M'}${n.x} ${n.y}`).join('')}
-            pathLength={1}
-            className="rcl-relay"
-            fill="none"
-            stroke="#ffffff"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-          {NODES.map((n, i) => (
-            <circle key={i} cx={n.x} cy={n.y} r={i === 8 ? 6 : 4} fill={i === 8 ? '#fc734d' : '#02070a'} stroke={i === 8 ? 'none' : '#0297de'} strokeWidth="1.5" />
-          ))}
-        </svg>
-      </Reveal>
+        <div className="mt-16 grid gap-12 lg:mt-24 lg:grid-cols-12 lg:gap-8">
+          <Reveal className="lg:col-span-12 xl:col-span-4">
+            <p className="max-w-2xl font-grotesk text-[24px] font-medium leading-snug tracking-[-0.02em] text-midnight sm:text-[28px]">
+              Relay Collective helps organizations spend less time coordinating and more time supporting their communities.
+            </p>
+          </Reveal>
+          <ul className="grid gap-10 sm:grid-cols-3 sm:gap-6 lg:col-span-12 xl:col-span-7 xl:col-start-6">
+            {IMPACT_POINTS.map((p, i) => (
+              <Reveal as="li" key={p.title} delay={i * 100} className="border-t-2 border-midnight pt-6">
+                <h3 className="font-grotesk text-[19px] font-semibold tracking-[-0.02em] text-midnight">{p.title}</h3>
+                <p className="mt-3 font-dm text-[16px] leading-relaxed text-midnight-soft">{p.text}</p>
+              </Reveal>
+            ))}
+          </ul>
+        </div>
 
-      <div className={`${container} mt-16 grid gap-12 lg:mt-20 lg:grid-cols-12 lg:gap-8`}>
-        <Reveal className="lg:col-span-4">
-          <p className="font-grotesk text-2xl font-medium leading-snug tracking-[-0.02em] text-white sm:text-[28px]">
-            Relay Collective exists to help organizations spend less time coordinating and more time supporting their communities.
-          </p>
+        {/* What's true today, where a template would put invented numbers */}
+        <Reveal className="mt-20 rounded-[20px] bg-porcelain lg:mt-28">
+          <dl className="grid gap-x-6 gap-y-8 p-7 sm:grid-cols-2 sm:p-10 lg:grid-cols-4">
+            {TRUST.map((t, i) => (
+              <div key={t.label} className={`lg:border-l lg:border-hairline lg:pl-8 ${i === 0 ? 'lg:border-l-0 lg:pl-0' : ''}`}>
+                <dt className="font-dm text-[14px] font-medium text-hush">{t.label}</dt>
+                <dd className="mt-2 font-grotesk text-[18px] font-medium leading-snug tracking-[-0.02em] text-midnight">{t.value}</dd>
+              </div>
+            ))}
+          </dl>
         </Reveal>
-        <ul className="grid gap-10 sm:grid-cols-3 sm:gap-6 lg:col-span-7 lg:col-start-6">
-          {IMPACT_POINTS.map((p, i) => (
-            <Reveal as="li" key={p.title} delay={i * 100} className="border-t border-white/15 pt-6">
-              <h3 className="font-grotesk text-lg font-semibold tracking-[-0.02em] text-white">{p.title}</h3>
-              <p className="mt-3 font-dm text-[15px] leading-relaxed text-white/65">{p.text}</p>
-            </Reveal>
-          ))}
-        </ul>
       </div>
     </section>
   )

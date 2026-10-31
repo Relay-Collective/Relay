@@ -57,7 +57,7 @@ export function LandingNavbar({ active }: { active?: string }) {
   return (
     <header
       className={`rcl-fade sticky top-0 z-40 border-b transition-[background-color,border-color] duration-300 ${
-        compact ? 'border-white/10 bg-midnight/95' : 'border-transparent bg-midnight'
+        compact ? 'border-hairline bg-white' : 'border-transparent bg-porcelain'
       }`}
     >
       <div
@@ -77,12 +77,12 @@ export function LandingNavbar({ active }: { active?: string }) {
                     href={`#${item.id}`}
                     aria-current={current ? 'location' : undefined}
                     className={`relative inline-flex min-h-11 items-center rounded-full px-4 font-dm text-[15px] font-medium transition-colors duration-200 ${focusRing} ${
-                      current ? 'text-white' : 'text-fog hover:text-white'
+                      current ? 'text-midnight' : 'text-midnight-soft hover:bg-midnight/[0.05] hover:text-midnight'
                     }`}
                   >
                     {item.label}
                     <span
-                      className={`absolute bottom-1.5 left-1/2 h-[3px] w-[3px] -translate-x-1/2 rounded-full bg-cantaloupe transition-opacity duration-300 ${current ? 'opacity-100' : 'opacity-0'}`}
+                      className={`absolute bottom-1 left-4 right-4 h-[2px] origin-left rounded-full bg-electric transition-transform duration-300 ${current ? 'scale-x-100' : 'scale-x-0'}`}
                       aria-hidden
                     />
                   </a>
@@ -95,7 +95,7 @@ export function LandingNavbar({ active }: { active?: string }) {
         <div className="flex items-center gap-2 sm:gap-3">
           <Link
             to={LINKS.signIn}
-            className={`hidden min-h-11 items-center rounded-full px-3 font-dm text-[15px] font-medium text-white/85 transition-colors hover:text-white sm:inline-flex ${focusRing}`}
+            className={`inline-flex min-h-11 min-w-12 items-center justify-center rounded-full px-3 font-dm text-[15px] font-medium text-midnight transition-colors hover:bg-midnight/[0.05] sm:px-4 ${focusRing}`}
           >
             Log in
           </Link>
@@ -108,13 +108,13 @@ export function LandingNavbar({ active }: { active?: string }) {
           <button
             ref={toggleRef}
             type="button"
-            className={`flex h-11 w-11 items-center justify-center rounded-full text-white transition-colors hover:bg-white/10 lg:hidden ${focusRing}`}
+            className={`flex h-12 w-12 items-center justify-center rounded-full border border-hairline bg-white text-midnight transition-colors hover:border-midnight/30 lg:hidden ${focusRing}`}
             aria-expanded={open}
             aria-controls="site-menu"
             aria-label={open ? 'Close menu' : 'Open menu'}
             onClick={() => setOpen((o) => !o)}
           >
-            {open ? <X className="h-6 w-6" aria-hidden /> : <Menu className="h-6 w-6" aria-hidden />}
+            {open ? <X className="h-5 w-5" aria-hidden /> : <Menu className="h-5 w-5" aria-hidden />}
           </button>
         </div>
       </div>
@@ -123,25 +123,20 @@ export function LandingNavbar({ active }: { active?: string }) {
         <div
           id="site-menu"
           ref={drawerRef}
-          className="fixed inset-x-0 bottom-0 top-16 z-40 flex animate-fade-up flex-col overflow-y-auto bg-midnight px-4 pb-[max(1.5rem,var(--safe-bottom))] pt-6 [animation-duration:280ms] sm:px-6 lg:hidden"
+          className="fixed inset-x-0 bottom-0 top-16 z-40 flex animate-fade-up flex-col overflow-y-auto bg-white px-4 pb-[max(1.5rem,var(--safe-bottom))] pt-6 [animation-duration:280ms] sm:px-6 lg:hidden"
         >
           <nav aria-label="Main">
-            <ul className="border-t border-white/10">
-              {NAV.map((item, i) => (
-                <li key={item.id} className="border-b border-white/10">
+            <ul className="border-t border-hairline">
+              {NAV.map((item) => (
+                <li key={item.id} className="border-b border-hairline">
                   <a
                     href={`#${item.id}`}
                     onClick={close}
                     aria-current={active === item.id ? 'location' : undefined}
-                    className={`flex min-h-[72px] items-center justify-between gap-4 rounded-lg px-1 font-grotesk text-[32px] font-medium tracking-[-0.04em] text-white ${focusRing}`}
+                    className={`flex min-h-[68px] items-center justify-between gap-4 rounded-lg px-1 font-grotesk text-[30px] font-medium tracking-[-0.035em] text-midnight ${focusRing}`}
                   >
-                    <span className="flex items-baseline gap-4">
-                      <span className="font-dm text-xs font-medium tracking-normal text-fog" aria-hidden>
-                        0{i + 1}
-                      </span>
-                      {item.label}
-                    </span>
-                    <ArrowRight className="h-5 w-5 text-electric" aria-hidden />
+                    {item.label}
+                    <ArrowRight className="h-5 w-5 text-electric-ink" aria-hidden />
                   </a>
                 </li>
               ))}

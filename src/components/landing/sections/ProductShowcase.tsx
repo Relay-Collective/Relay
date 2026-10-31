@@ -14,19 +14,15 @@ import {
   UsersRound,
   type LucideIcon,
 } from 'lucide-react'
+import type { ReactNode } from 'react'
 import logoMark from '../../../assets/logo-mark.svg'
+import { DEMO_ORG, DEMO_STAFF, DEMO_UPCOMING } from '../demo'
 import { Accent, Reveal } from '../primitives'
-import { container, eyebrow, h2 } from '../styles'
+import { StatusPill } from '../ProductBits'
+import { container, h2, lede } from '../styles'
 
 // 04: the organization workspace, drawn for the landing page. A picture of the real screens, built from
 // the same labels (nav, metrics, statuses), never the screens themselves, and never real data.
-// Everything below is illustrative: the organization, the people, and the numbers are made up.
-const DEMO = {
-  org: 'Northside Community Services',
-  person: 'Alex',
-  initials: 'AL',
-}
-
 const NAV: { label: string; icon: LucideIcon; active?: boolean; badge?: number; group?: string }[] = [
   { label: 'Overview', icon: LayoutDashboard, active: true },
   { label: 'Requests', icon: Inbox, badge: 1 },
@@ -43,83 +39,98 @@ const METRICS: { label: string; value: number; hint: string; icon: LucideIcon; t
   { label: 'Completed', value: 12, hint: 'Last 30 days', icon: CircleCheck, tone: 'plain' },
 ]
 
-type Status = 'Finding a driver' | 'Driver confirmed' | 'Picked up'
-const STATUS_TONE: Record<Status, string> = {
-  'Finding a driver': 'bg-white/[0.06] text-white/80',
-  'Driver confirmed': 'bg-electric/15 text-electric-soft',
-  'Picked up': 'bg-white text-midnight',
-}
-
-const RIDES: { who: string; time: string; to: string; status: Status }[] = [
-  { who: 'JD', time: '2:30 PM', to: 'Medical appointment', status: 'Driver confirmed' },
-  { who: 'SK', time: '3:15 PM', to: 'Housing interview', status: 'Picked up' },
-  { who: 'RM', time: '4:00 PM', to: 'Social service visit', status: 'Finding a driver' },
+// What each numbered marker on the picture points at
+const NOTES = [
+  { title: 'Nothing goes quiet', text: 'A request that no driver has taken is raised right away, with the next step beside it.' },
+  { title: 'Every request in one list', text: 'See what is waiting, confirmed, and on the road, for your whole organization.' },
+  { title: 'Each ride, start to finish', text: 'Follow a ride from request to drop-off, and see who confirmed it and when.' },
 ]
-
-const WEEK = [3, 5, 4, 6, 9, 2, 1]
-const DAYS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
 
 export function ProductShowcase() {
   return (
-    <section id="showcase" aria-labelledby="showcase-heading" className="relative scroll-mt-16 overflow-hidden bg-midnight py-24 text-white sm:py-28 lg:py-40">
-      <div
-        className="pointer-events-none absolute left-1/2 top-[38%] h-[640px] w-[1100px] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(closest-side,rgba(2,151,222,0.16),transparent)]"
-        aria-hidden
-      />
+    <section id="showcase" aria-labelledby="showcase-heading" className="relative scroll-mt-16 overflow-hidden border-y border-hairline bg-white py-24 sm:py-28 lg:py-36">
       <div className={`${container} relative`}>
         <Reveal className="grid gap-8 lg:grid-cols-12 lg:items-end">
-          <div className="lg:col-span-8">
-            <p className={`${eyebrow} text-electric`}>The workspace</p>
-            <h2 id="showcase-heading" className={`${h2} mt-6 text-white`}>
-              One platform.
-              <br />
-              More <Accent className="text-electric-soft">possibilities.</Accent>
-            </h2>
-          </div>
-          <p className="font-dm text-[17px] leading-relaxed text-white/70 lg:col-span-4">
+          <h2 id="showcase-heading" className={`${h2} lg:col-span-8`}>
+            One platform.
+            <br />
+            More <Accent>possibilities.</Accent>
+          </h2>
+          <p className={`${lede} lg:col-span-4`}>
             The workspace your team signs in to. What needs attention, every request in flight, and the services your organization uses, in one view.
           </p>
         </Reveal>
 
-        <Reveal delay={100} className="mt-16 [perspective:2400px] lg:mt-24">
-          <figure className="relative">
-            <div className="rcl-tilt">
-              <DashboardMock />
+        <Reveal delay={100} className="relative mt-16 lg:mt-20">
+          <figure>
+            <div className="relative rounded-[28px] bg-porcelain p-3 sm:p-6 lg:p-10">
+              {/* The electric field the workspace sits on */}
+              <span className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 rounded-b-[28px] bg-electric" aria-hidden />
+              <span className="pointer-events-none absolute -right-6 bottom-10 hidden h-28 w-28 rounded-full bg-cantaloupe lg:block" aria-hidden />
+              <div className="relative">
+                <DashboardMock />
+              </div>
             </div>
-            <RideCardMock />
-            <figcaption className="mt-6 flex items-center gap-2 font-dm text-sm text-fog">
-              <span className="h-px w-6 bg-fog/50" aria-hidden />
+            <figcaption className="mt-5 flex items-center gap-2 font-dm text-[13px] text-hush">
+              <span className="h-px w-5 bg-hush/60" aria-hidden />
               Illustrative demo. The organization, people, and rides shown are not real.
             </figcaption>
           </figure>
         </Reveal>
+
+        <ol className="mt-14 grid gap-10 sm:grid-cols-3 sm:gap-8">
+          {NOTES.map((n, i) => (
+            <Reveal as="li" key={n.title} delay={i * 90} className="border-t border-midnight/15 pt-5">
+              <h3 className="flex items-center gap-3 font-grotesk text-[20px] font-semibold tracking-[-0.02em] text-midnight">
+                <Marker n={i + 1} />
+                {n.title}
+              </h3>
+              <p className="mt-3 max-w-sm font-dm text-[16px] leading-relaxed text-midnight-soft">{n.text}</p>
+            </Reveal>
+          ))}
+        </ol>
       </div>
     </section>
   )
 }
 
-// The overview screen. Hidden from screen readers: the figure caption says what it is.
-function DashboardMock() {
+// A numbered dot that ties a spot on the picture to its note below
+function Marker({ n, onPicture = false }: { n: number; onPicture?: boolean }) {
   return (
-    <div
-      className="overflow-hidden rounded-2xl border border-white/10 bg-midnight-800 shadow-[0_60px_120px_-40px_rgba(0,0,0,0.9)] select-none"
+    <span
+      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-cantaloupe font-dm text-[13px] font-bold tabular-nums text-midnight ${
+        onPicture ? 'absolute -left-3 -top-3 z-10 shadow-[0_0_0_4px_#fff]' : ''
+      }`}
       aria-hidden
     >
+      {n}
+    </span>
+  )
+}
+
+function Box({ children, className = '' }: { children: ReactNode; className?: string }) {
+  return <div className={`relative min-w-0 rounded-xl border border-hairline bg-white p-4 ${className}`}>{children}</div>
+}
+
+// The overview screen. Hidden from screen readers: the caption and the notes say what it shows.
+function DashboardMock() {
+  return (
+    <div className="rcl-lift-lg select-none overflow-hidden rounded-2xl border border-hairline bg-white" aria-hidden>
       <div className="grid md:grid-cols-[232px_1fr]">
-        <aside className="hidden flex-col border-r border-white/[0.07] bg-midnight p-4 md:flex">
+        <aside className="hidden flex-col border-r border-hairline bg-porcelain p-4 md:flex">
           <div className="flex items-center gap-2 px-2 py-1">
             <img src={logoMark} alt="" className="h-6 w-6" />
-            <span className="font-grotesk text-[15px] font-semibold tracking-[-0.02em]">Relay Collective</span>
+            <span className="font-grotesk text-[15px] font-semibold tracking-[-0.02em] text-midnight">Relay Collective</span>
           </div>
-          <div className="mt-5 flex items-center justify-between rounded-lg border border-white/10 px-3 py-2 font-dm text-[12px] text-white/85">
-            <span className="truncate">{DEMO.org}</span>
-            <ChevronDown className="h-3.5 w-3.5 shrink-0 text-fog" />
+          <div className="mt-5 flex items-center justify-between rounded-lg border border-hairline bg-white px-3 py-2 font-dm text-[12px] text-midnight">
+            <span className="truncate">{DEMO_ORG}</span>
+            <ChevronDown className="h-3.5 w-3.5 shrink-0 text-hush" />
           </div>
           <nav className="mt-5 space-y-0.5 font-dm text-[13px]">
             {NAV.map(({ label, icon: Icon, active, badge, group }) => (
               <div key={label}>
-                {group && <p className="mb-1 mt-4 px-3 text-[10px] font-medium uppercase tracking-[0.14em] text-white/40">{group}</p>}
-                <div className={`flex items-center gap-2.5 rounded-lg px-3 py-2 ${active ? 'bg-electric font-medium text-midnight' : 'text-white/70'}`}>
+                {group && <p className="mb-1 mt-4 px-3 text-[11px] font-medium text-hush">{group}</p>}
+                <div className={`flex items-center gap-2.5 rounded-lg px-3 py-2 ${active ? 'bg-midnight font-medium text-white' : 'text-midnight-soft'}`}>
                   <Icon className="h-4 w-4" />
                   <span className="flex-1">{label}</span>
                   {badge && <span className="rounded-full bg-cantaloupe px-1.5 text-[10px] font-semibold text-midnight">{badge}</span>}
@@ -128,14 +139,18 @@ function DashboardMock() {
             ))}
           </nav>
           <div className="mt-auto space-y-3 pt-10">
-            <div className="flex items-center gap-2.5 px-3 font-dm text-[13px] text-white/60">
+            <div className="flex items-center gap-2.5 px-3 font-dm text-[13px] text-midnight-soft">
               <CircleHelp className="h-4 w-4" /> Help and support
             </div>
-            <div className="flex items-center gap-2.5 rounded-lg border-t border-white/[0.07] px-2 pt-3">
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 font-dm text-[11px] font-semibold">{DEMO.initials}</span>
+            <div className="flex items-center gap-2.5 border-t border-hairline px-2 pt-3">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-cantaloupe-wash font-dm text-[11px] font-semibold text-cantaloupe-ink">
+                {DEMO_STAFF.initials}
+              </span>
               <div className="font-dm text-[12px] leading-tight">
-                <p className="text-white">{DEMO.person} Lee</p>
-                <p className="text-white/50">Organization admin</p>
+                <p className="text-midnight">
+                  {DEMO_STAFF.first} {DEMO_STAFF.last}
+                </p>
+                <p className="text-hush">{DEMO_STAFF.role}</p>
               </div>
             </div>
           </div>
@@ -144,13 +159,11 @@ function DashboardMock() {
         <div className="min-w-0 p-4 sm:p-6 lg:p-8">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="font-dm text-[11px] font-medium uppercase tracking-[0.14em] text-white/45">Thursday, November 12</p>
-              <p className="mt-1.5 font-grotesk text-[22px] font-semibold tracking-[-0.03em] sm:text-[28px]">
-                Good afternoon, <span className="font-editorial text-[1.08em] font-normal italic tracking-[-0.01em] text-cantaloupe">{DEMO.person}.</span>
-              </p>
-              <p className="mt-1 font-dm text-[13px] text-white/60">Here's what's happening at {DEMO.org}.</p>
+              <p className="font-dm text-[12px] font-medium text-hush">Thursday, November 12</p>
+              <p className="mt-1 font-grotesk text-[22px] font-semibold tracking-[-0.03em] text-midnight sm:text-[28px]">Good afternoon, {DEMO_STAFF.first}.</p>
+              <p className="mt-1 font-dm text-[13px] text-midnight-soft">Here's what's happening at {DEMO_ORG}.</p>
             </div>
-            <span className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 font-dm text-[12px] font-semibold text-midnight">
+            <span className="inline-flex items-center gap-2 rounded-full bg-midnight px-4 py-2 font-dm text-[12px] font-semibold text-white">
               <CalendarPlus className="h-3.5 w-3.5" /> Request a ride
             </span>
           </div>
@@ -159,117 +172,82 @@ function DashboardMock() {
             {METRICS.map(({ label, value, hint, icon: Icon, tone }) => (
               <div
                 key={label}
-                className={`relative overflow-hidden rounded-xl border p-4 ${
-                  tone === 'live'
-                    ? 'border-electric/40 bg-[linear-gradient(135deg,rgba(2,151,222,0.32),rgba(2,151,222,0.06))]'
-                    : tone === 'attention'
-                      ? 'border-cantaloupe/40 bg-cantaloupe/[0.06]'
-                      : 'border-white/[0.07] bg-white/[0.02]'
+                className={`rounded-xl border p-4 ${
+                  tone === 'live' ? 'border-electric/40 bg-electric-wash' : tone === 'attention' ? 'border-cantaloupe/50 bg-cantaloupe-wash' : 'border-hairline bg-white'
                 }`}
               >
-                <Icon className={`h-4 w-4 ${tone === 'attention' ? 'text-cantaloupe' : tone === 'live' ? 'text-electric-soft' : 'text-white/50'}`} />
-                <p className="mt-3 font-dm text-[12px] text-white/70">{label}</p>
-                <p className="font-grotesk text-[30px] font-semibold leading-tight tracking-[-0.03em] tabular-nums">{value}</p>
-                <p className="font-dm text-[11px] text-white/45">{hint}</p>
-                {tone === 'live' && (
-                  <svg viewBox="0 0 120 40" className="absolute bottom-3 right-3 hidden h-8 w-24 text-electric-soft sm:block" fill="none">
-                    <path d="M2 34 C 20 34, 26 22, 40 24 S 62 36, 74 22 S 98 6, 118 8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-                  </svg>
-                )}
+                <Icon className={`h-4 w-4 ${tone === 'attention' ? 'text-cantaloupe-ink' : tone === 'live' ? 'text-electric-ink' : 'text-hush'}`} />
+                <p className="mt-3 font-dm text-[12px] text-midnight-soft">{label}</p>
+                <p className="font-grotesk text-[30px] font-semibold leading-tight tracking-[-0.03em] text-midnight tabular-nums">{value}</p>
+                <p className="font-dm text-[11px] text-hush">{hint}</p>
               </div>
             ))}
           </div>
 
-          <div className="mt-4 grid gap-4 lg:grid-cols-5">
-            <div className="rounded-xl border border-white/[0.07] bg-white/[0.02] p-4 lg:col-span-3">
+          <div className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-5">
+            <Box className="lg:col-span-3">
+              <Marker n={1} onPicture />
               <div className="flex items-center justify-between">
-                <p className="font-grotesk text-[15px] font-medium">Needs action</p>
-                <span className="font-dm text-[11px] text-white/50">View all requests</span>
+                <p className="font-grotesk text-[15px] font-semibold text-midnight">Needs action</p>
+                <span className="font-dm text-[11px] text-hush">View all requests</span>
               </div>
-              <div className="mt-3 flex items-center gap-3 rounded-lg bg-cantaloupe/10 p-3">
-                <TriangleAlert className="h-4 w-4 shrink-0 text-cantaloupe" />
+              <div className="mt-3 flex items-center gap-3 rounded-lg bg-cantaloupe-wash p-3">
+                <TriangleAlert className="h-4 w-4 shrink-0 text-cantaloupe-ink" />
                 <div className="min-w-0 flex-1 font-dm">
-                  <p className="text-[13px] font-medium">No driver available</p>
-                  <p className="truncate text-[11px] text-white/60">5:10 PM pickup · Pharmacy</p>
+                  <p className="text-[13px] font-semibold text-midnight">No driver available</p>
+                  <p className="truncate text-[11px] text-midnight-soft">5:10 PM pickup · Pharmacy</p>
                 </div>
-                <span className="rounded-full bg-cantaloupe px-3 py-1 font-dm text-[11px] font-semibold text-midnight">Rebook now</span>
+                <span className="rounded-full bg-midnight px-3 py-1 font-dm text-[11px] font-semibold text-white">Rebook now</span>
               </div>
-              <p className="mt-5 font-grotesk text-[15px] font-medium">Upcoming rides</p>
-              <ul className="mt-2 divide-y divide-white/[0.06]">
-                {RIDES.map((r) => (
+              <div className="relative mt-5">
+                <Marker n={2} onPicture />
+                <p className="pl-5 font-grotesk text-[15px] font-semibold text-midnight">Upcoming rides</p>
+              </div>
+              <ul className="mt-2 divide-y divide-hairline">
+                {DEMO_UPCOMING.map((r) => (
                   <li key={r.who} className="flex items-center gap-3 py-2.5 font-dm">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/[0.08] text-[10px] font-semibold">{r.who}</span>
-                    <span className="w-16 shrink-0 text-[12px] tabular-nums text-white/85">{r.time}</span>
-                    <span className="min-w-0 flex-1 truncate text-[12px] text-white/60">{r.to}</span>
-                    <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-medium ${STATUS_TONE[r.status]}`}>{r.status}</span>
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-porcelain text-[10px] font-semibold text-midnight">{r.who}</span>
+                    <span className="hidden w-16 shrink-0 text-[12px] tabular-nums text-midnight sm:inline">{r.time}</span>
+                    <span className="min-w-0 flex-1 truncate text-[12px] text-midnight-soft">{r.to}</span>
+                    <StatusPill status={r.status} size="text-[11px]" />
                   </li>
                 ))}
               </ul>
-            </div>
+            </Box>
 
-            <div className="rounded-xl border border-white/[0.07] bg-white/[0.02] p-4 lg:col-span-2">
+            <Box className="lg:col-span-2">
+              <Marker n={3} onPicture />
               <div className="flex items-center justify-between">
-                <p className="font-grotesk text-[15px] font-medium">Requests this week</p>
-                <span className="font-dm text-[11px] text-white/50">30 total</span>
+                <p className="font-grotesk text-[15px] font-semibold text-midnight">Ride · SK</p>
+                <StatusPill status="Picked up" size="text-[11px]" />
               </div>
-              <div className="mt-4 flex h-28 items-end gap-2">
-                {WEEK.map((v, i) => (
-                  <div key={i} className="flex flex-1 flex-col items-center gap-1.5">
-                    <div className={`w-full rounded-t-[4px] ${i === 4 ? 'bg-electric' : 'bg-white/[0.1]'}`} style={{ height: `${(v / 9) * 88}px` }} />
-                    <span className="font-dm text-[10px] text-white/45">{DAYS[i]}</span>
-                  </div>
+              <p className="mt-2 font-grotesk text-lg font-semibold tracking-[-0.02em] text-midnight">Housing interview</p>
+              <p className="font-dm text-[12px] text-midnight-soft">Pickup 3:15 PM · Wheelchair accessible</p>
+              <ol className="mt-5 space-y-3">
+                {[
+                  { label: 'Requested', done: true, at: '1:02 PM' },
+                  { label: 'Driver confirmed', done: true, at: '1:09 PM' },
+                  { label: 'Picked up', current: true, at: '3:14 PM' },
+                  { label: 'Completed' },
+                ].map((s) => (
+                  <li key={s.label} className="flex items-center gap-3 font-dm text-[12px]">
+                    <span
+                      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
+                        s.done ? 'bg-electric text-white' : s.current ? 'border-2 border-cantaloupe bg-white' : 'border border-midnight/25'
+                      }`}
+                    >
+                      {s.done && <Check className="h-3 w-3" strokeWidth={3} />}
+                      {s.current && <span className="h-1.5 w-1.5 rounded-full bg-cantaloupe" />}
+                    </span>
+                    <span className={`flex-1 ${s.done || s.current ? 'text-midnight' : 'text-hush'}`}>{s.label}</span>
+                    {s.at && <span className="tabular-nums text-hush">{s.at}</span>}
+                  </li>
                 ))}
-              </div>
-              <div className="mt-4 space-y-2 border-t border-white/[0.06] pt-3 font-dm text-[11px]">
-                <p className="flex items-center gap-2 text-white/70">
-                  <Check className="h-3.5 w-3.5 text-electric-soft" /> Driver confirmed for JD · 4 min ago
-                </p>
-                <p className="flex items-center gap-2 text-white/70">
-                  <CircleCheck className="h-3.5 w-3.5 text-white/50" /> Ride completed for MR · 1 hr ago
-                </p>
-              </div>
-            </div>
+              </ol>
+            </Box>
           </div>
         </div>
       </div>
-    </div>
-  )
-}
-
-// A ride's progress, as staff see it. Layered over the corner on wide screens only.
-function RideCardMock() {
-  const steps = [
-    { label: 'Requested', done: true },
-    { label: 'Driver confirmed', done: true },
-    { label: 'Picked up', current: true },
-    { label: 'Completed' },
-  ]
-  return (
-    <div
-      className="absolute -bottom-10 -right-6 hidden w-[300px] rounded-2xl border border-white/10 bg-midnight-700 p-5 shadow-[0_40px_80px_-30px_rgba(0,0,0,0.95)] select-none xl:block"
-      aria-hidden
-    >
-      <div className="flex items-center justify-between font-dm">
-        <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-white/45">Ride · SK</p>
-        <span className="rounded-full bg-white px-2.5 py-0.5 text-[10px] font-semibold text-midnight">Picked up</span>
-      </div>
-      <p className="mt-2 font-grotesk text-lg font-semibold tracking-[-0.02em]">Housing interview</p>
-      <p className="font-dm text-[12px] text-white/55">Pickup 3:15 PM · Wheelchair accessible</p>
-      <ol className="mt-5 space-y-3">
-        {steps.map((s) => (
-          <li key={s.label} className="flex items-center gap-3 font-dm text-[12px]">
-            <span
-              className={`flex h-5 w-5 items-center justify-center rounded-full ${
-                s.done ? 'bg-electric text-midnight' : s.current ? 'border-2 border-cantaloupe' : 'border border-white/25'
-              }`}
-            >
-              {s.done && <Check className="h-3 w-3" strokeWidth={3} />}
-              {s.current && <span className="h-1.5 w-1.5 rounded-full bg-cantaloupe" />}
-            </span>
-            <span className={s.done || s.current ? 'text-white' : 'text-white/50'}>{s.label}</span>
-          </li>
-        ))}
-      </ol>
     </div>
   )
 }
