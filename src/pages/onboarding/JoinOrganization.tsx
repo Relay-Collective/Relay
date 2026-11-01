@@ -219,7 +219,7 @@ function Sidebar() {
   const steps = ['Find your organization', 'Tell them about your role', 'An administrator reviews your request']
   return (
     <div>
-      <p className="font-heading text-2xl font-extrabold tracking-[-0.02em] text-rc-navy">Join your team.</p>
+      <p className="font-heading text-2xl font-bold tracking-[-0.02em] text-rc-navy">Join your team.</p>
       <p className="mt-3 text-sm leading-relaxed text-slate-600">
         Ask to join an organization that already uses Relay Collective. Its administrators decide who gets access.
       </p>

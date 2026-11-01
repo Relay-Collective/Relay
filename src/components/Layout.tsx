@@ -6,7 +6,7 @@ import type { UserRole } from '../types'
 import { AccountMenu } from './AccountMenu'
 import { Logo } from './Logo'
 import { AppFooter, LoadErrorBanner, PendingApprovalNotice, RideNotices } from './ShellNotices'
-import { ROLE_TONE, type Tone } from './ui'
+import type { Tone } from './ui'
 
 type NavLinkItem = { to: string; label: string }
 
@@ -36,7 +36,7 @@ function Badge({ count, active }: { count?: number; active: boolean }) {
   return (
     <span
       className={`ml-1.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-xs font-bold ${
-        active ? 'bg-white text-teal-700' : 'bg-teal-700 text-white'
+        active ? 'bg-white text-brand-700' : 'bg-brand-600 text-white'
       }`}
     >
       {count}
@@ -52,14 +52,14 @@ export function Layout() {
   const role = currentUser?.role
   const links = useNavLinks(role)
 
-  const activeNav = ACTIVE_NAV[role ? ROLE_TONE[role] : 'brand']
+  // Active navigation is electric in every console; the role's own colour stays on its avatar
+  const activeNav = ACTIVE_NAV.brand
 
   const pending = org?.status === 'PENDING'
 
   return (
     <div className="min-h-screen">
       <header className="no-print sticky top-0 z-30 border-b border-slate-200 bg-white pt-[var(--safe-top)]">
-        <div className="h-1 bg-brand-600" aria-hidden />
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
           <Logo size="sm" to={role ? HOME_FOR[role] : '/'} />
           <nav className="hidden items-center gap-1 lg:flex" aria-label="Main">

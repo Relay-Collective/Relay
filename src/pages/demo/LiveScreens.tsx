@@ -227,7 +227,7 @@ export function LiveScreens({ index, onChange }: Props) {
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-2">
       <div key={index} className="animate-step-forward text-center" aria-live="polite">
-        <h2 className="text-2xl font-black leading-tight md:text-3xl">
+        <h2 className="text-2xl font-bold leading-tight md:text-3xl">
           {step.title} <span className="font-semibold text-slate-500">· {step.caption}</span>
         </h2>
       </div>

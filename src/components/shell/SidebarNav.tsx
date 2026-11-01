@@ -1,7 +1,7 @@
 import { LogOut, PanelLeftClose, PanelLeftOpen, type LucideIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Link, NavLink } from 'react-router-dom'
-import logoMark from '../../assets/logo-mark.svg'
+import { LogoMark, wordmark } from '../brand/LogoMark'
 import { useApp } from '../../hooks/useApp'
 import { focusRing } from '../workspace/styles'
 
@@ -97,11 +97,9 @@ export function SidebarNav({ mode, onNavigate, onToggleCollapse, home, context, 
   return (
     <div className="flex h-full flex-col">
       <div className={`flex h-16 shrink-0 items-center px-4 ${center}`}>
-        <Link to={home.to} onClick={onNavigate} className={`inline-flex items-center gap-2.5 rounded-lg ${focusRing}`} aria-label={home.label}>
-          <img src={logoMark} alt="" className="h-8 w-8" width={32} height={32} />
-          <span className={`font-heading text-[17px] font-extrabold tracking-[-0.02em] whitespace-nowrap text-rc-navy ${onlyFull}`}>
-            Relay <span className="text-rc-blue">Collective</span>
-          </span>
+        <Link to={home.to} onClick={onNavigate} className={`inline-flex min-h-11 items-center gap-2.5 rounded-lg ${focusRing}`} aria-label={home.label}>
+          <LogoMark className="h-8 w-8" />
+          <span className={`${wordmark} text-[18px] ${onlyFull}`}>Relay Collective</span>
         </Link>
       </div>
 
@@ -122,7 +120,7 @@ export function SidebarNav({ mode, onNavigate, onToggleCollapse, home, context, 
           <div key={group.label ?? i} className={i ? 'mt-5' : ''}>
             {group.label && (
               <>
-                <p className={`px-3 pb-1.5 text-xs font-semibold uppercase tracking-wider text-slate-500 ${onlyFull}`} aria-hidden>
+                <p className={`px-3 pb-1.5 text-[13px] font-semibold text-slate-500 ${onlyFull}`} aria-hidden>
                   {group.label}
                 </p>
                 <div className={`mx-3 mb-2 border-t border-slate-200 ${onlyRail}`} aria-hidden />

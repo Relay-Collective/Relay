@@ -123,11 +123,11 @@ export function PickupTimePicker({ id, value, onChange, now, error, hint }: Prop
               onClick={() => shiftMonth(-1)}
               disabled={!canGoBack}
               aria-label="Previous month"
-              className="flex h-10 w-10 items-center justify-center rounded-xl text-slate-600 transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-brand-500 focus-visible:ring-offset-2 disabled:opacity-30"
+              className="flex h-11 w-11 items-center justify-center rounded-xl text-slate-600 transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-brand-500 focus-visible:ring-offset-2 disabled:opacity-30"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
-            <p className="font-display font-extrabold text-ink" aria-live="polite">
+            <p className="font-display font-bold text-ink" aria-live="polite">
               {monthName}
             </p>
             <button
@@ -135,7 +135,7 @@ export function PickupTimePicker({ id, value, onChange, now, error, hint }: Prop
               onClick={() => shiftMonth(1)}
               disabled={!canGoForward}
               aria-label="Next month"
-              className="flex h-10 w-10 items-center justify-center rounded-xl text-slate-600 transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-brand-500 focus-visible:ring-offset-2 disabled:opacity-30"
+              className="flex h-11 w-11 items-center justify-center rounded-xl text-slate-600 transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-brand-500 focus-visible:ring-offset-2 disabled:opacity-30"
             >
               <ChevronRight className="h-5 w-5" />
             </button>

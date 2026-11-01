@@ -24,7 +24,7 @@ const STATUS_LOOK: Record<ProductFeedbackStatus, { icon: LucideIcon; className: 
   under_review: { icon: Search, className: 'bg-sun-100 text-amber-900' },
   planned: { icon: ListChecks, className: 'bg-cyan-50 text-cyan-900' },
   in_progress: { icon: LoaderCircle, className: 'bg-indigo-50 text-indigo-800' },
-  resolved: { icon: CircleCheck, className: 'bg-rc-mint text-rc-teal-ink' },
+  resolved: { icon: CircleCheck, className: 'bg-emerald-50 text-emerald-800' },
   closed: { icon: CircleX, className: 'bg-slate-100 text-slate-700' },
 }
 

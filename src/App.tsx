@@ -121,7 +121,6 @@ export default function App() {
     // Feedback & Suggestions is one dialog for the whole signed-in app, so every page (and What's New) can open it
     <FeedbackProvider>
       <NativeBridge />
-      {pathname !== '/demo' && <VersionBadge />}
       <Routes>
         <Route path="/" element={isNative ? <NativeEntry /> : <Landing />} />
         <Route path="/signin" element={<SignIn />} />
@@ -236,6 +235,8 @@ export default function App() {
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      {/* After the page in the DOM, so keyboard users reach Skip to content first */}
+      {pathname !== '/demo' && <VersionBadge />}
     </FeedbackProvider>
   )
 }

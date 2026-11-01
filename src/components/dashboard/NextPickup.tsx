@@ -26,7 +26,7 @@ export function NextPickup({ ride, driverName, vehicle, now }: Props) {
         <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-brand-50 text-brand-600" aria-hidden>
           <CalendarPlus className="h-7 w-7" />
         </span>
-        <h2 id="next-title" className="text-lg font-extrabold">
+        <h2 id="next-title" className="text-lg font-bold">
           Nothing booked right now
         </h2>
         <p className="mt-1 text-sm text-slate-500">When you book a ride, the next pickup shows up here with a live countdown.</p>
@@ -49,7 +49,7 @@ export function NextPickup({ ride, driverName, vehicle, now }: Props) {
         <h2 id="next-title" className="text-sm font-bold text-white">
           {onBoard ? 'On the road' : 'Next pickup'}
         </h2>
-        <p className="mt-2 font-display text-4xl font-black tracking-tight" aria-live="polite">
+        <p className="mt-2 font-display text-4xl font-bold tracking-tight" aria-live="polite">
           {onBoard ? 'Riding now' : ride.type === 'ON_DEMAND' ? 'As soon as possible' : countdown(pickupMs, now)}
         </p>
         <p className="mt-1 flex items-center gap-1.5 text-sm text-white/70">

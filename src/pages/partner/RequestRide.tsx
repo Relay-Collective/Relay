@@ -232,7 +232,7 @@ export function RequestRide() {
   if (mode === 'edit' && source && !EDITABLE.includes(source.status)) {
     return (
       <div className={`${card} max-w-xl`}>
-        <h1 className="text-2xl font-extrabold">This ride can't be changed anymore</h1>
+        <h1 className="text-2xl font-bold">This ride can't be changed anymore</h1>
         <p className="mt-2 text-slate-600">
           {source.status === 'PICKED_UP' ? 'The client is already in the car.' : 'It has already finished or been cancelled.'}
         </p>
@@ -523,7 +523,7 @@ function RideForm({ mode, source, house, user }: FormProps) {
           <ArrowLeft className="h-4 w-4" aria-hidden />
           {source && mode !== 'again' ? 'Back to the ride' : 'Back to your rides'}
         </Link>
-        <h1 className="font-display text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">{title}</h1>
+        <h1 className="font-display text-3xl font-bold tracking-tight text-ink sm:text-4xl">{title}</h1>
         <p className="mt-1 text-slate-600">
           {intro} Fields marked{' '}
           <span className="font-semibold text-red-600" aria-hidden>

@@ -29,7 +29,7 @@ export function NetworkImpact() {
               {s.icon}
             </span>
             <span className="min-w-0 leading-tight">
-              <span className="block font-display text-lg font-black tabular-nums text-ink">{s.value}</span>
+              <span className="block font-display text-lg font-bold tabular-nums text-ink">{s.value}</span>
               <span className="block text-sm text-slate-500">{s.label}</span>
             </span>
           </li>

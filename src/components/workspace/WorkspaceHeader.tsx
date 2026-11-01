@@ -36,9 +36,11 @@ export function WorkspaceHeader({ onOpenMenu, menuOpen }: { onOpenMenu: () => vo
 
         <div className="flex shrink-0 items-center gap-2">
           {showRequest && (
-            <Link to={paths.newRide} className={`${primaryButton} ${compactButton} max-sm:w-11 max-sm:px-0`}>
+            <Link to={paths.newRide} className={`${primaryButton} ${compactButton} max-sm:px-3.5`}>
               <CalendarPlus className="h-4 w-4 shrink-0" aria-hidden />
-              <span className="max-sm:sr-only">Request a ride</span>
+              {/* Phones keep a short visible label: an icon alone hides the main action */}
+              <span className="sm:hidden">Request</span>
+              <span className="max-sm:hidden">Request a ride</span>
             </Link>
           )}
           <AccountMenu />

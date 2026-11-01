@@ -87,7 +87,7 @@ function Row({ label, children, copy }: { label: string; children: ReactNode; co
 function Stat({ value, label }: { value: ReactNode; label: string }) {
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-4 text-center">
-      <p className="font-display text-2xl font-extrabold text-ink">{value}</p>
+      <p className="font-display text-2xl font-bold text-ink">{value}</p>
       <p className="text-sm text-slate-500">{label}</p>
     </div>
   )

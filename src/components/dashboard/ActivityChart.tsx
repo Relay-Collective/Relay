@@ -36,7 +36,7 @@ export function ActivityChart({ days, today, title, subtitle }: Props) {
     <section aria-labelledby="activity-title" className={`${card} p-5 sm:p-6`}>
       <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
         <div>
-          <h2 id="activity-title" className="text-lg font-extrabold">
+          <h2 id="activity-title" className="text-lg font-bold">
             {title}
           </h2>
           <p className="text-sm text-slate-500">{subtitle}</p>
@@ -44,11 +44,11 @@ export function ActivityChart({ days, today, title, subtitle }: Props) {
         <dl className="flex gap-6">
           <div>
             <dt className="text-xs font-semibold text-slate-500">Last 7 days</dt>
-            <dd className="font-display text-2xl font-black tabular-nums text-ink">{rides(lastSeven)}</dd>
+            <dd className="font-display text-2xl font-bold tabular-nums text-ink">{rides(lastSeven)}</dd>
           </div>
           <div>
             <dt className="text-xs font-semibold text-slate-500">Next 7 days</dt>
-            <dd className="font-display text-2xl font-black tabular-nums text-ink">{rides(nextSeven)}</dd>
+            <dd className="font-display text-2xl font-bold tabular-nums text-ink">{rides(nextSeven)}</dd>
           </div>
         </dl>
       </div>

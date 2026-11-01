@@ -76,10 +76,10 @@ export function RideCelebration({ ride, count, onClose, onUndo }: Props) {
           />
         ))}
       </div>
-      <span className="mx-auto mb-4 flex h-16 w-16 animate-pop items-center justify-center rounded-xl bg-teal-700 text-white" aria-hidden>
+      <span className="mx-auto mb-4 flex h-16 w-16 animate-pop items-center justify-center rounded-xl bg-coral-600 text-white" aria-hidden>
         <PartyPopper className="h-8 w-8" />
       </span>
-      <h2 id="celebrate-title" className="font-display text-2xl font-extrabold tracking-tight">
+      <h2 id="celebrate-title" className="font-display text-2xl font-bold tracking-tight">
         {milestone ? milestoneTitle(count) : 'Ride complete. Thank you!'}
       </h2>
       <p className="mt-2 text-slate-600">

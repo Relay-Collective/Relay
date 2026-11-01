@@ -33,12 +33,12 @@ export function FormSection({ id, step, title, description, required, done, chil
           {done ? <Check className="h-4 w-4 animate-pop" strokeWidth={3} /> : step}
         </span>
         <div className="min-w-0 flex-1">
-          <h2 id={headingId} className="text-lg font-extrabold leading-8">
+          <h2 id={headingId} className="text-lg font-bold leading-8">
             {title}
             {required ? (
               <RequiredMark />
             ) : (
-              <span className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 align-middle font-sans text-xs font-semibold text-slate-500">
+              <span className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 align-middle font-sans text-xs font-semibold text-slate-600">
                 Optional
               </span>
             )}

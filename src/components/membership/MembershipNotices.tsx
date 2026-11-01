@@ -102,10 +102,10 @@ function Banner({
   action: { to: string; label: string }
   onDismiss: () => void
 }) {
-  const box = tone === 'success' ? 'border-emerald-200 bg-rc-mint' : 'border-brand-100 bg-brand-50/60'
+  const box = tone === 'success' ? 'border-emerald-200 bg-emerald-50' : 'border-brand-100 bg-brand-50/60'
   return (
     <div role="status" className={`mb-6 flex items-start gap-3 rounded-xl border p-4 ${box}`}>
-      <span className={tone === 'success' ? 'text-rc-teal-ink' : 'text-rc-blue'}>{icon}</span>
+      <span className={tone === 'success' ? 'text-emerald-700' : 'text-rc-blue'}>{icon}</span>
       <div className="min-w-0 flex-1">
         <p className="font-semibold text-rc-navy">{title}</p>
         <p className="mt-0.5 text-sm text-slate-700">{text}</p>

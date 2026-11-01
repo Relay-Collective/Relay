@@ -218,7 +218,7 @@ export function Overview() {
                   ).map(([label, value]) => (
                     <div key={label} className="px-4 py-4 text-center">
                       <dt className="text-xs font-semibold text-slate-500">{label}</dt>
-                      <dd className="mt-1 font-heading text-2xl font-extrabold tabular-nums text-rc-navy">{value}</dd>
+                      <dd className="mt-1 font-heading text-2xl font-bold tabular-nums text-rc-navy">{value}</dd>
                     </div>
                   ))}
                 </dl>

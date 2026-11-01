@@ -8,7 +8,7 @@ const ICON: Record<ActivityKind, { icon: LucideIcon; tone: string }> = {
   REQUESTED: { icon: CalendarPlus, tone: 'bg-brand-50 text-rc-blue' },
   CONFIRMED: { icon: Check, tone: 'bg-emerald-50 text-emerald-700' },
   PICKED_UP: { icon: CarFront, tone: 'bg-cyan-50 text-cyan-800' },
-  COMPLETED: { icon: CircleCheck, tone: 'bg-rc-mint text-rc-teal-ink' },
+  COMPLETED: { icon: CircleCheck, tone: 'bg-emerald-50 text-emerald-800' },
   NO_SHOW: { icon: UserX, tone: 'bg-coral-50 text-coral-700' },
   TRANSIT: { icon: Bus, tone: 'bg-teal-50 text-teal-700' },
   EXPIRED: { icon: SearchX, tone: 'bg-slate-100 text-slate-600' },

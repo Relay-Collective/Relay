@@ -60,7 +60,7 @@ function VolunteerSidebar(props: SidebarSlotProps) {
         initials: initials(name),
         title: name || 'Your workspace',
         subtitle: driver ? DRIVER_KIND_LABELS[driverKind(driver)] : 'Volunteer workspace',
-        className: 'bg-rc-teal text-white',
+        className: 'bg-coral-400 text-ink',
       }}
       groups={volunteerNav(canDrive(driver))}
       footer={[VOLUNTEER_HELP_NAV, VOLUNTEER_FEEDBACK_NAV]}

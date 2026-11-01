@@ -32,7 +32,7 @@ export function StatTile({ label, value, icon, tone, note, to, onClick, actionLa
           <ArrowRight className="h-4 w-4 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-ink" aria-hidden />
         )}
       </div>
-      <p className="mt-3 font-display text-4xl font-black tabular-nums tracking-tight text-ink">{value}</p>
+      <p className="mt-3 font-display text-4xl font-bold tabular-nums tracking-tight text-ink">{value}</p>
       {note && <p className={`mt-1 text-sm ${alert ? 'font-semibold text-red-700' : 'text-slate-500'}`}>{note}</p>}
     </>
   )

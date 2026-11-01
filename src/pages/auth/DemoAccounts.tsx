@@ -42,13 +42,13 @@ export function DemoAccounts({ users, busyId, disabled, defaultOpen, onPick }: P
           const tone = tones[ROLE_TONE[g.role]]
           return (
             <li key={g.role} className="py-3.5">
-              <h3 className="flex items-center gap-2 text-sm font-bold">
+              <h2 className="flex items-center gap-2 font-sans text-sm font-bold">
                 <span className={tone.text} aria-hidden>
                   {g.icon}
                 </span>
                 {g.title}
                 <span className="font-normal text-slate-500">· {g.text}</span>
-              </h3>
+              </h2>
               <div className="mt-2.5 flex flex-wrap gap-2">
                 {g.users.map((u) => (
                   <button
@@ -57,7 +57,7 @@ export function DemoAccounts({ users, busyId, disabled, defaultOpen, onPick }: P
                     disabled={disabled}
                     onClick={() => onPick(u, demoPasswordFor(u.email!))}
                     aria-label={`Sign in as ${u.name}`}
-                    className={`group/chip inline-flex min-h-9 items-center gap-2 rounded-full border border-slate-200 bg-white py-0.5 pl-0.5 pr-3 text-left text-sm font-semibold text-ink transition hover:-translate-y-0.5 disabled:pointer-events-none disabled:opacity-60 ${focusRing} ${tone.border}`}
+                    className={`group/chip inline-flex min-h-11 items-center gap-2 rounded-full border border-slate-200 bg-white py-0.5 pl-0.5 pr-3 text-left text-sm font-semibold text-ink transition hover:-translate-y-0.5 disabled:pointer-events-none disabled:opacity-60 ${focusRing} ${tone.border}`}
                   >
                     <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${tone.solid}`} aria-hidden>
                       {busyId === u.id ? <Loader2 className="h-4 w-4 animate-spin" /> : initials(u.name)}

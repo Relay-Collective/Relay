@@ -4,7 +4,7 @@ import type { VerificationStatus } from '../../types'
 
 const LOOK: Record<VerificationStatus, { icon: typeof Clock; className: string }> = {
   PENDING: { icon: Clock, className: 'bg-sun-100 text-amber-900' },
-  APPROVED: { icon: BadgeCheck, className: 'bg-rc-mint text-rc-teal-ink' },
+  APPROVED: { icon: BadgeCheck, className: 'bg-emerald-50 text-emerald-800' },
   REJECTED: { icon: CircleX, className: 'bg-slate-100 text-slate-700' },
 }
 

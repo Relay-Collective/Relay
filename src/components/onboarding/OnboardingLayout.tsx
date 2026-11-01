@@ -31,7 +31,7 @@ export function OnboardingLayout({ progress, sidebarIntro, help, children }: Pro
         {help && (
           <div className="mt-6 rounded-xl border border-rc-line bg-white p-4 text-sm text-slate-600">
             <p className="mb-1 flex items-center gap-2 font-semibold text-rc-navy">
-              <LifeBuoy className="h-4 w-4 text-rc-teal-ink" aria-hidden /> Good to know
+              <LifeBuoy className="h-4 w-4 text-brand-600" aria-hidden /> Good to know
             </p>
             {help}
           </div>

@@ -1,7 +1,7 @@
 import { ArrowUpRight } from 'lucide-react'
 import { useRef, type CSSProperties, type ElementType, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import logoMark from '../../assets/logo-mark.svg'
+import { LogoMark } from '../brand/LogoMark'
 import type { Availability } from './content'
 import { useInView } from './hooks'
 import { focusRing } from './styles'
@@ -97,7 +97,7 @@ export function StatusTag({ availability, children }: { availability: Availabili
 export function Wordmark({ to = '/', onClick }: { to?: string; onClick?: () => void }) {
   return (
     <Link to={to} onClick={onClick} className={`inline-flex min-h-11 items-center gap-2.5 rounded-lg ${focusRing}`} aria-label="Relay Collective home">
-      <img src={logoMark} alt="" className="h-8 w-8" width={32} height={32} />
+      <LogoMark className="h-8 w-8" />
       <span className="whitespace-nowrap font-grotesk text-[18px] font-semibold tracking-[-0.03em] text-midnight">Relay Collective</span>
     </Link>
   )
