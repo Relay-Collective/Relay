@@ -1,4 +1,4 @@
-import { Building2, CarFront, HandHeart, Layers, type LucideIcon } from 'lucide-react'
+import { CarFront, HandHeart, Layers, Waypoints, type LucideIcon } from 'lucide-react'
 
 // Everything the public website says lives here, so copy can change without touching layout.
 // Rule for this file: say what exists today as fact, and label everything else as planned.
@@ -29,7 +29,7 @@ export interface NavItem {
 // Each item jumps to a section on this page. Resources is the footer's resources column.
 export const NAV: NavItem[] = [
   { id: 'platform', label: 'Platform' },
-  { id: 'solutions', label: 'Solutions' },
+  { id: 'solutions', label: 'Modules' },
   { id: 'impact', label: 'Impact' },
   { id: 'resources', label: 'Resources' },
 ]
@@ -65,12 +65,23 @@ export interface Capability {
   accent: 'electric' | 'cantaloupe'
 }
 
+// The foundation comes first: it is the product. Transportation is the first module built on it.
 export const CAPABILITIES: Capability[] = [
+  {
+    id: 'organizations',
+    area: 'Shared foundation',
+    title: 'Build on common ground.',
+    text: 'Every organization gets the same base: a workspace for its team, invitations, role-based access, and one place for requests. It is built once, shared by everyone, and every module runs on it.',
+    status: 'Working today',
+    availability: 'live',
+    icon: Waypoints,
+    accent: 'electric',
+  },
   {
     id: 'transport',
     area: 'Transportation',
     title: 'Move people.',
-    text: 'Coordinate rides to essential appointments, services, and destinations. Staff request a ride, a verified driver accepts it, and it stays in view until drop-off.',
+    text: 'The first module on the foundation. Staff request a ride, a verified driver accepts it, and it stays in view until drop-off.',
     status: 'Working today',
     availability: 'live',
     icon: CarFront,
@@ -80,56 +91,49 @@ export const CAPABILITIES: Capability[] = [
     id: 'volunteers',
     area: 'Volunteer coordination',
     title: 'Mobilize communities.',
-    text: 'Connect volunteers with opportunities to support the organizations that need them. Volunteer drivers can sign up today.',
+    text: 'Connect volunteers with the organizations that need them. Volunteer drivers can sign up today.',
     status: 'Drivers today, more roles planned',
     availability: 'partial',
     icon: HandHeart,
     accent: 'cantaloupe',
   },
   {
-    id: 'organizations',
-    area: 'Organization management',
-    title: 'Work together.',
-    text: 'Bring your teams, members, and coordination workflows into one connected workspace, with invitations and role-based access.',
-    status: 'Working today',
-    availability: 'live',
-    icon: Building2,
-    accent: 'electric',
-  },
-  {
     id: 'grow',
-    area: 'Expanding services',
+    area: 'Next modules',
     title: 'Built to grow.',
-    text: 'Designed to support resource sharing and cross-organization services next, on the same foundation, as your organization evolves.',
-    status: 'Our vision',
+    text: 'Resource sharing and cross-organization services are planned next. Each new module starts from what the others already proved, so no organization builds it alone.',
+    status: 'Planned',
     availability: 'planned',
     icon: Layers,
     accent: 'cantaloupe',
   },
 ]
 
+// What sits in the shared foundation, whatever module an organization runs. All of these work today.
+export const FOUNDATION: string[] = ['Organization workspaces', 'Invitations and teams', 'Role-based access', 'Requests and status']
+
 /* ---------- How it works ---------- */
 
 export const STEPS: { n: string; title: string; text: string }[] = [
-  { n: '01', title: 'Join the network', text: 'Organizations establish their workspace and connect their team. Every organization and driver is reviewed first.' },
-  { n: '02', title: 'Coordinate support', text: 'Manage service requests and organize available resources, in one shared view.' },
-  { n: '03', title: 'Make an impact', text: 'Help people access services and support more effectively.' },
+  { n: '01', title: 'Join the foundation', text: 'Set up your organization’s workspace and invite your team. Every organization is reviewed before it goes live.' },
+  { n: '02', title: 'Turn on what you need', text: 'Start with transportation today. Each module uses the same accounts, roles, and requests, so there is nothing new to learn.' },
+  { n: '03', title: 'Grow with the network', text: 'What one organization helps build, every other one can use. Resource sharing and cross-organization services are planned.' },
 ]
 
 /* ---------- Impact: what is true today, in words ---------- */
 
 export const IMPACT_POINTS: { title: string; text: string }[] = [
   {
+    title: 'Shared before bespoke',
+    text: 'One foundation, maintained together. A small organization gets the same tools as a large one, without building its own.',
+  },
+  {
+    title: 'Open by default',
+    text: 'Open source under the MIT license. Anyone can see how it works, use it, and help build the next module.',
+  },
+  {
     title: 'Dignity first',
-    text: 'The person riding needs no account, phone, or money. Drivers see only what the ride requires.',
-  },
-  {
-    title: 'Grounded in front-line work',
-    text: `Built with ${PARTNER.name} – ${PARTNER.program} staff, who showed us how often a missed ride means a missed appointment.`,
-  },
-  {
-    title: 'Responsible by design',
-    text: 'Honest about what works today and what is planned. Open source, accessible, and reviewed before anyone’s first ride.',
+    text: 'Every module asks only for what the job needs. The people being supported need no account, and are never treated as a case.',
   },
 ]
 

@@ -1,39 +1,37 @@
 import { ArrowDown, Building2, CarFront, CircleCheck, HandHeart, Inbox, Layers, LayoutDashboard, UsersRound, type LucideIcon } from 'lucide-react'
-import { useLayoutEffect, useRef, useState, type CSSProperties, type RefObject } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode, type RefObject } from 'react'
 import { LogoMark } from '../brand/LogoMark'
 import { DEMO_ACTIVITY, DEMO_ORG, DEMO_STAFF, type DemoArea } from './demo'
 import { usePrefersReducedMotion } from './hooks'
 
 const at = (ms: number) => ({ '--enter-delay': `${ms}ms` } as CSSProperties)
 
-// When each part lands, in ms after load: the workspace, the people around it, the services it runs, the outcome.
-// Everything is in place by about 1.8s; the relay points finish travelling by about 2.6s and nothing moves after.
+// When each part lands, in ms after load: the track draws, the workspace settles inside it, the stations take their places.
+// Everything is in place by about 1.8s; the relay point then runs one lap (LAP, below) and nothing moves after it.
 const T = {
-  board: 120,
-  orgs: 520,
-  orgsLine: 680,
-  volunteers: 700,
-  volunteersLine: 860,
-  transport: 1000,
-  services: 1100,
-  impactLine: 1200,
-  impact: 1320,
+  board: 220,
+  orgs: 640,
+  volunteers: 780,
+  transport: 920,
+  impact: 1060,
+  services: 1200,
 }
-const TRAVEL = { orgs: 1050, volunteers: 1250, impact: 1500 }
 
 type PartKey = 'organizations' | 'volunteers' | 'transport' | 'services' | 'impact'
 type Tone = 'electric' | 'cantaloupe' | 'emerald'
 
-const TONE: Record<Tone, string> = {
+// 'arrived' is Community impact once the relay point reaches it: the check fills in
+const TONE: Record<Tone | 'arrived', string> = {
   electric: 'bg-electric-wash text-electric-ink',
   cantaloupe: 'bg-cantaloupe-wash text-cantaloupe-ink',
   emerald: 'bg-emerald-50 text-emerald-700',
+  arrived: 'bg-emerald-600 text-white',
 }
 
 // What the platform brings together, each linking to where the page explains it.
-// Status follows CAPABILITIES in content.ts: volunteers are drivers today, community services are planned.
+// Status follows CAPABILITIES in content.ts: volunteers are drivers today, resource sharing is planned.
 const PARTS: Record<PartKey, { title: string; text: string; icon: LucideIcon; tone: Tone; href: string; status?: 'drivers' | 'planned' }> = {
-  organizations: { title: 'Organizations', text: 'Teams, members, and services in one place.', icon: Building2, tone: 'electric', href: '#cap-orgs' },
+  organizations: { title: 'Organizations', text: 'One shared workspace for every team.', icon: Building2, tone: 'electric', href: '#cap-orgs' },
   volunteers: {
     title: 'Volunteers',
     text: 'People ready to support community needs.',
@@ -42,10 +40,10 @@ const PARTS: Record<PartKey, { title: string; text: string; icon: LucideIcon; to
     href: '#cap-volunteers',
     status: 'drivers',
   },
-  transport: { title: 'Transportation', text: 'Rides to essential appointments.', icon: CarFront, tone: 'electric', href: '#cap-transport' },
+  transport: { title: 'Transportation', text: 'The first module. Rides to appointments.', icon: CarFront, tone: 'electric', href: '#cap-transport' },
   services: {
-    title: 'Community services',
-    text: 'Room for growing programs.',
+    title: 'Resource sharing',
+    text: 'The next module.',
     icon: Layers,
     tone: 'cantaloupe',
     href: '#cap-grow',
@@ -54,20 +52,19 @@ const PARTS: Record<PartKey, { title: string; text: string; icon: LucideIcon; to
   impact: { title: 'Community impact', text: 'People connected. Services delivered.', icon: CircleCheck, tone: 'emerald', href: '#impact' },
 }
 
-// The hero picture: one workspace at the centre, the parts of the platform around it, the outcome beneath.
+// The hero picture: the Relay Loop. One workspace at the centre, the parts of the platform as stations on a track around it.
 // The workspace is illustrative and hidden from screen readers; the cards are links to the sections that explain each part.
 export function HeroProductEcosystem() {
   const [active, setActive] = useState<PartKey | null>(null)
   return (
     <figure className="relative">
       <figcaption className="sr-only">
-        An illustrative Relay Collective workspace, connected to organizations, volunteers, transportation, community services (planned), and
+        An illustrative Relay Collective workspace, connected to organizations, volunteers, transportation, resource sharing (planned), and
         community impact.
       </figcaption>
-      <Stage active={active} onActive={setActive} />
-      <Compact active={active} onActive={setActive} />
+      <Loop active={active} onActive={setActive} />
       <p
-        className="rcl-enter mt-6 flex items-center gap-2 font-dm text-[13px] text-hush md:justify-center xl:mt-3 xl:justify-start"
+        className="rcl-enter mt-6 flex items-center gap-2 font-dm text-[13px] text-hush md:justify-center xl:mt-4 xl:justify-start"
         style={at(T.impact + 200)}
         aria-hidden
       >
@@ -83,229 +80,296 @@ interface Linked {
   onActive: (part: PartKey | null) => void
 }
 
-/* ---------- Tablet and desktop ---------- */
+/* ---------- The Relay Loop ---------- */
 
-// The workspace leads; Organizations and Volunteers sit above it, Transportation and Community services dock on its lower
-// edge, and Community impact hangs beneath as the outcome. Sizes are in em, and 1em is a fortieth of the stage's width,
-// so the whole composition scales as one piece.
-function Stage({ active, onActive }: Linked) {
-  const stage = useRef<HTMLDivElement>(null)
-  const board = useRef<HTMLDivElement>(null)
-  const orgs = useRef<HTMLAnchorElement>(null)
-  const volunteers = useRef<HTMLAnchorElement>(null)
-  const impact = useRef<HTMLAnchorElement>(null)
-  const wires = useConnectors(stage, board, { orgs, volunteers, impact })
-  const reduced = usePrefersReducedMotion()
-
-  const LINES = [
-    { part: 'organizations', wire: wires.orgs, delay: T.orgsLine, travel: TRAVEL.orgs, dot: 'bg-electric' },
-    { part: 'volunteers', wire: wires.volunteers, delay: T.volunteersLine, travel: TRAVEL.volunteers, dot: 'bg-cantaloupe' },
-    { part: 'impact', wire: wires.impact, delay: T.impactLine, travel: TRAVEL.impact, dot: 'bg-electric' },
-  ] as const
+// The logo, scaled up until it holds the product: its two hooks become one track, and each part of the platform is a
+// station on it. Volunteers sit in the open top-right handoff; the planned module sits on the open bottom-left corner,
+// drawn as sleepers with no rails yet.
+//
+// The cards and the workspace are laid out in a grid, so nothing can overlap; the track is then measured from that grid
+// and drawn behind it, through the middle of the top row and of Community impact. One layout for every screen:
+// - phones: Organizations and Volunteers on the top track, the workspace, Transportation and Community services inside
+//   the loop, Community impact on the bottom track
+// - tablet and desktop: the same, with Community services, Community impact and Transportation sharing the bottom track
+// Sizes are in em. From md, 1em is a fortieth of the picture's width, so the whole piece scales as one.
+function Loop({ active, onActive }: Linked) {
+  const root = useRef<HTMLDivElement>(null)
+  const organizations = useRef<HTMLDivElement>(null)
+  const volunteers = useRef<HTMLDivElement>(null)
+  const transport = useRef<HTMLDivElement>(null)
+  const impact = useRef<HTMLDivElement>(null)
+  const services = useRef<HTMLDivElement>(null)
+  const stations: Stations = { organizations, volunteers, transport, impact, services }
+  const relay = useRef<SVGPathElement>(null)
+  const dot = useRef<SVGGElement>(null)
+  const geo = useLoopGeometry(root, stations)
+  const arrived = useRelay(root, stations, relay, dot, geo !== null)
+  const parallax = useParallax()
+  const linked = { active, onActive }
 
   return (
-    <div className="hidden select-none [container-type:inline-size] md:block">
-      <div ref={stage} className="relative text-[2.5cqw]">
-        <Hook className="absolute left-[0.6em] top-[4.4em] w-[24em]" />
-        <span
-          className="rcl-fade absolute left-[35.6em] top-[22.6em] aspect-square w-[3.8em] rounded-full bg-cantaloupe"
-          style={at(T.services)}
-          aria-hidden
-        />
+    <div className="[container-type:inline-size]">
+      <div
+        ref={root}
+        className="relative select-none text-[16px] [--gap:0.75em] [--tw:14px] md:text-[2.5cqw] md:[--gap:2.6em] md:[--tw:2.2em]"
+        {...parallax}
+      >
+        {geo && (
+          <div className="rcl-depth absolute inset-0" style={depth(-0.5)}>
+            <Track geo={geo} relay={relay} dot={dot} />
+          </div>
+        )}
 
-        {/* Thin electric connectors. A hovered or focused card brings its own forward and quiets the others. */}
-        <svg className="pointer-events-none absolute inset-0 z-10 h-full w-full overflow-visible" fill="none" aria-hidden>
-          {LINES.map(
-            ({ part, wire, delay }) =>
-              wire && (
-                <g key={part} className="transition-opacity duration-300" opacity={active && active !== part ? 0.25 : 1}>
-                  {/* A white casing keeps the line legible where it crosses the electric hook */}
-                  <path className="rcl-route" pathLength={1} style={at(delay)} d={wire.d} stroke="#fff" strokeWidth={4.5} strokeLinecap="round" />
-                  <path
-                    className="rcl-route transition-[stroke,stroke-width] duration-300"
-                    pathLength={1}
-                    style={at(delay)}
-                    d={wire.d}
-                    stroke={active === part ? '#0272A8' : '#0297DE'}
-                    strokeOpacity={active === part ? 1 : 0.7}
-                    strokeWidth={active === part ? 1.75 : 1.25}
-                    strokeLinecap="round"
-                  />
-                  <g className="rcl-fade" style={at(delay + 300)}>
-                    <circle cx={wire.from[0]} cy={wire.from[1]} r="3" fill="#fff" stroke="#0297DE" strokeWidth="1.25" />
-                    <circle cx={wire.to[0]} cy={wire.to[1]} r="3" fill="#fff" stroke="#0297DE" strokeWidth="1.25" />
-                  </g>
-                </g>
-              ),
-          )}
-        </svg>
+        {/* On the top track. Keyboard order follows the lap: organizations, volunteers, transportation, impact, then planned. */}
+        <div className="relative mx-[0.4em] grid grid-cols-2 gap-[0.6em] md:mx-0 md:flex md:items-center md:justify-between">
+          <Station ref={organizations} className="md:ml-[6.5em] md:w-[14.5em]">
+            <PartCard part="organizations" stack="mobile" delay={T.orgs} {...linked} />
+          </Station>
+          <Station ref={volunteers} className="md:w-[14.5em]">
+            <PartCard part="volunteers" stack="mobile" delay={T.volunteers} {...linked} />
+          </Station>
+        </div>
 
-        {/* Relay points: blue from Organizations into the workspace, cantaloupe out to Volunteers, blue down to impact. Once. */}
-        {!reduced &&
-          LINES.map(
-            ({ part, wire, travel, dot }) =>
-              wire && (
-                <span
-                  key={part}
-                  className={`rcl-traveller pointer-events-none absolute left-0 top-0 z-30 h-[0.55em] w-[0.55em] rounded-full ring-[0.2em] ring-white ${dot}`}
-                  style={{ offsetPath: `path('${wire.d}')`, ...at(travel) }}
-                  aria-hidden
-                />
-              ),
-          )}
-
-        {/* The upper cards come first in the markup, so keyboard order follows the story: people, services, outcome */}
-        <PartCard
-          ref={orgs}
-          part="organizations"
-          size="upper"
-          delay={T.orgs}
-          active={active}
-          onActive={onActive}
-          className="absolute left-0 top-[0.5em] z-20 w-[14.8em]"
-        />
-        <PartCard
-          ref={volunteers}
-          part="volunteers"
-          size="upper"
-          delay={T.volunteers}
-          active={active}
-          onActive={onActive}
-          className="absolute right-0 top-0 z-20 w-[15.2em]"
-        />
-
-        <div className="px-[3em] pt-[9.6em]">
-          <div ref={board} className="rcl-card relative" style={at(T.board)}>
-            <div aria-hidden>
+        {/* Inside the loop, clear of its sides */}
+        <div className="rcl-depth relative mx-[calc(var(--tw)+var(--gap))] my-[0.9em] md:my-[1.6em]" style={depth(0.35)}>
+          <div className="rcl-card" style={at(T.board)} aria-hidden>
+            <div className="md:hidden">
+              <Workspace compact active={active} />
+            </div>
+            <div className="hidden md:block">
               <Workspace active={active} />
             </div>
-            <div className="absolute left-[1.4em] top-[calc(100%-1.8em)] z-20 w-[13.8em]">
-              <PartCard part="transport" size="chip" delay={T.transport} active={active} onActive={onActive} />
-            </div>
-            <div className="absolute right-[1.4em] top-[calc(100%-1.8em)] z-20 w-[13.8em]">
-              <PartCard part="services" size="chip" delay={T.services} active={active} onActive={onActive} />
-            </div>
           </div>
-          <div className="mt-[5.8em] flex justify-center">
-            <PartCard ref={impact} part="impact" size="outcome" delay={T.impact} active={active} onActive={onActive} className="w-[20.4em]" />
-          </div>
+        </div>
+
+        {/* Phones: two stations inside the loop, impact on the bottom track. From md: all three on the bottom track. */}
+        <div className="relative mx-[calc(var(--tw)+var(--gap))] grid grid-cols-2 gap-[0.6em] md:ml-0 md:mr-[2em] md:grid-cols-[11.6fr_13fr_11.6fr] md:gap-[0.9em]">
+          <Station ref={transport} className="order-1 md:order-3">
+            <PartCard part="transport" stack="always" delay={T.transport} {...linked} />
+          </Station>
+          <Station ref={impact} className="order-3 col-span-2 mt-[0.3em] md:order-2 md:col-span-1 md:mt-0">
+            <PartCard part="impact" stack="mobile-row" outcome arrived={arrived} delay={T.impact} {...linked} />
+          </Station>
+          <Station ref={services} className="order-2 md:order-1">
+            <PartCard part="services" stack="always" delay={T.services} {...linked} />
+          </Station>
         </div>
       </div>
     </div>
   )
 }
 
-interface Wire {
-  d: string
-  from: [number, number]
-  to: [number, number]
-}
+// How far a layer drifts with the pointer, in em: the track sits behind, the stations float in front
+const depth = (d: number) => ({ '--depth': d }) as CSSProperties
 
-type WireKey = 'orgs' | 'volunteers' | 'impact'
-
-// Measures where each card meets the workspace and draws a soft S-curve between them, in the stage's own pixels.
-// Organizations runs into the workspace, Volunteers out of it, impact down from it: the way the relay points travel.
-function useConnectors(
-  stage: RefObject<HTMLDivElement | null>,
-  board: RefObject<HTMLDivElement | null>,
-  cards: Record<WireKey, RefObject<HTMLAnchorElement | null>>,
-): Partial<Record<WireKey, Wire>> {
-  const [wires, setWires] = useState<Partial<Record<WireKey, Wire>>>({})
-  const { orgs, volunteers, impact } = cards
-
-  useLayoutEffect(() => {
-    const root = stage.current
-    if (!root) return
-    const n = (v: number) => Math.round(v * 10) / 10
-    const curve = (from: [number, number], to: [number, number]): Wire => {
-      const bend = (to[1] - from[1]) * 0.55
-      return {
-        d: `M${n(from[0])} ${n(from[1])} C${n(from[0])} ${n(from[1] + bend)} ${n(to[0])} ${n(to[1] - bend)} ${n(to[0])} ${n(to[1])}`,
-        from,
-        to,
-      }
-    }
-    // Cards settle in with a transform, so read layout boxes (offset*), never the animated ones
-    const box = (el: HTMLElement | null) => {
-      if (!el) return null
-      let left = 0
-      let top = 0
-      for (let at: HTMLElement | null = el; at && at !== root; at = at.offsetParent as HTMLElement | null) {
-        left += at.offsetLeft
-        top += at.offsetTop
-      }
-      return { left, top, width: el.offsetWidth, height: el.offsetHeight }
-    }
-    const measure = () => {
-      const b = box(board.current)
-      const o = box(orgs.current)
-      const v = box(volunteers.current)
-      const i = box(impact.current)
-      if (!b || !o || !v || !i || root.offsetWidth === 0) return
-      const em = root.offsetWidth / 40
-      const impactX = i.left + i.width / 2
-      setWires({
-        orgs: curve([o.left + o.width * 0.68, o.top + o.height], [o.left + o.width * 0.68 + 1.8 * em, b.top]),
-        volunteers: curve([v.left + v.width * 0.32 - 1.8 * em, b.top], [v.left + v.width * 0.32, v.top + v.height]),
-        impact: curve([impactX, b.top + b.height], [impactX, i.top]),
-      })
-    }
-    measure()
-    const observer = new ResizeObserver(measure)
-    observer.observe(root)
-    document.fonts?.ready.then(measure)
-    return () => observer.disconnect()
-  }, [stage, board, orgs, volunteers, impact])
-
-  return wires
-}
-
-// The electric hook from the logo, drawn large and cropped by the workspace, so the brand's own loop frames the product
-function Hook({ className }: { className: string }) {
+function Station({ className = '', children, ref }: { className?: string; children: ReactNode; ref: RefObject<HTMLDivElement | null> }) {
   return (
-    <svg viewBox="0 0 432 480" className={`rcl-fade overflow-visible ${className}`} fill="none" aria-hidden>
-      <path d="M40 420V184a144 144 0 0 1 144-144h248" stroke="#0297DE" strokeWidth="48" strokeLinecap="round" />
-    </svg>
-  )
-}
-
-/* ---------- Phones ---------- */
-
-// Phones get their own arrangement: the workspace first, Organizations and Volunteers tucked under it, the services it runs
-// as one short list, then the outcome. Readable sizes, one short connector, nothing hidden behind anything else.
-function Compact({ active, onActive }: Linked) {
-  return (
-    <div className="relative select-none md:hidden">
-      <Hook className="absolute -left-3 -top-5 w-[62%]" />
-      <span className="absolute -right-6 top-[38%] aspect-square w-16 rounded-full bg-cantaloupe" aria-hidden />
-
-      <div className="rcl-card relative ml-3" style={at(T.board)} aria-hidden>
-        <Workspace compact active={active} />
-      </div>
-
-      <div className="relative z-10 -mt-4 grid grid-cols-2 gap-2.5 px-1.5">
-        <PartCard part="organizations" size="compact" delay={T.orgs} active={active} onActive={onActive} />
-        <PartCard part="volunteers" size="compact" delay={T.volunteers} active={active} onActive={onActive} />
-      </div>
-
-      <div className="rcl-card rcl-card-lift mx-1.5 mt-2.5 rounded-xl border border-hairline bg-white" style={at(T.transport)}>
-        <PartRow part="transport" onActive={onActive} />
-        <PartRow part="services" onActive={onActive} />
-      </div>
-
-      <span className="mx-auto block h-7 w-px bg-electric" aria-hidden />
-      <div className="mx-1.5">
-        <PartCard part="impact" size="compact-outcome" delay={T.impact} active={active} onActive={onActive} />
-      </div>
+    <div ref={ref} className={`rcl-depth relative ${className}`} style={depth(1)}>
+      {children}
     </div>
   )
 }
 
+type Stations = Record<PartKey, RefObject<HTMLDivElement | null>>
+
+interface Geo {
+  w: number
+  h: number
+  tw: number
+  electric: string
+  midnight: string
+  planned: string
+  relay: string
+}
+
+// A layout box relative to the loop. Cards settle in with a transform, so read layout boxes (offset*), never the animated ones.
+function box(el: HTMLElement | null | undefined, root: HTMLElement) {
+  if (!el) return null
+  let left = 0
+  let top = 0
+  for (let at: HTMLElement | null = el; at && at !== root; at = at.offsetParent as HTMLElement | null) {
+    left += at.offsetLeft
+    top += at.offsetTop
+  }
+  return { left, top, width: el.offsetWidth, height: el.offsetHeight }
+}
+
+// The logo's two hooks, stretched to the loop. On the logo's 30-unit square each hook runs 22 units up its side and
+// 19 across, with a 10-unit corner; here those become shares of the loop's width and height, and the corner a third
+// of its shorter side.
+function loopPaths(w: number, h: number, tw: number, top: number, bottom: number, impactX: number): Geo {
+  const n = (v: number) => Math.round(v * 10) / 10
+  const L = tw / 2
+  const R = w - tw / 2
+  const W = R - L
+  const H = bottom - top
+  const r = n(0.33 * Math.min(W, H))
+  const arc = (x: number, y: number) => `A${r} ${r} 0 0 1 ${n(x)} ${n(y)}`
+  const eStart = n(top + 0.73 * H)
+  const eEnd = n(L + 0.633 * W)
+  const mStart = n(top + 0.267 * H)
+  const mEnd = n(L + 0.367 * W)
+  return {
+    w,
+    h,
+    tw,
+    electric: `M${n(L)} ${eStart}V${n(top + r)}${arc(L + r, top)}H${eEnd}`,
+    midnight: `M${n(R)} ${mStart}V${n(bottom - r)}${arc(R - r, bottom)}H${mEnd}`,
+    planned: `M${mEnd} ${n(bottom)}H${n(L + r)}${arc(L, bottom - r)}V${eStart}`,
+    // Up the electric hook, across the open handoff, down the midnight hook, into impact
+    relay: `M${n(L)} ${eStart}V${n(top + r)}${arc(L + r, top)}H${n(R - r)}${arc(R, top + r)}V${n(bottom - r)}${arc(R - r, bottom)}H${n(impactX)}`,
+  }
+}
+
+// Measures the grid and fits the track to it, again whenever the picture resizes or the fonts arrive
+function useLoopGeometry(root: RefObject<HTMLDivElement | null>, stations: Stations) {
+  const [geo, setGeo] = useState<Geo | null>(null)
+  useLayoutEffect(() => {
+    const el = root.current
+    if (!el) return
+    const measure = () => {
+      const top = box(stations.organizations.current, el)
+      const impact = box(stations.impact.current, el)
+      if (!top || !impact || el.offsetWidth === 0) return
+      const md = window.matchMedia('(min-width: 768px)').matches
+      const tw = md ? parseFloat(getComputedStyle(el).fontSize) * 2.2 : 14
+      setGeo(loopPaths(el.offsetWidth, el.offsetHeight, tw, top.top + top.height / 2, impact.top + impact.height / 2, impact.left + impact.width / 2))
+    }
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(el)
+    document.fonts?.ready.then(measure)
+    return () => observer.disconnect()
+  }, [root, stations.organizations, stations.impact])
+  return geo
+}
+
+// The track: an electric hook and a midnight hook, each with a white road lane down its middle, sleepers where the
+// planned module will be laid, and the relay point (moved by useRelay).
+function Track({ geo, relay, dot }: { geo: Geo; relay: RefObject<SVGPathElement | null>; dot: RefObject<SVGGElement | null> }) {
+  const { w, h, tw } = geo
+  const lane = { stroke: '#fff', strokeOpacity: 0.75, strokeWidth: Math.max(1.25, tw * 0.075), strokeDasharray: `${tw * 0.32} ${tw * 0.42}`, strokeLinecap: 'round' as const }
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} width={w} height={h} className="absolute inset-0 overflow-visible" fill="none" aria-hidden>
+      <path className="rcl-fade" style={at(T.services)} d={geo.planned} stroke="#111820" strokeOpacity="0.26" strokeWidth={tw} strokeDasharray={`${tw * 0.12} ${tw * 0.36}`} />
+      <path className="rcl-route" pathLength={1} style={at(60)} d={geo.electric} stroke="#0297DE" strokeWidth={tw} strokeLinecap="round" />
+      <path className="rcl-route" pathLength={1} style={at(360)} d={geo.midnight} stroke="#111820" strokeWidth={tw} strokeLinecap="round" />
+      <g className="rcl-fade" style={at(T.board + 600)}>
+        <path d={geo.electric} {...lane} />
+        <path d={geo.midnight} {...lane} />
+      </g>
+      <path ref={relay} d={geo.relay} stroke="none" />
+      {/* The person at the logo's centre, relayed from hand to hand */}
+      <g ref={dot} opacity="0">
+        <circle r={tw * 0.42} fill="#FC734D" stroke="#fff" strokeWidth={tw * 0.17} />
+      </g>
+    </svg>
+  )
+}
+
+// One lap, once, when the picture is in view and has settled: the relay point runs the track, each station lifts and
+// lights as the point passes it, and the lap ends in Community impact. Returns true once it has arrived (at once with
+// reduced motion, which skips the lap).
+const LAP = { after: 1900, ms: 3200 }
+
+function useRelay(
+  root: RefObject<HTMLDivElement | null>,
+  stations: Stations,
+  relay: RefObject<SVGPathElement | null>,
+  dot: RefObject<SVGGElement | null>,
+  ready: boolean,
+) {
+  const reduced = usePrefersReducedMotion()
+  const [done, setDone] = useState(false)
+  const ran = useRef(false)
+
+  useEffect(() => {
+    const el = root.current
+    if (reduced || !ready || ran.current || !el) return
+    const mounted = performance.now()
+    let timer = 0
+    let frame = 0
+
+    const run = () => {
+      const path = relay.current
+      const point = dot.current
+      if (!path || !point) return
+      ran.current = true
+      const length = path.getTotalLength()
+      const reach = Number(path.ownerSVGElement?.querySelector('circle')?.getAttribute('r') ?? 8) * 3
+      const waiting = [stations.organizations, stations.volunteers, stations.transport, stations.impact, stations.services].map(({ current: s }) => ({
+        s,
+        b: box(s, el),
+      }))
+      const start = performance.now()
+      const step = (now: number) => {
+        const t = Math.min(1, (now - start) / LAP.ms)
+        const eased = 0.5 - Math.cos(Math.PI * t) / 2
+        const p = path.getPointAtLength(eased * length)
+        point.setAttribute('transform', `translate(${p.x} ${p.y})`)
+        point.setAttribute('opacity', String(t < 0.04 ? t / 0.04 : t > 0.93 ? (1 - t) / 0.07 : 1))
+        for (const w of waiting) {
+          const { b, s } = w
+          if (!b || !s || s.dataset.passed) continue
+          if (p.x > b.left - reach && p.x < b.left + b.width + reach && p.y > b.top - reach && p.y < b.top + b.height + reach) {
+            s.dataset.passed = 'true'
+            s.querySelector('[data-surface]')?.classList.add('rcl-pass')
+          }
+        }
+        if (t < 1) frame = requestAnimationFrame(step)
+        else setDone(true)
+      }
+      frame = requestAnimationFrame(step)
+    }
+
+    // Wait until most of the picture is on screen (phones scroll to it), and never start before the stations have landed
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return
+        observer.disconnect()
+        timer = window.setTimeout(run, Math.max(0, LAP.after - (performance.now() - mounted)))
+      },
+      { threshold: 0.5 },
+    )
+    observer.observe(el)
+    return () => {
+      observer.disconnect()
+      window.clearTimeout(timer)
+      cancelAnimationFrame(frame)
+    }
+  }, [reduced, ready, root, relay, dot, stations.organizations, stations.volunteers, stations.transport, stations.impact, stations.services])
+
+  return reduced || done
+}
+
+// Each layer drifts a little with the pointer, by its depth, so the stations float over the workspace and the track.
+// Flat translation only, so text stays crisp. Mouse only, never with reduced motion. The offsets are custom properties
+// on the pointer's target, which .rcl-depth inherits.
+function useParallax() {
+  const reduced = usePrefersReducedMotion()
+  const set = (el: HTMLElement, x: number, y: number) => {
+    el.style.setProperty('--px', x.toFixed(3))
+    el.style.setProperty('--py', y.toFixed(3))
+  }
+  return {
+    onPointerMove: (e: PointerEvent<HTMLDivElement>) => {
+      if (reduced || e.pointerType !== 'mouse') return
+      const r = e.currentTarget.getBoundingClientRect()
+      set(e.currentTarget, (e.clientX - r.left) / r.width - 0.5, (e.clientY - r.top) / r.height - 0.5)
+    },
+    onPointerLeave: (e: PointerEvent<HTMLDivElement>) => set(e.currentTarget, 0, 0),
+  }
+}
+
 /* ---------- Parts ---------- */
 
-function Icon({ icon: I, tone, size }: { icon: LucideIcon; tone: Tone; size: string }) {
+function Icon({ icon: I, tone, size }: { icon: LucideIcon; tone: Tone | 'arrived'; size: string }) {
   return (
-    <span className={`flex shrink-0 items-center justify-center rounded-[28%] ${TONE[tone]}`} style={{ width: size, height: size }} aria-hidden>
+    <span
+      className={`flex shrink-0 items-center justify-center rounded-[28%] transition-colors duration-500 ${TONE[tone]}`}
+      style={{ width: size, height: size }}
+      aria-hidden
+    >
       <I className="h-[48%] w-[48%]" strokeWidth={2} />
     </span>
   )
@@ -339,101 +403,77 @@ const label = (part: PartKey) => {
   return `${title}${status ? ` (${status === 'planned' ? 'planned' : 'drivers today'})` : ''}. ${text}`
 }
 
-type Size = 'upper' | 'chip' | 'outcome' | 'compact' | 'compact-outcome'
-
-const card = 'group block rounded-[0.9em] focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-electric-ink'
+const card = 'group block h-full rounded-[0.9em] focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-electric-ink'
 const surface =
   'rcl-card-lift relative h-full rounded-[0.9em] border bg-white transition-[translate,border-color,box-shadow] duration-300 ease-out group-hover:-translate-y-[0.15em] group-hover:border-electric/40 group-focus-visible:border-electric/40 motion-reduce:transition-none motion-reduce:group-hover:translate-y-0'
 
+// stack: where the icon sits above the words: 'always', only on phones ('mobile'), or only from md ('mobile-row').
+// When stacked, the icon shares its row with the status (or the way-in arrow), so every stacked card has the same rhythm.
+// outcome: Community impact, a little larger; arrived fills its check in once the relay point gets there.
+type Stack = 'always' | 'mobile' | 'mobile-row'
+
+const STACK: Record<Stack, { card: string; head: string; inline: string; stacked: string }> = {
+  always: { card: 'flex-col', head: 'flex', inline: 'hidden', stacked: 'flex' },
+  mobile: { card: 'flex-col md:flex-row md:items-start', head: 'flex md:contents', inline: 'hidden md:inline-flex', stacked: 'flex md:hidden' },
+  'mobile-row': { card: 'items-center md:flex-col md:items-stretch', head: 'contents md:flex', inline: 'inline-flex md:hidden', stacked: 'hidden md:flex' },
+}
+
 function PartCard({
   part,
-  size,
+  stack,
+  outcome = false,
+  arrived = false,
   delay,
   active,
   onActive,
-  className = '',
-  ref,
 }: {
   part: PartKey
-  size: Size
+  stack: Stack
+  outcome?: boolean
+  arrived?: boolean
   delay: number
-  onActive: (part: PartKey | null) => void
-  className?: string
-  ref?: RefObject<HTMLAnchorElement | null>
-} & Pick<Linked, 'active'>) {
+} & Linked) {
   const { title, text, icon, tone, href, status } = PARTS[part]
-  const compact = size === 'compact' || size === 'compact-outcome'
-  const stacked = size === 'compact'
-  // Status sits beside the name on the wide cards, and under the text on the narrow phone cards
-  const inline = !stacked
+  const v = STACK[stack]
+  // The way in: shown on phones, revealed on hover or focus where a pointer can find the card
+  const arrow = (
+    <ArrowDown
+      className="h-[0.9em] w-[0.9em] shrink-0 text-electric-ink opacity-60 transition-[opacity,translate] duration-300 group-hover:translate-y-[0.1em] group-hover:opacity-100 group-focus-visible:opacity-100 md:opacity-0"
+      strokeWidth={2.25}
+      aria-hidden
+    />
+  )
   return (
     <a
-      ref={ref}
       href={href}
       aria-label={label(part)}
-      className={`rcl-card ${card} ${compact ? 'text-[15px]' : ''} ${className}`}
+      className={`rcl-card ${card}`}
       style={at(delay)}
       onMouseEnter={() => onActive(part)}
       onMouseLeave={() => onActive(null)}
       onFocus={() => onActive(part)}
       onBlur={() => onActive(null)}
     >
-      <span
-        className={`${surface} flex ${stacked ? 'flex-col' : 'items-start'} gap-[0.75em] ${size === 'chip' ? 'p-[0.75em]' : 'p-[0.9em]'} ${
-          active === part ? 'border-electric/40' : 'border-hairline'
-        }`}
-      >
-        <Icon icon={icon} tone={tone} size={size === 'chip' ? '2em' : size === 'outcome' ? '2.5em' : '2.2em'} />
-        <span className="block min-w-0 flex-1 pr-[0.6em]">
-          <span className="flex flex-wrap items-center gap-x-[0.5em] gap-y-[0.25em]">
-            <span
-              className={`whitespace-nowrap font-grotesk font-semibold leading-tight tracking-[-0.02em] text-midnight ${
-                size === 'chip' ? 'text-[0.9em]' : size === 'outcome' ? 'text-[1.1em]' : 'text-[1em]'
-              }`}
-            >
+      <span data-surface className={`${surface} flex ${v.card} gap-[0.7em] p-[0.85em] ${active === part ? 'border-electric/40' : 'border-hairline'}`}>
+        <span className={`${v.head} items-start justify-between gap-[0.5em]`}>
+          <Icon icon={icon} tone={arrived ? 'arrived' : tone} size={outcome ? '2.4em' : '2.1em'} />
+          <span className={`${v.stacked} items-center`}>{status ? <Status status={status} /> : arrow}</span>
+        </span>
+        <span className="block min-w-0 flex-1">
+          <span className="flex flex-wrap items-center gap-x-[0.5em] gap-y-[0.3em]">
+            <span className={`font-grotesk font-semibold leading-tight tracking-[-0.02em] text-midnight ${outcome ? 'text-[1.05em]' : 'text-[0.95em]'}`}>
               {title}
             </span>
-            {inline && status && <Status status={status} />}
+            {status && (
+              <span className={v.inline}>
+                <Status status={status} />
+              </span>
+            )}
           </span>
-          <span className={`mt-[0.3em] block font-dm leading-[1.4] text-midnight-soft ${size === 'chip' ? 'text-[0.75em]' : 'text-[0.8125em]'}`}>
-            {text}
-          </span>
-          {!inline && status && (
-            <span className="mt-[0.6em] block">
-              <Status status={status} />
-            </span>
-          )}
+          <span className="mt-[0.3em] block font-dm text-[0.8125em] leading-[1.4] text-midnight-soft">{text}</span>
         </span>
-        {/* The way in: always shown on phones, revealed on hover or focus where a pointer can find the card */}
-        <ArrowDown
-          className={`absolute right-[0.75em] top-[0.8em] h-[0.9em] w-[0.9em] text-electric-ink transition-[opacity,translate] duration-300 group-hover:translate-y-[0.1em] group-hover:opacity-100 group-focus-visible:opacity-100 ${
-            compact ? 'opacity-60' : 'opacity-0'
-          }`}
-          strokeWidth={2.25}
-          aria-hidden
-        />
+        {!status && <span className={`${v.inline} absolute right-[0.85em] top-[0.9em]`}>{arrow}</span>}
       </span>
-    </a>
-  )
-}
-
-// One line of the phone's services list: icon, name, short description, status
-function PartRow({ part, onActive }: { part: PartKey; onActive: (part: PartKey | null) => void }) {
-  const { title, text, icon, tone, href, status } = PARTS[part]
-  return (
-    <a
-      href={href}
-      aria-label={label(part)}
-      className={`group flex min-h-16 items-center gap-3 px-3.5 py-3 text-[15px] first:rounded-t-xl last:rounded-b-xl [&+&]:border-t [&+&]:border-hairline ${card}`}
-      onFocus={() => onActive(part)}
-      onBlur={() => onActive(null)}
-    >
-      <Icon icon={icon} tone={tone} size="2.25em" />
-      <span className="min-w-0 flex-1">
-        <span className="block font-grotesk text-[15px] font-semibold leading-tight tracking-[-0.02em] text-midnight">{title}</span>
-        <span className="mt-0.5 block font-dm text-[13px] leading-snug text-midnight-soft">{text}</span>
-      </span>
-      {status ? <Status status={status} /> : <ArrowDown className="h-4 w-4 shrink-0 text-hush" strokeWidth={2.25} aria-hidden />}
     </a>
   )
 }
@@ -468,7 +508,8 @@ const lit = (on: boolean) => (on ? 'bg-electric-wash ring-1 ring-electric/35' : 
 function Workspace({ active, compact = false }: { active: PartKey | null; compact?: boolean }) {
   const activity = compact ? DEMO_ACTIVITY.slice(0, 2) : DEMO_ACTIVITY
   const main = (
-    <div className={`min-w-0 ${compact ? 'px-4 pb-10 pt-4' : 'px-[1.5em] pb-[3.6em] pt-[1.4em]'}`}>
+    <div className={`min-w-0 ${compact ? 'px-4 pb-4 pt-4' : 'px-[1.5em] pb-[1.4em] pt-[1.4em]'}`}>
+      {!compact && <p className="mb-[0.35em] truncate font-dm text-[0.68em] font-medium text-hush">{DEMO_ORG}</p>}
       <p className={`font-grotesk font-semibold leading-tight tracking-[-0.03em] text-midnight ${compact ? 'text-[19px]' : 'text-[1.35em]'}`}>
         Good afternoon, {DEMO_STAFF.first}.
       </p>
@@ -532,31 +573,23 @@ function Workspace({ active, compact = false }: { active: PartKey | null; compac
     )
   }
 
+  // On the stage: a slim icon rail, so the overview gets the room
   return (
     <div className="rcl-lift-lg overflow-hidden rounded-[1.1em] border border-hairline bg-white">
-      <div className="grid grid-cols-[8.6em_1fr]">
-        <aside className="flex flex-col border-r border-hairline bg-porcelain px-[0.75em] pb-[3.6em] pt-[1.3em]">
-          <div className="flex items-center gap-[0.45em] px-[0.3em]">
-            <LogoMark className="h-[1.4em] w-[1.4em]" />
-            <span className="whitespace-nowrap font-grotesk text-[0.72em] font-semibold tracking-[-0.02em] text-midnight">Relay Collective</span>
-          </div>
-          <ul className="mt-[1.4em] grid gap-[0.25em] font-dm text-[0.75em]">
-            {NAV.map(({ label, icon: I, current, badge, part }) => (
-              <li
-                key={label}
-                className={`flex items-center gap-[0.6em] rounded-[0.6em] px-[0.65em] py-[0.6em] transition-[background-color,box-shadow,color] duration-300 ${
-                  current ? 'bg-midnight font-semibold text-white' : `text-midnight-soft ${lit(!!part && active === part)}`
-                }`}
-              >
-                <I className="h-[1.25em] w-[1.25em] shrink-0" />
-                <span className="flex-1 truncate">{label}</span>
-                {badge && (
-                  <span className="rounded-full bg-cantaloupe px-[0.5em] text-[0.85em] font-semibold text-midnight tabular-nums">{badge}</span>
-                )}
-              </li>
-            ))}
-          </ul>
-          <span className="mt-auto block truncate px-[0.3em] pt-[1em] font-dm text-[0.68em] text-hush">{DEMO_ORG}</span>
+      <div className="grid grid-cols-[3.6em_1fr]">
+        <aside className="flex flex-col items-center gap-[0.35em] border-r border-hairline bg-porcelain pb-[1.4em] pt-[1.2em]">
+          <LogoMark className="mb-[0.9em] h-[1.5em] w-[1.5em]" />
+          {NAV.map(({ label, icon: I, current, badge, part }) => (
+            <span
+              key={label}
+              className={`relative flex h-[2.2em] w-[2.2em] items-center justify-center rounded-[0.6em] transition-[background-color,box-shadow,color] duration-300 ${
+                current ? 'bg-midnight text-white' : `text-midnight-soft ${lit(!!part && active === part)}`
+              }`}
+            >
+              <I className="h-[1em] w-[1em]" />
+              {badge && <span className="absolute right-[0.3em] top-[0.3em] h-[0.45em] w-[0.45em] rounded-full bg-cantaloupe ring-[0.12em] ring-porcelain" />}
+            </span>
+          ))}
         </aside>
         {main}
       </div>

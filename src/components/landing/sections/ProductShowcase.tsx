@@ -1,49 +1,56 @@
 import {
-  Blocks,
-  Building2,
-  CalendarPlus,
   CarFront,
-  Check,
   ChevronDown,
-  CircleCheck,
   CircleHelp,
   Clock,
+  HandHeart,
   Inbox,
+  Layers,
   LayoutDashboard,
+  Plus,
   TriangleAlert,
+  UserPlus,
   UsersRound,
   type LucideIcon,
 } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { LogoMark } from '../../brand/LogoMark'
-import { DEMO_ORG, DEMO_STAFF, DEMO_UPCOMING } from '../demo'
+import { DEMO_ORG, DEMO_PEOPLE, DEMO_STAFF, DEMO_UPCOMING, type DemoRole } from '../demo'
 import { Accent, Reveal } from '../primitives'
 import { StatusPill } from '../ProductBits'
 import { container, h2, lede } from '../styles'
 
 // 04: the organization workspace, drawn for the landing page. A picture of the real screens, built from
 // the same labels (nav, metrics, statuses), never the screens themselves, and never real data.
-const NAV: { label: string; icon: LucideIcon; active?: boolean; badge?: number; group?: string }[] = [
+// The foundation (people, requests, attention) frames the page; each module is one entry under Modules.
+const NAV: { label: string; icon: LucideIcon; active?: boolean; badge?: number; group?: string; planned?: boolean }[] = [
   { label: 'Overview', icon: LayoutDashboard, active: true },
   { label: 'Requests', icon: Inbox, badge: 1 },
-  { label: 'Services', icon: Blocks },
-  { label: 'Transportation', icon: CarFront, group: 'Services' },
-  { label: 'Organization profile', icon: Building2, group: 'Organization' },
   { label: 'Team', icon: UsersRound },
+  { label: 'Volunteers', icon: HandHeart },
+  { label: 'Transportation', icon: CarFront, group: 'Modules' },
+  { label: 'Resource sharing', icon: Layers, planned: true },
 ]
 
 const METRICS: { label: string; value: number; hint: string; icon: LucideIcon; tone: 'attention' | 'plain' | 'live' }[] = [
   { label: 'Need attention', value: 1, hint: 'Pickup in 40 min', icon: TriangleAlert, tone: 'attention' },
-  { label: 'Awaiting a driver', value: 2, hint: 'Drivers are being asked', icon: Clock, tone: 'plain' },
-  { label: 'Confirmed or under way', value: 3, hint: 'On the road today', icon: CarFront, tone: 'live' },
-  { label: 'Completed', value: 12, hint: 'Last 30 days', icon: CircleCheck, tone: 'plain' },
+  { label: 'Open requests', value: 5, hint: 'Across your modules', icon: Inbox, tone: 'plain' },
+  { label: 'Under way today', value: 3, hint: 'Confirmed or on the road', icon: Clock, tone: 'live' },
+  { label: 'Your people', value: 24, hint: '6 staff, 18 volunteers', icon: UsersRound, tone: 'plain' },
 ]
+
+// Role colours from the app: staff in electric, volunteers in cantaloupe
+const ROLE_TONE: Record<DemoRole, string> = {
+  Admin: 'bg-electric-wash text-electric-ink',
+  Staff: 'bg-electric-wash text-electric-ink',
+  'Volunteer driver': 'bg-cantaloupe-wash text-cantaloupe-ink',
+}
 
 // What each numbered marker on the picture points at
 const NOTES = [
-  { title: 'Nothing goes quiet', text: 'A request that no driver has taken is raised right away, with the next step beside it.' },
-  { title: 'Every request in one list', text: 'See what is waiting, confirmed, and on the road, for your whole organization.' },
-  { title: 'Each ride, start to finish', text: 'Follow a ride from request to drop-off, and see who confirmed it and when.' },
+  { title: 'Nothing goes quiet', text: 'A request no one has picked up is raised right away, with the next step beside it.' },
+  { title: 'Every request, one list', text: 'See what is waiting, confirmed, and under way across your organization, whatever module it came from.' },
+  { title: 'Your people, one place', text: 'Staff, admins, and volunteers each join from one invitation, with only the access their role needs.' },
 ]
 
 export function ProductShowcase() {
@@ -57,7 +64,7 @@ export function ProductShowcase() {
             More <Accent>possibilities.</Accent>
           </h2>
           <p className={`${lede} lg:col-span-4`}>
-            The workspace your team signs in to. What needs attention, every request in flight, and the services your organization uses, in one view.
+            The workspace every organization shares. Your people, every open request, and what needs attention next, whichever module it came from.
           </p>
         </Reveal>
 
@@ -127,12 +134,19 @@ function DashboardMock() {
             <ChevronDown className="h-3.5 w-3.5 shrink-0 text-hush" />
           </div>
           <nav className="mt-5 space-y-0.5 font-dm text-[13px]">
-            {NAV.map(({ label, icon: Icon, active, badge, group }) => (
+            {NAV.map(({ label, icon: Icon, active, badge, group, planned }) => (
               <div key={label}>
                 {group && <p className="mb-1 mt-4 px-3 text-[11px] font-medium text-hush">{group}</p>}
-                <div className={`flex items-center gap-2.5 rounded-lg px-3 py-2 ${active ? 'bg-midnight font-medium text-white' : 'text-midnight-soft'}`}>
+                <div
+                  className={`flex items-center gap-2.5 rounded-lg px-3 py-2 ${
+                    active ? 'bg-midnight font-medium text-white' : planned ? 'text-hush' : 'text-midnight-soft'
+                  }`}
+                >
                   <Icon className="h-4 w-4" />
-                  <span className="flex-1">{label}</span>
+                  <span className="flex-1">
+                    {label}
+                    {planned && <span className="block text-[11px]">Planned</span>}
+                  </span>
                   {badge && <span className="rounded-full bg-cantaloupe px-1.5 text-[10px] font-semibold text-midnight">{badge}</span>}
                 </div>
               </div>
@@ -164,7 +178,7 @@ function DashboardMock() {
               <p className="mt-1 font-dm text-[13px] text-midnight-soft">Here's what's happening at {DEMO_ORG}.</p>
             </div>
             <span className="inline-flex items-center gap-2 rounded-full bg-midnight px-4 py-2 font-dm text-[12px] font-semibold text-white">
-              <CalendarPlus className="h-3.5 w-3.5" /> Request a ride
+              <Plus className="h-3.5 w-3.5" /> New request
             </span>
           </div>
 
@@ -201,7 +215,7 @@ function DashboardMock() {
               </div>
               <div className="relative mt-5">
                 <Marker n={2} onPicture />
-                <p className="pl-5 font-grotesk text-[15px] font-semibold text-midnight">Upcoming rides</p>
+                <p className="pl-5 font-grotesk text-[15px] font-semibold text-midnight">Open requests</p>
               </div>
               <ul className="mt-2 divide-y divide-hairline">
                 {DEMO_UPCOMING.map((r) => (
@@ -218,32 +232,30 @@ function DashboardMock() {
             <Box className="lg:col-span-2">
               <Marker n={3} onPicture />
               <div className="flex items-center justify-between">
-                <p className="font-grotesk text-[15px] font-semibold text-midnight">Ride · SK</p>
-                <StatusPill status="Picked up" size="text-[11px]" />
+                <p className="font-grotesk text-[15px] font-semibold text-midnight">Your people</p>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-midnight px-3 py-1 font-dm text-[11px] font-semibold text-white">
+                  <UserPlus className="h-3 w-3" /> Invite
+                </span>
               </div>
-              <p className="mt-2 font-grotesk text-lg font-semibold tracking-[-0.02em] text-midnight">Housing interview</p>
-              <p className="font-dm text-[12px] text-midnight-soft">Pickup 3:15 PM · Wheelchair accessible</p>
-              <ol className="mt-5 space-y-3">
-                {[
-                  { label: 'Requested', done: true, at: '1:02 PM' },
-                  { label: 'Driver confirmed', done: true, at: '1:09 PM' },
-                  { label: 'Picked up', current: true, at: '3:14 PM' },
-                  { label: 'Completed' },
-                ].map((s) => (
-                  <li key={s.label} className="flex items-center gap-3 font-dm text-[12px]">
+              <ul className="mt-3 divide-y divide-hairline">
+                {DEMO_PEOPLE.map((p) => (
+                  <li key={p.name} className="flex items-center gap-3 py-2.5 font-dm">
                     <span
-                      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
-                        s.done ? 'bg-electric text-white' : s.current ? 'border-2 border-cantaloupe bg-white' : 'border border-midnight/25'
+                      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold ${
+                        p.role ? ROLE_TONE[p.role] : 'border border-dashed border-midnight/30 text-hush'
                       }`}
                     >
-                      {s.done && <Check className="h-3 w-3" strokeWidth={3} />}
-                      {s.current && <span className="h-1.5 w-1.5 rounded-full bg-cantaloupe" />}
+                      {p.initials}
                     </span>
-                    <span className={`flex-1 ${s.done || s.current ? 'text-midnight' : 'text-hush'}`}>{s.label}</span>
-                    {s.at && <span className="tabular-nums text-hush">{s.at}</span>}
+                    <span className={`min-w-0 flex-1 truncate text-[12px] ${p.role ? 'text-midnight' : 'text-hush'}`}>{p.name}</span>
+                    {p.role ? (
+                      <span className={`whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-semibold ${ROLE_TONE[p.role]}`}>{p.role}</span>
+                    ) : (
+                      <span className="whitespace-nowrap text-[11px] text-hush">Invite sent</span>
+                    )}
                   </li>
                 ))}
-              </ol>
+              </ul>
             </Box>
           </div>
         </div>

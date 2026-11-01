@@ -13,6 +13,16 @@ export const DEMO_UPCOMING: { who: string; time: string; to: string; status: Dem
   { who: 'RM', time: '4:00 PM', to: 'Social service visit', status: 'Finding a driver' },
 ]
 
+// The showcase's people panel: one invitation each, the access their role needs
+export type DemoRole = 'Admin' | 'Staff' | 'Volunteer driver'
+
+export const DEMO_PEOPLE: { initials: string; name: string; role: DemoRole | null }[] = [
+  { initials: 'AL', name: 'Alex Lee', role: 'Admin' },
+  { initials: 'PN', name: 'Priya N.', role: 'Staff' },
+  { initials: 'MR', name: 'Maya R.', role: 'Volunteer driver' },
+  { initials: 'DO', name: 'Dev O.', role: null },
+]
+
 // The hero workspace's activity feed: one line from each part of the platform that works today
 export type DemoArea = 'organizations' | 'volunteers' | 'transport' | 'impact'
 

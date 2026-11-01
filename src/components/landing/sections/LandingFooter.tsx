@@ -16,7 +16,7 @@ const COLUMNS: { title: string; id?: string; links: { label: string; href: strin
     title: 'Explore',
     links: [
       { label: 'Platform', href: '#platform' },
-      { label: 'Solutions', href: '#solutions' },
+      { label: 'Modules', href: '#solutions' },
       { label: 'The workspace', href: '#showcase' },
       { label: 'How it works', href: '#how-it-works' },
       { label: 'Impact', href: '#impact' },
@@ -26,7 +26,7 @@ const COLUMNS: { title: string; id?: string; links: { label: string; href: strin
     title: 'Resources',
     id: 'resources',
     links: [
-      { label: 'Transportation app tour', href: LINKS.transportTour },
+      { label: 'Transportation module tour', href: LINKS.transportTour },
       { label: 'GitHub', href: LINKS.github },
       { label: 'Source code', href: LINKS.repo },
       { label: 'MIT License', href: LINKS.license },
