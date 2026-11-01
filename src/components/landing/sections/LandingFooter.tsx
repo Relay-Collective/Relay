@@ -1,4 +1,4 @@
-import { LINKS, MISSION, PARTNER, TAGLINE, TEAM } from '../content'
+import { LINKS, MISSION, PARTNER, TAGLINE } from '../content'
 import { SmartLink, Wordmark } from '../primitives'
 import { container, focusRing } from '../styles'
 
@@ -67,23 +67,7 @@ export function LandingFooter() {
 
       <div className={container}>
         <div className="flex flex-col gap-4 border-t border-hairline py-8 font-dm text-sm leading-relaxed text-hush lg:flex-row lg:items-start lg:justify-between lg:gap-10">
-          <p className="shrink-0">
-            © {new Date().getFullYear()} Relay Collective · Built by{' '}
-            {TEAM.map((m, i) => (
-              <span key={m.handle}>
-                <a
-                  href={`https://github.com/${m.handle}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className={`rounded text-midnight-soft underline underline-offset-4 decoration-midnight/25 hover:text-midnight hover:decoration-midnight ${focusRing}`}
-                >
-                  {m.name}
-                  <span className="sr-only"> on GitHub (opens in a new tab)</span>
-                </a>
-                {i < TEAM.length - 2 ? ', ' : i === TEAM.length - 2 ? ' and ' : ''}
-              </span>
-            ))}
-          </p>
+          <p className="shrink-0">© {new Date().getFullYear()} Relay Collective</p>
           <p className="max-w-xl lg:text-right">
             Born at FaithTech HACKVAN 2026 and developed in partnership with {PARTNER.name} – {PARTNER.program}. Relay Collective is an
             independent platform. It is not an emergency service: in an emergency, call 911.
