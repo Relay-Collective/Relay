@@ -20,13 +20,3 @@ export function StatusPill({ status, size = 'text-[0.6875em]', className = '' }:
     </span>
   )
 }
-
-// "1 · Request": which part of the story a card tells
-export function StepLabel({ n, children }: { n: number; children: string }) {
-  return (
-    <span className="inline-flex items-center gap-[0.5em] font-dm text-[0.6875em] font-semibold text-hush">
-      <span className="flex h-[1.6em] w-[1.6em] items-center justify-center rounded-full border border-hairline bg-porcelain tabular-nums text-midnight">{n}</span>
-      {children}
-    </span>
-  )
-}

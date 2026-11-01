@@ -1,61 +1,70 @@
-import { ArrowDown, ArrowRight } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
-import { HeroProductExperience } from '../HeroProductExperience'
+import { HeroCTAButtons } from '../HeroCTAButtons'
+import { HeroProductEcosystem } from '../HeroProductEcosystem'
 import { LINKS, PARTNER } from '../content'
 import { Accent } from '../primitives'
-import { container, ctaArrow, ctaArrowDown, ctaGhost, ctaPrimary, display, focusRing } from '../styles'
+import { container, display, focusRing } from '../styles'
 
 const enter = (ms: number) => ({ '--enter-delay': `${ms}ms` }) as CSSProperties
 
-// 01: the first five seconds. What it is, who it's for, the two ways forward, and one ride playing out beside it.
+// 01: the first five seconds. What it is, who it's for, the two ways forward, and the platform beside it.
+// Phones and tablets read copy → platform → pilot; from xl the platform sits beside the copy and the pilot line.
 export function LandingHero() {
   return (
     <section id="top" aria-labelledby="hero-heading" className="relative isolate bg-porcelain">
       <div
-        className={`${container} grid items-center gap-14 pb-20 pt-10 sm:pt-14 md:gap-16 lg:grid-cols-[minmax(0,1.04fr)_minmax(0,1fr)] lg:gap-10 lg:pb-28 lg:pt-16 xl:gap-16 xl:pt-20`}
+        className={`${container} grid grid-cols-[minmax(0,1fr)] gap-x-14 pb-20 pt-8 [grid-template-areas:'copy'_'visual'_'proof'] sm:pt-14 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.06fr)] xl:grid-rows-[1fr_auto_1fr] xl:pb-24 xl:pt-16 xl:[grid-template-areas:'._visual'_'copy_visual'_'proof_visual']`}
       >
-        <div>
-          <h1 id="hero-heading" className={`${display} text-[clamp(44px,6.2vw,92px)] leading-[0.95] lg:text-[clamp(56px,5.5vw,88px)]`}>
-            <span className="rcl-enter block" style={enter(80)}>
+        {/* The copy column is a size container, so the headline can size itself to its longer line */}
+        <div className="[container-type:inline-size] [grid-area:copy]">
+          {/* Always two lines: "Technology that" / "brings us together.". The longer line is about 7.6em wide,
+              so the size is whatever fills the column, up to 88px. Neither line may wrap. */}
+          <h1 id="hero-heading" className={`${display} text-[min(88px,calc(100cqw/7.7))] leading-[0.98]`}>
+            <span className="rcl-enter block whitespace-nowrap" style={enter(80)}>
               Technology that
             </span>
-            <span className="rcl-enter block" style={enter(180)}>
-              brings us <Accent className="pr-1 text-cantaloupe-display">together.</Accent>
+            <span className="block whitespace-nowrap">
+              <span className="rcl-enter inline-block" style={enter(200)}>
+                brings us
+              </span>{' '}
+              <Accent className="text-cantaloupe-display">
+                <span className="rcl-flourish inline-block pr-[0.06em]" style={enter(360)}>
+                  together.
+                </span>
+              </Accent>
             </span>
           </h1>
 
-          <p className="rcl-enter mt-7 max-w-[34ch] font-dm text-[18px] leading-[1.6] text-midnight-soft sm:text-[20px]" style={enter(320)}>
+          <p className="rcl-enter mt-6 max-w-[36ch] font-dm text-[18px] leading-[1.55] text-midnight-soft sm:mt-7 sm:text-[20px]" style={enter(520)}>
             A connected platform for nonprofits, volunteers, and communities to coordinate support, resources, and essential services.
           </p>
 
-          <div className="rcl-enter mt-9 flex flex-col gap-3 sm:flex-row" style={enter(440)}>
-            <Link to={LINKS.register} className={ctaPrimary}>
-              Get Started <ArrowRight className={ctaArrow} aria-hidden />
-            </Link>
-            <a href="#platform" className={ctaGhost}>
-              Explore the Platform <ArrowDown className={ctaArrowDown} aria-hidden />
-            </a>
+          <div className="rcl-enter mt-8 sm:mt-10" style={enter(620)}>
+            <HeroCTAButtons />
           </div>
 
-          <p className="rcl-enter mt-5 font-dm text-[15px] text-midnight-soft" style={enter(500)}>
+          <p className="rcl-enter mt-6 font-dm text-[15px] text-midnight-soft" style={enter(700)}>
             Want to drive?{' '}
             <Link to={LINKS.registerDriver} className={`rounded font-semibold text-midnight underline decoration-electric decoration-2 underline-offset-[5px] hover:decoration-midnight ${focusRing}`}>
               Volunteer as a driver
             </Link>
           </p>
-
-          <p className="rcl-enter mt-10 flex max-w-[44ch] items-start gap-3 font-dm text-[14px] leading-relaxed text-hush" style={enter(560)}>
-            <span className="mt-[7px] h-2 w-2 shrink-0 rounded-full bg-electric" aria-hidden />
-            <span>
-              In pilot with {PARTNER.name} — {PARTNER.program}, {PARTNER.place}.
-            </span>
-          </p>
         </div>
 
-        <div className="max-w-[640px] md:mx-auto md:w-full lg:mx-0 lg:max-w-none">
-          <HeroProductExperience />
+        <div className="mt-14 w-full max-w-[680px] [grid-area:visual] md:mx-auto md:mt-16 xl:mx-0 xl:mt-0 xl:max-w-none xl:self-center xl:pl-2">
+          <HeroProductEcosystem />
         </div>
+
+        <p
+          className="rcl-enter mt-12 flex max-w-[44ch] items-start gap-3 font-dm text-[14px] leading-relaxed text-hush [grid-area:proof] md:mx-auto md:w-full md:max-w-[680px] xl:mx-0 xl:mt-14 xl:max-w-[44ch] xl:self-start"
+          style={enter(760)}
+        >
+          <span className="mt-[7px] h-2 w-2 shrink-0 rounded-full bg-electric" aria-hidden />
+          <span>
+            In pilot with {PARTNER.name} — {PARTNER.program}, {PARTNER.place}.
+          </span>
+        </p>
       </div>
     </section>
   )
