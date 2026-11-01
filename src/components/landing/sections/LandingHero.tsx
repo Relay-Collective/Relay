@@ -38,7 +38,7 @@ export function LandingHero() {
           </h1>
 
           <p className="rcl-enter mt-6 max-w-[36ch] font-dm text-[18px] leading-[1.55] text-midnight-soft sm:mt-7 sm:text-[20px]" style={enter(520)}>
-            A connected platform for nonprofits, volunteers, and communities to coordinate support, resources, and essential services.
+            Shared, open-source infrastructure for nonprofits. One foundation for your team, your volunteers, and the services you run, so no organization has to build it alone.
           </p>
 
           <div className="rcl-enter mt-8 sm:mt-10" style={enter(620)}>
@@ -46,17 +46,17 @@ export function LandingHero() {
           </div>
 
           <p className="rcl-enter mt-6 font-dm text-[15px] text-midnight-soft" style={enter(700)}>
-            Want to drive?{' '}
+            Want to volunteer?{' '}
             <Link to={LINKS.registerDriver} className={`rounded font-semibold text-midnight underline decoration-electric decoration-2 underline-offset-[5px] hover:decoration-midnight ${focusRing}`}>
               Volunteer as a driver
             </Link>
           </p>
         </div>
 
-        {/* From xl the hero fills one screen below the 77px header. The picture is 1.143 times as tall as it is wide,
+        {/* From xl the hero fills one screen below the 77px header. The picture is about 1.16 times as tall as it is wide,
             plus a 32px caption, so its width is capped by the viewport height and the whole picture always fits.
             440px is the floor that keeps its smallest text readable. */}
-        <div className="mt-14 w-full max-w-[680px] [grid-area:visual] md:mx-auto md:mt-16 xl:mx-0 xl:mt-0 xl:w-[min(100%,max(440px,calc((100svh-165px)/1.143)))] xl:max-w-none xl:self-center xl:justify-self-end">
+        <div className="mt-14 w-full max-w-[680px] [grid-area:visual] md:mx-auto md:mt-16 xl:mx-0 xl:mt-0 xl:w-[min(100%,max(440px,calc((100svh-165px)/1.16)))] xl:max-w-none xl:self-center xl:justify-self-end">
           <HeroProductEcosystem />
         </div>
 

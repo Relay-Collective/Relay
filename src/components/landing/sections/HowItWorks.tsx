@@ -2,14 +2,14 @@ import { STEPS } from '../content'
 import { Accent, Reveal } from '../primitives'
 import { container, h2Small } from '../styles'
 
-// 05: three steps on one blue route, the same line the hero's ride travels. It draws once the steps come into view.
+// 05: three steps on one blue route: join the foundation, turn on a module, grow with everyone else on it. It draws once the steps come into view.
 export function HowItWorks() {
   return (
     <section id="how-it-works" aria-labelledby="how-heading" className="scroll-mt-16 bg-porcelain py-24 sm:py-28 lg:py-36">
       <div className={container}>
         <Reveal className="max-w-3xl">
           <h2 id="how-heading" className={h2Small}>
-            From sign-up to <Accent>showing up.</Accent>
+            Start with one module. <Accent>Grow together.</Accent>
           </h2>
         </Reveal>
 

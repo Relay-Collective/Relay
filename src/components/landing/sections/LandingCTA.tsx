@@ -7,6 +7,7 @@ import { container, ctaArrow, ctaGhostOnBlue, ctaOnBlue, display } from '../styl
 const MORE: { label: string; href: string; external?: boolean }[] = [
   { label: 'Register your organization', href: LINKS.registerOrg },
   { label: 'Volunteer as a driver', href: LINKS.registerDriver },
+  { label: 'Build with us on GitHub', href: LINKS.repo, external: true },
 ]
 
 // 07: the close. Electric blue, the one loud surface on the page.
@@ -24,14 +25,14 @@ export function LandingCTA() {
             Let’s build stronger communities, <Accent className="text-white">together.</Accent>
           </h2>
           <p className="mt-8 max-w-xl font-dm text-lg leading-relaxed text-midnight sm:text-xl">
-            Bring your organization into a connected platform built for meaningful community impact.
+            Bring your organization onto shared infrastructure, and help shape the modules that come next.
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <Link to={LINKS.register} className={ctaOnBlue}>
               Get Started <ArrowRight className={ctaArrow} aria-hidden />
             </Link>
             <Link to={LINKS.transportTour} className={ctaGhostOnBlue}>
-              Take the transportation tour <ArrowRight className={ctaArrow} aria-hidden />
+              Tour the first module <ArrowRight className={ctaArrow} aria-hidden />
             </Link>
           </div>
           <ul className="mt-12 flex flex-wrap gap-x-8 gap-y-2 border-t border-midnight/25 pt-6">
