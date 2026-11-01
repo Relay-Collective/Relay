@@ -34,6 +34,7 @@ import { ForgotPassword } from './pages/auth/ForgotPassword'
 import { FullPageLoader } from './pages/auth/FullPageLoader'
 import { Landing } from './pages/auth/Landing'
 import { ResetPassword } from './pages/auth/ResetPassword'
+import { SignedIn, signedInPath } from './pages/auth/SignedIn'
 import { SignIn } from './pages/auth/SignIn'
 import { SignUp } from './pages/auth/SignUp'
 import { GetStarted } from './pages/onboarding/GetStarted'
@@ -124,6 +125,8 @@ export default function App() {
       <Routes>
         <Route path="/" element={isNative ? <NativeEntry /> : <Landing />} />
         <Route path="/signin" element={<SignIn />} />
+        {/* Right after sign-in: says so plainly, then one way into the workspace */}
+        <Route path={signedInPath} element={<SignedIn />} />
         <Route path="/register" element={<SignUp />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
