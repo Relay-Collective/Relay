@@ -214,7 +214,7 @@
 }
 
 /* Landing page (v3). Everything is prefixed rcl- and only components/landing uses it.
-   The hero plays one ride on load; later sections reveal once as they scroll into view.
+   The hero draws the platform once on load; later sections reveal once as they scroll into view.
    Content is visible by default: reduced motion shows everything in its final place and nothing loops. */
 @media (prefers-reduced-motion: no-preference) {
   html:has(.rcl-page) {
@@ -254,8 +254,8 @@
   opacity: 1;
   transform: none;
 }
-/* Hero ride: each card settles in at its --enter-delay, the route draws between them, and the request's
-   status swaps from "Finding a driver" to "Driver confirmed" once the driver card lands. */
+/* Hero ecosystem: the workspace settles first, then each connector draws out and its card settles in,
+   each at its own --enter-delay. */
 .rcl-card {
   animation: rcl-settle 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
   animation-delay: var(--enter-delay, 0ms);
@@ -265,13 +265,21 @@
   animation: rcl-draw 0.9s cubic-bezier(0.65, 0, 0.35, 1) both;
   animation-delay: var(--enter-delay, 0ms);
 }
-.rcl-swap-out {
-  animation: rcl-out 0.3s ease-in both;
+/* "together." arrives last and a little more slowly, settling onto its baseline from a slight tilt */
+.rcl-flourish {
+  transform-origin: left bottom;
+  animation: rcl-flourish 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
   animation-delay: var(--enter-delay, 0ms);
 }
-.rcl-swap-in {
-  animation: rcl-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
-  animation-delay: calc(var(--enter-delay, 0ms) + 0.2s);
+/* A relay point that travels a hero connector once, then fades: coordination, shown a single time */
+.rcl-traveller {
+  offset-rotate: 0deg;
+  animation: rcl-travel 1.1s cubic-bezier(0.65, 0, 0.35, 1) both;
+  animation-delay: var(--enter-delay, 0ms);
+}
+/* The capability headings sit under the sticky header when the hero cards link to them */
+.rcl-page [id^='cap-'] {
+  scroll-margin-top: 7rem;
 }
 /* A line that draws across once its parent is revealed (How it works) */
 .rcl-line {
@@ -287,6 +295,48 @@
     transform: scaleY(0);
     transform-origin: center top;
   }
+}
+/* The signature CTA: a light top edge, a faint inner base and a short offset shadow, so it reads as pressable
+   and solid, never glowing. The quiet CTA gets only a hairline of lift. */
+.rcl-cta-raised {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.22),
+    inset 0 -2px 0 rgb(2 7 10 / 0.14),
+    0 1px 2px rgb(17 24 32 / 0.14),
+    0 12px 24px -12px rgb(2 72 106 / 0.55);
+}
+.rcl-cta-raised:hover {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.22),
+    inset 0 -2px 0 rgb(2 7 10 / 0.14),
+    0 1px 2px rgb(17 24 32 / 0.14),
+    0 18px 30px -14px rgb(2 72 106 / 0.6);
+}
+.rcl-cta-raised:active {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.12),
+    inset 0 1px 3px rgb(2 7 10 / 0.18),
+    0 1px 2px rgb(17 24 32 / 0.14);
+}
+.rcl-cta-quiet {
+  box-shadow: 0 1px 2px rgb(17 24 32 / 0.05);
+}
+.rcl-cta-quiet:hover {
+  box-shadow:
+    0 1px 2px rgb(17 24 32 / 0.05),
+    0 10px 22px -14px rgb(17 24 32 / 0.25);
+}
+/* Hero ecosystem cards: the same soft lift, a touch deeper while their link is hovered or focused */
+.rcl-card-lift {
+  box-shadow:
+    0 1px 2px rgb(17 24 32 / 0.04),
+    0 10px 28px -14px rgb(17 24 32 / 0.16);
+}
+.group:hover > .rcl-card-lift,
+.group:focus-visible > .rcl-card-lift {
+  box-shadow:
+    0 1px 2px rgb(17 24 32 / 0.05),
+    0 18px 36px -16px rgb(17 24 32 / 0.24);
 }
 /* Raised surfaces: a soft, offset shadow that deepens a little on hover */
 .rcl-lift {
@@ -311,28 +361,28 @@
   from { stroke-dashoffset: 1; }
   to { stroke-dashoffset: 0; }
 }
+@keyframes rcl-flourish {
+  from { opacity: 0; transform: translateY(0.3em) rotate(-4deg); filter: blur(6px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+@keyframes rcl-travel {
+  0% { offset-distance: 0%; opacity: 0; }
+  15%, 80% { opacity: 1; }
+  100% { offset-distance: 100%; opacity: 0; }
+}
 @keyframes rcl-fade {
   from { opacity: 0; }
-}
-@keyframes rcl-out {
-  to { opacity: 0; visibility: hidden; }
-}
-@keyframes rcl-in {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .rcl-enter,
   .rcl-fade,
   .rcl-card,
   .rcl-route,
-  .rcl-swap-in {
+  .rcl-flourish {
     animation: none;
   }
-  .rcl-swap-out {
-    animation: none;
-    opacity: 0;
-    visibility: hidden;
+  .rcl-traveller {
+    display: none;
   }
   .rcl-reveal,
   .rcl-line {
