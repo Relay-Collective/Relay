@@ -38,7 +38,7 @@ export function AdminHeader({ onOpenMenu, menuOpen }: { onOpenMenu: () => void; 
 
         <div className="min-w-0 flex-1">
           <p className="truncate text-xs font-medium text-slate-500">
-            <span className="mr-1.5 inline-block rounded bg-rc-teal/10 px-1.5 py-px font-semibold text-rc-teal-ink">Admin</span>
+            <span className="mr-1.5 inline-block rounded bg-ink px-1.5 py-px font-semibold text-white">Admin</span>
             Platform administration
           </p>
           <p className="truncate font-heading text-base font-bold text-rc-navy sm:text-lg">{adminTitle(pathname)}</p>

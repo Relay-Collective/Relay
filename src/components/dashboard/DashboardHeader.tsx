@@ -20,7 +20,7 @@ export function DashboardHeader({ name, summary, detail, actions }: Props) {
       <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div className="min-w-0">
           <p className="text-sm font-semibold text-slate-500">{date}</p>
-          <h1 id="dashboard-title" className="mt-1 text-3xl font-black tracking-tight sm:text-4xl">
+          <h1 id="dashboard-title" className="mt-1 text-3xl font-bold tracking-tight sm:text-4xl">
             {greetingFor(new Date(now).getHours())}, {name}
           </h1>
           <div className="mt-2 text-lg text-slate-600">{summary}</div>

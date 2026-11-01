@@ -83,7 +83,7 @@ export function SidebarShell({ storageKey, sidebar, header, banner, footer, bott
       <div className="flex min-h-screen flex-col md:pl-[var(--shell-inset)]">
         {header({ onOpenMenu: () => setDrawerOpen(true), menuOpen: drawerOpen })}
         {banner}
-        <main id="app-main" tabIndex={-1} className={`mx-auto w-full ${maxWidth} flex-1 px-4 py-6 focus:outline-none sm:px-6 lg:px-8 lg:py-8`}>
+        <main id="app-main" tabIndex={-1} className={`mx-auto w-full ${maxWidth} flex-1 px-4 pb-24 pt-6 focus:outline-none sm:px-6 lg:px-8 lg:pt-8`}>
           {children}
         </main>
         {footer && <div className={`mx-auto w-full ${maxWidth} px-4 pb-10 sm:px-6 lg:px-8`}>{footer}</div>}

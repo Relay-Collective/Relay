@@ -15,7 +15,7 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import type { ReactNode } from 'react'
-import logoMark from '../../../assets/logo-mark.svg'
+import { LogoMark } from '../../brand/LogoMark'
 import { DEMO_ORG, DEMO_STAFF, DEMO_UPCOMING } from '../demo'
 import { Accent, Reveal } from '../primitives'
 import { StatusPill } from '../ProductBits'
@@ -119,7 +119,7 @@ function DashboardMock() {
       <div className="grid md:grid-cols-[232px_1fr]">
         <aside className="hidden flex-col border-r border-hairline bg-porcelain p-4 md:flex">
           <div className="flex items-center gap-2 px-2 py-1">
-            <img src={logoMark} alt="" className="h-6 w-6" />
+            <LogoMark className="h-6 w-6" />
             <span className="font-grotesk text-[15px] font-semibold tracking-[-0.02em] text-midnight">Relay Collective</span>
           </div>
           <div className="mt-5 flex items-center justify-between rounded-lg border border-hairline bg-white px-3 py-2 font-dm text-[12px] text-midnight">

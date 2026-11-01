@@ -18,7 +18,7 @@ export function PassengerStepper({ labelId, value, onChange, min = 1, max = 12 }
       <button type="button" className={stepButton} aria-label="One fewer person" disabled={value <= min} onClick={() => onChange(value - 1)}>
         <Minus className="h-5 w-5" />
       </button>
-      <output aria-live="polite" className="flex h-12 w-14 items-center justify-center border-x border-slate-200 font-display text-xl font-extrabold text-ink tabular-nums">
+      <output aria-live="polite" className="flex h-12 w-14 items-center justify-center border-x border-slate-200 font-display text-xl font-bold text-ink tabular-nums">
         {value}
       </output>
       <button type="button" className={stepButton} aria-label="One more person" disabled={value >= max} onClick={() => onChange(value + 1)}>

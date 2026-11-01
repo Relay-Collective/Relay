@@ -15,7 +15,7 @@ export function RestrictedState({ icon, title, children, action }: { icon: React
       <span className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-sun-100 text-amber-900" aria-hidden>
         {icon}
       </span>
-      <h1 id="restricted-title" className="font-heading text-2xl font-extrabold tracking-tight text-rc-navy">
+      <h1 id="restricted-title" className="font-heading text-2xl font-bold tracking-tight text-rc-navy">
         {title}
       </h1>
       <div className="mt-2 text-slate-600">{children}</div>

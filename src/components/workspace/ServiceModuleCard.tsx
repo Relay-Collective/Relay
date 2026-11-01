@@ -54,10 +54,10 @@ export function AvailabilityPill({ availability }: { availability: 'live' | 'pla
   return (
     <span
       className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-        live ? 'bg-rc-mint text-rc-teal-ink' : 'border border-dashed border-slate-300 text-slate-600'
+        live ? 'bg-emerald-50 text-emerald-800' : 'border border-dashed border-slate-300 text-slate-600'
       }`}
     >
-      <span className={`h-1.5 w-1.5 rounded-full ${live ? 'bg-rc-teal' : 'border border-slate-400'}`} aria-hidden />
+      <span className={`h-1.5 w-1.5 rounded-full ${live ? 'bg-emerald-600' : 'border border-slate-400'}`} aria-hidden />
       {live ? 'Active' : 'Planned'}
     </span>
   )

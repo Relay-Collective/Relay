@@ -67,7 +67,7 @@ function PersonalInfo({ user }: { user: User }) {
         </span>
       </div>
       <div className="flex items-center gap-4 px-5 pt-5">
-        <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-rc-teal font-heading text-lg font-bold text-white" aria-hidden>
+        <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-coral-400 font-heading text-lg font-bold text-ink" aria-hidden>
           {initials(user.name)}
         </span>
         <div className="min-w-0">

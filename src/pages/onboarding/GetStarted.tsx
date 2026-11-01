@@ -66,7 +66,7 @@ export function GetStarted() {
     <OnboardingLayout
       sidebarIntro={
         <div>
-          <p className="font-heading text-2xl font-extrabold tracking-[-0.02em] text-rc-navy">Welcome{firstName ? `, ${firstName}` : ''}.</p>
+          <p className="font-heading text-2xl font-bold tracking-[-0.02em] text-rc-navy">Welcome{firstName ? `, ${firstName}` : ''}.</p>
           <p className="mt-3 text-sm leading-relaxed text-slate-600">
             Your account is ready. Relay Collective connects nonprofits, their staff, and the people who help them. Pick the path that fits you.
           </p>

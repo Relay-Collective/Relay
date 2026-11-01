@@ -12,7 +12,7 @@ export function TopDestinations({ places }: { places: PlaceCount[] }) {
   return (
     <section aria-labelledby="places-title" className={`${card} p-5 sm:p-6`}>
       <div className="mb-4 flex items-baseline justify-between gap-3">
-        <h2 id="places-title" className="text-lg font-extrabold">
+        <h2 id="places-title" className="text-lg font-bold">
           Frequent places
         </h2>
         <Link to={paths.destinations} className="text-sm font-semibold text-brand-700 hover:underline">

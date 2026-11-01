@@ -4,10 +4,27 @@
 export interface Release {
   version: string
   date: string // YYYY-MM-DD
+  title?: string // a headline for a major release, shown at the top of What's New
+  summary?: string
   changes: string[]
 }
 
 export const RELEASES: Release[] = [
+  {
+    version: '1.6',
+    date: '2026-10-31',
+    title: 'Introducing Relay Collective 1.6',
+    summary: 'A new experience, built around you.',
+    changes: [
+      'Relay Collective has a new logo: two parts that close one loop, with the person they come together around at its centre. It is on every screen, the browser tab and the Android app icon.',
+      'A new light look across the whole platform, with one set of colours and type everywhere: the public site, sign in and sign up, onboarding, organization and volunteer workspaces, and the admin console.',
+      'The public site leads with one ride from request to drop-off, so it is clear what Relay Collective does before you scroll.',
+      'Sign in and sign up have a new brand panel that shows a ride the way staff see it.',
+      'Colours mean the same thing everywhere: green is done or approved, red needs attention, and electric blue marks what is selected.',
+      'Buttons, forms, navigation and status labels share one style, with clearer focus outlines for keyboard users.',
+      'What’s New has a new look, and the version chip is smaller on phones so it covers less of the page.',
+    ],
+  },
   {
     version: '1.5',
     date: '2026-10-29',

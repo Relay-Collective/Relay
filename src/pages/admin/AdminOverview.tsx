@@ -109,12 +109,7 @@ export function AdminOverview() {
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow={
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-rc-teal/10 px-2.5 py-0.5 text-xs font-semibold text-rc-teal-ink">
-            <BadgeCheck className="h-3.5 w-3.5" aria-hidden /> Platform administration
-          </span>
-        }
-        title="Platform Overview"
+        title="Platform overview"
         description="Monitor the organizations, services, and activity across Relay Collective."
       />
 

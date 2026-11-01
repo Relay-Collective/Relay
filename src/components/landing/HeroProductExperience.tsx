@@ -1,6 +1,6 @@
 import { Accessibility, Blocks, CalendarPlus, CarFront, Check, CircleCheck, Inbox, LayoutDashboard, MapPin, UsersRound } from 'lucide-react'
 import type { CSSProperties, ReactNode } from 'react'
-import logoMark from '../../assets/logo-mark.svg'
+import { LogoMark } from '../brand/LogoMark'
 import { DEMO_DRIVER, DEMO_ORG, DEMO_RIDE, DEMO_STAFF, DEMO_UPCOMING } from './demo'
 import { StatusPill, StepLabel } from './ProductBits'
 
@@ -177,7 +177,7 @@ function Dashboard() {
       <div className="grid grid-cols-[7.6em_1fr]">
         <aside className="border-r border-hairline bg-porcelain p-[0.75em]">
           <div className="flex items-center gap-[0.4em]">
-            <img src={logoMark} alt="" className="h-[1.2em] w-[1.2em]" />
+            <LogoMark className="h-[1.2em] w-[1.2em]" />
             <span className="whitespace-nowrap font-grotesk text-[0.5625em] font-semibold tracking-[-0.02em] text-midnight">Relay Collective</span>
           </div>
           <p className="mt-[1em] truncate rounded-[0.4em] border border-hairline bg-white px-[0.5em] py-[0.35em] font-dm text-[0.5625em] font-medium text-midnight">

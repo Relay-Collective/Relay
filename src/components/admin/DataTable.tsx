@@ -46,7 +46,8 @@ export function DataTable<T>({ caption, columns, rows, rowKey, card, initialSort
 
   return (
     <>
-      <div className="hidden overflow-x-auto md:block">
+      {/* relative: the screen-reader labels inside are absolutely placed and must stay inside the scroll area */}
+      <div className="relative hidden overflow-x-auto md:block">
         <table className="w-full text-left text-sm">
           <caption className="sr-only">{caption}</caption>
           <thead className="border-b border-slate-200 bg-slate-50/70 text-xs font-semibold uppercase tracking-wider text-slate-500">
@@ -65,7 +66,7 @@ export function DataTable<T>({ caption, columns, rows, rowKey, card, initialSort
                       <button
                         type="button"
                         onClick={() => toggle(c.id)}
-                        className={`-mx-1.5 inline-flex min-h-9 items-center gap-1 rounded px-1.5 uppercase tracking-wider hover:text-rc-navy ${focusRing} ${active ? 'text-rc-navy' : ''}`}
+                        className={`-mx-1.5 inline-flex min-h-11 items-center gap-1 rounded px-1.5 uppercase tracking-wider hover:text-rc-navy ${focusRing} ${active ? 'text-rc-navy' : ''}`}
                       >
                         {c.header}
                         <Icon className={`h-3.5 w-3.5 ${active ? '' : 'opacity-50'}`} aria-hidden />

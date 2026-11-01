@@ -1,6 +1,6 @@
 import { AlertCircle } from 'lucide-react'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
-import logoMark from '../assets/logo-mark.svg'
+import { LogoMark } from './brand/LogoMark'
 import { useApp } from '../hooks/useApp'
 import { useCurrentOrg } from '../hooks/useCurrent'
 import { HOME_FOR } from '../logic/homeFor'
@@ -18,7 +18,7 @@ export function RequireAuth() {
   if (!ready) {
     return (
       <div className="flex min-h-screen items-center justify-center" role="status" aria-label="Loading">
-        <img src={logoMark} alt="" className="h-16 w-16 animate-pulse" />
+        <LogoMark className="h-16 w-16 animate-pulse" />
       </div>
     )
   }

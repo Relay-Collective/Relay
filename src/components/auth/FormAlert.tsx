@@ -4,7 +4,7 @@ import type { ReactNode } from 'react'
 const TONES = {
   error: { box: 'border-red-200 bg-red-50 text-red-800', icon: AlertCircle, role: 'alert' },
   info: { box: 'border-rc-line bg-rc-canvas text-slate-700', icon: Info, role: 'status' },
-  success: { box: 'border-emerald-200 bg-rc-mint text-emerald-900', icon: CheckCircle2, role: 'status' },
+  success: { box: 'border-emerald-200 bg-emerald-50 text-emerald-900', icon: CheckCircle2, role: 'status' },
 } as const
 
 interface Props {

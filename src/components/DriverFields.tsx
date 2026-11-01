@@ -134,7 +134,7 @@ export function DriverCityFields({ value, onChange, errors = {} }: SectionProps)
               />
               <MapPin className={`mt-0.5 h-5 w-5 shrink-0 ${on ? 'text-brand-600' : 'text-slate-400'}`} aria-hidden />
               <span className="min-w-0 flex-1">
-                <span className="block font-display text-lg font-extrabold text-ink">{city}</span>
+                <span className="block font-display text-lg font-bold text-ink">{city}</span>
                 <span className="mt-0.5 block text-sm text-slate-600">{CITY_TRIPS[city]}</span>
               </span>
               <span
@@ -195,15 +195,15 @@ export function DriverFields({ value, onChange, errors }: SectionProps) {
     <div className="space-y-8">
       <DriverAboutFields value={value} onChange={onChange} errors={errors} />
       <section className="space-y-4">
-        <h3 className="text-lg font-extrabold">Vehicle</h3>
+        <h3 className="text-lg font-bold">Vehicle</h3>
         <DriverVehicleFields value={value} onChange={onChange} errors={errors} />
       </section>
       <section className="space-y-4">
-        <h3 className="text-lg font-extrabold">Ride requests</h3>
+        <h3 className="text-lg font-bold">Ride requests</h3>
         <DriverRequestFields value={value} onChange={onChange} errors={errors} />
       </section>
       <section className="space-y-4">
-        <h3 className="text-lg font-extrabold">Documents</h3>
+        <h3 className="text-lg font-bold">Documents</h3>
         <DriverDocumentFields value={value} onChange={onChange} errors={errors} />
       </section>
     </div>

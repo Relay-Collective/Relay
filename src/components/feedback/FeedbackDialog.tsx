@@ -145,10 +145,10 @@ export function FeedbackDialog({ user, request, onClosed }: Props) {
     >
       {view === 'sent' && outcome ? (
         <div className="overflow-y-auto px-6 py-8 text-center sm:px-10">
-          <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-rc-mint text-rc-teal-ink" aria-hidden>
+          <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700" aria-hidden>
             <CircleCheck className="h-7 w-7" />
           </span>
-          <h2 id="feedback-dialog-title" ref={headingRef} tabIndex={-1} className="mt-4 font-heading text-2xl font-extrabold tracking-tight focus:outline-none">
+          <h2 id="feedback-dialog-title" ref={headingRef} tabIndex={-1} className="mt-4 font-heading text-2xl font-bold tracking-tight focus:outline-none">
             Thank you for helping us improve.
           </h2>
           <p id="feedback-dialog-description" className="mt-2 text-slate-600">
@@ -213,7 +213,7 @@ export function FeedbackDialog({ user, request, onClosed }: Props) {
               <MessageSquareHeart className="h-5 w-5" />
             </span>
             <div className="min-w-0 flex-1">
-              <h2 id="feedback-dialog-title" className="font-heading text-lg font-extrabold leading-snug tracking-tight sm:text-xl">
+              <h2 id="feedback-dialog-title" className="font-heading text-lg font-bold leading-snug tracking-tight sm:text-xl">
                 Help us make Relay Collective better.
               </h2>
               <p id="feedback-dialog-description" className="mt-0.5 text-sm text-slate-600">

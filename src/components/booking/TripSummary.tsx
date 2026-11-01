@@ -35,7 +35,7 @@ function Row({ icon, label, children }: { icon: ReactNode; label: string; childr
   )
 }
 
-const missing = (text: string) => <span className="italic text-slate-400">{text}</span>
+const missing = (text: string) => <span className="italic text-slate-500">{text}</span>
 
 // A live recap of the ride beside the form, so staff can check it at a glance before sending.
 export function TripSummary({ from, to, when, wait, rider, passengers, needs, done, total, children }: Props) {
@@ -44,7 +44,7 @@ export function TripSummary({ from, to, when, wait, rider, passengers, needs, do
     <div className={`${card} space-y-5 p-5`}>
       <div>
         <div className="flex items-baseline justify-between gap-2">
-          <h2 className="text-lg font-extrabold">Trip summary</h2>
+          <h2 className="text-lg font-bold">Trip summary</h2>
           <span className="text-xs font-semibold text-slate-500">
             {done} of {total} required steps
           </span>

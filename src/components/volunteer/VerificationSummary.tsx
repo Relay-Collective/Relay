@@ -17,7 +17,7 @@ const LOOK: Record<Driver['status'], { icon: LucideIcon; className: string; titl
   },
   APPROVED: {
     icon: BadgeCheck,
-    className: 'bg-rc-mint text-rc-teal-ink',
+    className: 'bg-emerald-50 text-emerald-800',
     title: 'You’re approved to drive.',
     text: 'Ride requests that fit your vehicle, cities, and availability are sent to you. You always choose which to accept.',
   },
@@ -30,7 +30,7 @@ const LOOK: Record<Driver['status'], { icon: LucideIcon; className: string; titl
 }
 
 const STATE_ICON = { done: Check, waiting: Clock, missing: CircleX } as const
-const STATE_CLASS = { done: 'bg-rc-teal text-white', waiting: 'bg-sun-100 text-amber-900', missing: 'bg-slate-100 text-slate-600' } as const
+const STATE_CLASS = { done: 'bg-emerald-700 text-white', waiting: 'bg-sun-100 text-amber-900', missing: 'bg-slate-100 text-slate-600' } as const
 const STATE_TEXT = { done: 'Complete', waiting: 'In progress', missing: 'Needs attention' } as const
 
 // The driver's review status in words, and what it's based on

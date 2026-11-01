@@ -13,7 +13,7 @@ interface Props {
 // The frame for every signed-out screen: brand on the left (wide screens), one focused form on the right.
 export function AuthLayout({ brand, aside, children }: Props) {
   return (
-    <div className="rc-brand min-h-screen bg-white pt-[var(--safe-top)] pb-[var(--safe-bottom)] lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+    <div className="rc-brand min-h-screen bg-white pt-[var(--safe-top)] pb-[var(--safe-bottom)] lg:grid lg:grid-cols-[minmax(0,6fr)_minmax(0,7fr)]">
       {brand && (
         <aside className="hidden lg:sticky lg:top-0 lg:block lg:h-screen">
           <BrandPanel title={brand.title} body={brand.body} />

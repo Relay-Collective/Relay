@@ -5,42 +5,48 @@
    question never restyles. Match the attribute only. */
 @custom-variant open (&[open]);
 
-/* Brand tokens, taken from the Relay Collective heart-road logo */
+/* Relay Collective 1.6: one light system for the whole product (see DESIGN.md).
+   Porcelain ground, white surfaces, midnight ink type and primary actions, electric blue for selection,
+   active navigation and links, cantaloupe for warmth. Small text in a brand hue always uses an -ink or
+   600+ shade that passes AA on white. */
 @theme {
-  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-display: 'Nunito', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'DM Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Space Grotesk', 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-display);
 
-  --color-ink: #0b1557; /* wordmark navy */
-  --color-brand-50: #eef4ff;
-  --color-brand-100: #dbe7ff;
-  --color-brand-200: #bcd3ff;
-  --color-brand-300: #8cb4ff;
-  --color-brand-400: #5a8cfb;
-  --color-brand-500: #2f67f2;
-  --color-brand-600: #1d4fe0;
-  --color-brand-700: #1a3fba;
-  --color-brand-800: #1b3794;
-  --color-brand-900: #1a2f74;
-  --color-aqua-300: #7deaf1;
-  --color-aqua-400: #2ad4e3;
-  --color-aqua-500: #14bdd0;
-  --color-violet-brand: #3b2fd6; /* logo only */
+  --color-ink: #111820; /* midnight ink: headings, strong text, primary actions */
 
-  /* Public website (landing page) palette. The signed-in app keeps the tokens above.
-     Teal and cyan fail AA as small text on white: small teal text uses rc-teal-ink, cyan stays graphic. */
-  --font-heading: 'Plus Jakarta Sans', 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --color-rc-navy: #101b52;
-  --color-rc-navy-deep: #0b133d;
-  --color-rc-blue: #2251e8;
-  --color-rc-blue-dark: #1a3fc0;
-  --color-rc-teal: #008d82;
-  --color-rc-teal-ink: #00736a;
-  --color-rc-cyan: #18b9cf;
-  --color-rc-canvas: #f6f8fc;
-  --color-rc-mint: #e8f7f3;
-  --color-rc-line: #e3e8f2;
+  /* Electric blue. 500 is the brand colour (graphics, focus rings); 600 and up carry text and fills */
+  --color-brand-50: #eef8fd;
+  --color-brand-100: #d9f0fb;
+  --color-brand-200: #b3e0f5;
+  --color-brand-300: #7cc9ee;
+  --color-brand-400: #3bafe5;
+  --color-brand-500: #0297de;
+  --color-brand-600: #0272a8; /* 5.3:1 with white */
+  --color-brand-700: #035c87;
+  --color-brand-800: #054a6c;
+  --color-brand-900: #083b55;
 
-  /* Landing page (v3, light): porcelain, midnight ink, electric blue, cantaloupe. Only components/landing uses these.
+  /* Older names still used across the signed-in app, pointed at the 1.6 palette */
+  --color-rc-navy: #111820;
+  --color-rc-navy-deep: #0b1015;
+  --color-rc-blue: #0272a8;
+  --color-rc-blue-dark: #035c87;
+  --color-rc-cyan: #0297de;
+  --color-rc-canvas: #f8f9f7;
+  --color-rc-line: #e5e9ec;
+  /* The old secondary accent (teal) now speaks electric: section icons, progress, identity tints.
+     Success states use the emerald scale explicitly, so green always means done or approved. */
+  --color-rc-teal: #0272a8;
+  --color-rc-teal-ink: #035c87;
+  --color-rc-mint: #eef8fd;
+
+  /* Neutrals: the slate scale, with the 1.6 border and soft surface */
+  --color-slate-100: #f1f4f5;
+  --color-slate-200: #e5e9ec;
+
+  /* The 1.6 palette by name (the public site uses these directly; the app reaches them through the tokens above).
      Electric and cantaloupe are graphic colours: small text on light grounds uses the -ink shades, and display-size
      cantaloupe words use cantaloupe-display (3.35:1 on porcelain). */
   --font-grotesk: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
@@ -60,7 +66,7 @@
   --color-porcelain: #f8f9f7;
 
   /* Flat app background. One step below white cards, so a card reads by its edge, not a shadow */
-  --color-canvas: oklch(0.982 0.005 260);
+  --color-canvas: #f8f9f7; /* porcelain */
 
   /* Care red and sun yellow: seasoning beside the blue, never side by side (see DESIGN.md) */
   --color-care-red: oklch(0.56 0.2 30);
@@ -68,20 +74,20 @@
   --color-sun-100: oklch(0.962 0.059 95);
   --color-sun-400: oklch(0.837 0.164 84);
 
-  /* Supporting accents: warm coral for care, teal for going, sunny amber for welcome */
-  --color-coral-50: #fff3f1;
-  --color-coral-100: #ffe3de;
-  --color-coral-200: #ffc9c0;
-  --color-coral-300: #ffa293;
-  --color-coral-400: #fd7a66;
-  --color-coral-500: #f5573f;
-  --color-coral-600: #e03c24;
-  --color-coral-700: #bb2f1a;
+  /* Cantaloupe: warm emphasis and "needs action". Errors stay red. */
+  --color-coral-50: #fff0eb;
+  --color-coral-100: #ffe3d8;
+  --color-coral-200: #fec3af;
+  --color-coral-300: #fda185;
+  --color-coral-400: #fc734d; /* cantaloupe */
+  --color-coral-500: #f0602f;
+  --color-coral-600: #c9471f; /* white text passes AA */
+  --color-coral-700: #a83a18;
 
   --animate-fade-up: fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-step-forward: step-forward 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-step-back: step-back 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
-  --animate-pop: pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  --animate-pop: pop 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
   --animate-float: float 6s ease-in-out infinite;
   --animate-shake: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
   --animate-confetti: confetti 2.6s cubic-bezier(0.25, 0.6, 0.5, 1) forwards;
@@ -157,19 +163,6 @@
   @keyframes rc-spin {
     to { transform: rotate(360deg); }
   }
-}
-
-/* The organization workspace speaks the public site's language: Plus Jakarta Sans headings and the
-   landing palette. Remapping the app tokens here restyles the transportation pages inside it too,
-   without forking their components. Every pairing still passes AA (Relay Blue on white is 6.2:1).
-   Sign-in and onboarding (.rc-brand) use the same remap, so the first screens match the workspace. */
-.workspace,
-.rc-brand {
-  --font-display: var(--font-heading);
-  --color-ink: var(--color-rc-navy);
-  --color-brand-600: var(--color-rc-blue);
-  --color-brand-700: var(--color-rc-blue-dark);
-  --color-canvas: var(--color-rc-canvas);
 }
 
 /* A phone tab bar (SidebarShell's bottomBar) is 4rem tall. Things floating outside the shell, like the
@@ -349,14 +342,6 @@
   }
 }
 
-/* Logo wordmark only. UI chrome uses solid colour. */
-@utility text-brand-gradient {
-  background-image: linear-gradient(90deg, #1d4fe0 0%, #1f8ff0 55%, #22d3e6 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
 @layer base {
   html {
     -webkit-tap-highlight-color: transparent;
@@ -389,11 +374,13 @@
 
   body {
     @apply font-sans text-slate-800 antialiased;
+    font-optical-sizing: auto;
     @apply bg-canvas;
   }
 
   h1, h2, h3 {
     @apply font-display text-ink;
+    text-wrap: balance;
   }
 
   ::selection {

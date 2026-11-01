@@ -19,7 +19,7 @@ export function SaveBar({ dirty, state, onSave, onCancel }: { dirty: boolean; st
           ) : dirty ? (
             <p className="font-semibold text-rc-navy">You have unsaved changes.</p>
           ) : state.kind === 'saved' ? (
-            <p className="flex items-center gap-2 font-semibold text-rc-teal-ink">
+            <p className="flex items-center gap-2 font-semibold text-emerald-700">
               <Check className="h-5 w-5" strokeWidth={3} aria-hidden /> Changes saved.
             </p>
           ) : null}

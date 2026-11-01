@@ -210,7 +210,7 @@ function RideRow({ ride, driver, now, alert, past }: RowProps) {
           <span className="text-sm font-bold text-ink">Now</span>
         ) : (
           <>
-            <span className="block whitespace-nowrap font-display text-sm font-extrabold tabular-nums text-ink sm:text-base">{formatTime(ride.pickupTime)}</span>
+            <span className="block whitespace-nowrap font-display text-sm font-bold tabular-nums text-ink sm:text-base">{formatTime(ride.pickupTime)}</span>
             {(past || alert) && <span className="block text-xs text-slate-500">{dayLabel(pickupMs, now)}</span>}
           </>
         )}

@@ -8,7 +8,7 @@ import { focusRing } from '../workspace/styles'
 
 const LOOK: Record<AdminEventKind, { icon?: LucideIcon; tone: string }> = {
   REGISTERED: { tone: 'bg-brand-50 text-rc-blue' },
-  APPROVED: { icon: BadgeCheck, tone: 'bg-rc-mint text-rc-teal-ink' },
+  APPROVED: { icon: BadgeCheck, tone: 'bg-emerald-50 text-emerald-800' },
   REJECTED: { icon: CircleX, tone: 'bg-slate-100 text-slate-600' },
 }
 
