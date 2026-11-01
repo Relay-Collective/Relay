@@ -5,18 +5,10 @@ import { myFeedbackPaths } from '../feedback/paths'
 import { useApp } from '../hooks/useApp'
 import { useFeedback } from '../hooks/useFeedback'
 import { ROLE_LABELS } from '../logic/homeFor'
+import { initials } from '../logic/initials'
 import { BuildStamp } from '../native/BuildStamp'
 import { DeleteMyAccount } from './DeleteMyAccount'
 import { ROLE_TONE, tones } from './ui'
-
-function initials(name: string): string {
-  return name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((p) => p[0]!.toUpperCase())
-    .join('')
-}
 
 export function AccountMenu() {
   const { currentUser, signOut } = useApp()

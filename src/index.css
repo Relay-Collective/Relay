@@ -96,6 +96,12 @@
   --animate-status-in: status-in 0.9s ease-out both;
   --animate-ring-fill: ring-fill 1s linear both; /* duration set where it's used */
   --animate-dim-in: dim-in 0.4s ease-out both;
+  --animate-check-draw: check-draw 0.45s cubic-bezier(0.65, 0, 0.35, 1) both; /* on a path with pathLength 1 */
+
+  @keyframes check-draw {
+    from { stroke-dashoffset: 1; }
+    to { stroke-dashoffset: 0; }
+  }
 
   /* On a circle with pathLength 100: fills most of the way, the rest when the work is done */
   @keyframes ring-fill {

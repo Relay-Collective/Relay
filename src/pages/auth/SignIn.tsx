@@ -1,6 +1,6 @@
-import { ArrowRight, Mail } from 'lucide-react'
+import { Mail } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
-import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { AuthLayout } from '../../components/auth/AuthLayout'
 import { FormAlert } from '../../components/auth/FormAlert'
 import { SubmitButton } from '../../components/auth/SubmitButton'
@@ -10,11 +10,12 @@ import { TextField } from '../../components/form/TextField'
 import { useApp } from '../../hooks/useApp'
 import { returnPath } from '../../logic/returnPath'
 import { EMAIL } from '../../logic/validate'
-import { onboardingPaths } from '../../onboarding/routing'
 import { dataService, isDemoBackend } from '../../services'
-import { UnconfirmedEmailError, type Session } from '../../services/dataService'
+import { UnconfirmedEmailError } from '../../services/dataService'
 import type { User } from '../../types'
 import { DemoAccounts } from './DemoAccounts'
+import { FullPageLoader } from './FullPageLoader'
+import { signedInPath, type SignedInState } from './SignedIn'
 
 const SIGN_IN_BRAND = {
   title: 'Welcome back to the collective.',
@@ -47,15 +48,8 @@ function focusField(id: string) {
   el?.select()
 }
 
-// Where to go once signed in: back to the page that asked, else onboarding (no role yet) or home.
-// /home works out the right place from the account the backend returned.
-function nextPath(session: Session, from: string | undefined): string {
-  if (from) return from
-  return session.user ? '/home' : onboardingPaths.start
-}
-
 export function SignIn() {
-  const { users, identity, currentUser, sessionExpired, signIn } = useApp()
+  const { users, ready, identity, sessionExpired, signIn } = useApp()
   const navigate = useNavigate()
   const location = useLocation()
   const [params] = useSearchParams()
@@ -79,9 +73,10 @@ export function SignIn() {
     setUnconfirmed(false)
     setResent(undefined)
     try {
-      const session = await signIn(emailValue, passwordValue)
+      await signIn(emailValue, passwordValue)
       if (key === 'form') saveLastEmail(emailValue)
-      navigate(nextPath(session, from), { replace: true })
+      // A page of its own says it worked, then sends them on to `from`, onboarding or home
+      navigate(signedInPath, { replace: true, state: { from, fresh: true } satisfies SignedInState })
     } catch (err) {
       setError((err as Error).message)
       setUnconfirmed(err instanceof UnconfirmedEmailError)
@@ -103,7 +98,10 @@ export function SignIn() {
     attempt('form', email.trim(), password)
   }
 
-  const signedInAs = currentUser?.name ?? identity?.name
+  // Wait for the session check, so a signed-in visitor never sees the form flash first
+  if (!ready) return <FullPageLoader />
+  // Already signed in on this device (and not mid sign-in here): say so on its own page
+  if (identity && !busy) return <Navigate to={signedInPath} replace state={{ from } satisfies SignedInState} />
 
   return (
     <AuthLayout
@@ -117,24 +115,13 @@ export function SignIn() {
         </>
       }
     >
-      {signedInAs && (
-        <div className="mb-8 flex items-center justify-between gap-3 rounded-xl border border-rc-line bg-rc-canvas p-4">
-          <p className="text-sm text-slate-700">
-            You're signed in as <strong className="text-rc-navy">{signedInAs}</strong>.
-          </p>
-          <Link to={from ?? (currentUser ? '/home' : onboardingPaths.start)} className={`inline-flex shrink-0 items-center gap-1 text-sm ${textLink}`}>
-            Continue <ArrowRight className="h-4 w-4" aria-hidden />
-          </Link>
-        </div>
-      )}
-
       <h1 className={authTitle}>
         <span className="lg:hidden">{SIGN_IN_BRAND.title}</span>
         <span className="hidden lg:inline">Sign in to your account</span>
       </h1>
       <p className={authLead}>One account for every organization and service you're part of on Relay Collective.</p>
 
-      {sessionExpired && !signedInAs && (
+      {sessionExpired && (
         <FormAlert tone="info" className="mt-6">
           Your session ended, so we signed you out. Sign in again to pick up where you left off.
         </FormAlert>
