@@ -67,7 +67,7 @@ export function HeroProductEcosystem() {
       <Stage active={active} onActive={setActive} />
       <Compact active={active} onActive={setActive} />
       <p
-        className="rcl-enter mt-6 flex items-center gap-2 font-dm text-[13px] text-hush md:justify-center xl:justify-start"
+        className="rcl-enter mt-6 flex items-center gap-2 font-dm text-[13px] text-hush md:justify-center xl:mt-3 xl:justify-start"
         style={at(T.impact + 200)}
         aria-hidden
       >
@@ -106,9 +106,9 @@ function Stage({ active, onActive }: Linked) {
   return (
     <div className="hidden select-none [container-type:inline-size] md:block">
       <div ref={stage} className="relative text-[2.5cqw]">
-        <Hook className="absolute left-[0.6em] top-[5.4em] w-[24em]" />
+        <Hook className="absolute left-[0.6em] top-[4.4em] w-[24em]" />
         <span
-          className="rcl-fade absolute left-[35.6em] top-[23.6em] aspect-square w-[3.8em] rounded-full bg-cantaloupe"
+          className="rcl-fade absolute left-[35.6em] top-[22.6em] aspect-square w-[3.8em] rounded-full bg-cantaloupe"
           style={at(T.services)}
           aria-hidden
         />
@@ -174,7 +174,7 @@ function Stage({ active, onActive }: Linked) {
           className="absolute right-0 top-0 z-20 w-[15.2em]"
         />
 
-        <div className="px-[3em] pt-[10.6em]">
+        <div className="px-[3em] pt-[9.6em]">
           <div ref={board} className="rcl-card relative" style={at(T.board)}>
             <div aria-hidden>
               <Workspace active={active} />
@@ -186,7 +186,7 @@ function Stage({ active, onActive }: Linked) {
               <PartCard part="services" size="chip" delay={T.services} active={active} onActive={onActive} />
             </div>
           </div>
-          <div className="mt-[7em] flex justify-center">
+          <div className="mt-[5.8em] flex justify-center">
             <PartCard ref={impact} part="impact" size="outcome" delay={T.impact} active={active} onActive={onActive} className="w-[20.4em]" />
           </div>
         </div>
