@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import { HeroCTAButtons } from '../HeroCTAButtons'
+import { HeroMesh } from '../HeroMesh'
 import { HeroProductEcosystem } from '../HeroProductEcosystem'
 import { LINKS, PARTNER } from '../content'
 import { Accent } from '../primitives'
@@ -14,6 +15,7 @@ const enter = (ms: number) => ({ '--enter-delay': `${ms}ms` }) as CSSProperties
 export function LandingHero() {
   return (
     <section id="top" aria-labelledby="hero-heading" className="relative isolate bg-porcelain">
+      <HeroMesh />
       <div
         className={`${container} grid grid-cols-[minmax(0,1fr)] gap-x-14 pb-20 pt-8 [grid-template-areas:'copy'_'visual'_'proof'] sm:pt-14 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.06fr)] xl:grid-rows-[1fr_auto_1fr] xl:min-h-[calc(100svh-77px)] xl:content-center xl:py-7 xl:[grid-template-areas:'._visual'_'copy_visual'_'proof_visual']`}
       >

@@ -312,6 +312,20 @@
     transform-origin: center top;
   }
 }
+/* The hero mesh (HeroMesh.tsx) fades in from under the header and out into the next section, and from xl
+   steps back behind the headline, so it frames the copy and gathers around the Relay Loop. Below xl the copy
+   comes first, so the mesh stays faint behind it and comes up to full strength around the loop. */
+.rcl-mesh {
+  mask-image: linear-gradient(to bottom, transparent 0, rgb(0 0 0 / 0.4) 140px, rgb(0 0 0 / 0.45) 40%, #000 60%, #000 85%, transparent 100%);
+}
+@media (min-width: 1280px) {
+  .rcl-mesh {
+    mask-image:
+      linear-gradient(to bottom, transparent 0, #000 140px, #000 72%, transparent 100%),
+      linear-gradient(to right, rgb(0 0 0 / 0.35) 0%, rgb(0 0 0 / 0.55) 30%, #000 52%);
+    mask-composite: intersect;
+  }
+}
 /* The hero CTA capsule: a hairline of contact and a soft, wide shadow, so it sits on porcelain as one object */
 .rcl-cta-capsule {
   box-shadow:
