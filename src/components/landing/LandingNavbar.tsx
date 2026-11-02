@@ -7,6 +7,7 @@ import { Wordmark } from './primitives'
 import { ctaArrow, ctaGhost, ctaPrimary, focusRing } from './styles'
 
 // Public website header. Jump links to each part of the page, and the two ways into the app.
+// Clear at the top, so the hero's mesh runs under it; solid white once the page scrolls.
 export function LandingNavbar({ active }: { active?: string }) {
   const [open, setOpen] = useState(false)
   const scrolled = useScrolledPast(24)
@@ -57,7 +58,7 @@ export function LandingNavbar({ active }: { active?: string }) {
   return (
     <header
       className={`rcl-fade sticky top-0 z-40 border-b transition-[background-color,border-color] duration-300 ${
-        compact ? 'border-hairline bg-white' : 'border-transparent bg-porcelain'
+        compact ? 'border-hairline bg-white' : 'border-transparent bg-transparent'
       }`}
     >
       <div

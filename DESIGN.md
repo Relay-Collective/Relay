@@ -137,6 +137,7 @@ Self-hosted with `@fontsource` (loaded once in `src/main.tsx`).
 - **Layout:** mobile-first, single column up to 640px, max content width 960px. Booking flows are step-by-step, one question per step.
 - **Elevation:** one approach per element. In-page cards get a `slate-200` border and no shadow. Shadows are only for things that float: menus, dialogs, toasts, the floating "Request a ride" button. No coloured glow shadows.
 - **Background:** flat porcelain `canvas`. No radial glows, blurred blobs, or frosted glass. Sticky bars and sidebars are solid white with a `slate-200` edge.
+- **Public hero mesh:** the one exception to a plain ground. Behind the landing hero only, a still hairline midnight grid that a soft electric light picks out around the pointer (light, never movement, so text never shifts), and that carries cantaloupe relay points from node to node (`components/landing/HeroMesh.tsx`). Lines and dots only: still no glows, blobs or gradient fields.
 - **Public site:** may use larger radii (16–28px) on product pictures and a soft offset shadow (`rcl-lift`) on floating product cards. The consoles keep the 12px rule.
 
 ### Signature move: the road rule
